@@ -2,7 +2,7 @@
 
 A graph-grounded, hallucination-resistant RAG system for Arabic banking and finance compliance documents. Ingests scanned regulatory PDFs and Word documents, extracts a knowledge graph plus vector embeddings, serves a streaming chat UI with citations, role-based access control, and a graph explorer.
 
-The chatbot is **Gazelle**, themed for **Abu Dhabi Islamic Bank (ADIB)** — navy + gold + cream, Apple/Anthropic-clean.
+
 
 ---
 
