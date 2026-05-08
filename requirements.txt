@@ -22,3 +22,7 @@ neo4j>=5.26.0
 pyvis>=0.3.0
 neo4j
 python-dotenv
+fastapi
+uvicorn
+FlagEmbedding
+gliner
