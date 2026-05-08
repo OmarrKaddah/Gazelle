@@ -109,7 +109,9 @@ def main():
     ap.add_argument('--skip-embed', action='store_true', help='Skip embedding step')
     args = ap.parse_args()
 
-    src = Path(args.source) | "..\\Documents"
+    from pathlib import Path
+
+    src = Path(args.source) if args.source else Path.home() / "Documents"
     print(f"Source: {src}")
     if src.is_file():
         process_file(str(src), skip_kg=args.skip_kg, skip_embed=args.skip_embed)
