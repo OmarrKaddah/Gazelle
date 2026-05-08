@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #F8FBFE;
+  color: #0F1B2D;
+  font-feature-settings: 'cv11', 'ss01';
+}
+
+/* Discreet ADIB-toned scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #D8E5EE;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #009CDA;
+}
+
+textarea {
+  font-family: inherit;
+}
+
+/* Streaming caret */
+.caret {
+  display: inline-block;
+  width: 8px;
+  height: 1.05em;
+  background: #009CDA;
+  margin-left: 3px;
+  vertical-align: text-bottom;
+  animation: caretPulse 1s ease-in-out infinite;
+  border-radius: 1px;
+}
+
+/* Citation jump-target highlight */
+@keyframes citationFlash {
+  0%   { box-shadow: 0 0 0 0 rgba(0, 156, 218, 0); background-color: #FFFFFF; }
+  15%  { box-shadow: 0 0 0 4px rgba(0, 156, 218, 0.45); background-color: #9DDBF0; }
+  100% { box-shadow: 0 0 0 0 rgba(0, 156, 218, 0); background-color: #FFFFFF; }
+}
+.citation-flash {
+  animation: citationFlash 1.6s ease-out;
+}
+
+/* Cytoscape canvas adjustments */
+.cy-canvas {
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(6, 47, 98, 0.07) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* Selection color tuned to ADIB blue */
+::selection {
+  background: #9DDBF0;
+  color: #062F62;
+}
+
+/* Focus rings */
+*:focus {
+  outline: none;
+}
+*:focus-visible {
+  outline: 2px solid #009CDA;
+  outline-offset: 2px;
+}
+
+/* Subtle inner border on inputs */
+input, textarea, button, select {
+  font-family: inherit;
+}
+
+li::marker {
+  color: #009CDA;
+}
+
+/* Prose tightening for assistant text */
+.prose-message p {
+  margin: 0 0 0.75em;
+}
+.prose-message p:last-child {
+  margin-bottom: 0;
+}
+.prose-message ul, .prose-message ol {
+  margin: 0.5em 0;
+  padding-left: 1.5em;
+}
+.prose-message strong {
+  color: #062F62;
+  font-weight: 600;
+}
+.prose-message code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.92em;
+  background: #E8F2FA;
+  padding: 1px 5px;
+  border-radius: 3px;
+}

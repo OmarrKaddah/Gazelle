@@ -1,0 +1,42 @@
+[
+  {
+    "id": "q01",
+    "query": "ما هي شروط إلغاء ترخيص البنك",
+    "type": "single-hop",
+    "relevantChunks": [],
+    "expectedAnswer": "",
+    "notes": "Single-hop: answer should be in chunks discussing license cancellation conditions. Vector should win."
+  },
+  {
+    "id": "q02",
+    "query": "متى يجب على البنك إخطار البنك المركزي بتغيير في ملكيته",
+    "type": "single-hop",
+    "relevantChunks": [],
+    "expectedAnswer": "",
+    "notes": "Single-hop: ownership change notification requirements."
+  },
+  {
+    "id": "q03",
+    "query": "ما هي الإجراءات المطلوبة لوقف العمليات المصرفية جزئياً",
+    "type": "multi-step",
+    "relevantChunks": [],
+    "expectedAnswer": "",
+    "notes": "Multi-step procedure list — usually one chunk has the enumerated steps."
+  },
+  {
+    "id": "q04",
+    "query": "ما هي القوانين التي تحكم البنوك التي يُلغى ترخيصها",
+    "type": "multi-hop",
+    "relevantChunks": [],
+    "expectedAnswer": "",
+    "notes": "Multi-hop: requires connecting law -> license -> bank. Graph should win."
+  },
+  {
+    "id": "q05",
+    "query": "من هم الأشخاص المخولون بتوقيع قرار إلغاء الترخيص",
+    "type": "multi-hop",
+    "relevantChunks": [],
+    "expectedAnswer": "",
+    "notes": "Multi-hop: signatory -> document -> license cancellation."
+  }
+]
