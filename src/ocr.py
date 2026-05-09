@@ -13,7 +13,7 @@ PARALLEL_PAGES = 1
 
 LLAMA_SERVER_URL = "http://localhost:8080/v1/chat/completions"
 OLLAMA_URL = "http://localhost:11434/v1/chat/completions"
-OLLAMA_MODEL = "qwen3-vl:8b-instruct-q4_K_M"
+OLLAMA_MODEL = "gemma3:1b"
 
 OCR_PROMPT = (
     "Extract every visible character from this image exactly as it appears. "

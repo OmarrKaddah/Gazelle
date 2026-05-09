@@ -13,6 +13,7 @@ DOC_ACCESS = {
     'Gazma': 'public',
     'gazma2': 'confidential',
     'table_ar': 'restricted',
+    'Documents/Phase - 1 document': 'confidential',
 }
 
 

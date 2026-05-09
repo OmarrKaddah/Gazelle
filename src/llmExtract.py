@@ -7,7 +7,7 @@ from ontology import ENTITIES, RELATIONSHIPS
 
 
 OLLAMA_URL = "http://localhost:11434/v1/chat/completions"
-OLLAMA_TEXT_MODEL = "qwen3-vl:8b-instruct-q4_K_M"
+OLLAMA_TEXT_MODEL = "gemma3:1b"
 PARALLEL_CHUNKS = 4  # Match OLLAMA_NUM_PARALLEL on the Ollama server.
 
 
