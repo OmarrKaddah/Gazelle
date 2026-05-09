@@ -21,7 +21,7 @@ NEO4J_PASSWORD = os.environ['NEO4J_PASSWORD']
 OLLAMA_URL = "http://localhost:11434/v1/chat/completions"
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
-OLLAMA_TEXT_MODEL = os.environ.get('OLLAMA_TEXT_MODEL', 'qwen3-vl:8b-instruct-q4_K_M')
+OLLAMA_TEXT_MODEL = os.environ.get('OLLAMA_TEXT_MODEL', 'gemma3:1b')
 GROQ_MODEL = os.environ.get('GROQ_MODEL', 'llama-3.3-70b-versatile')
 GROQ_API_KEY = os.environ.get('GROQ_API_KEY')
 
@@ -84,10 +84,18 @@ def buildPrompt(query, chunks):
 
 def streamTokens(query, chunks, provider='ollama'):
     if not chunks:
+        print(
+            f"[chatApi] No chunks to stream for query={query!r} provider={provider}",
+            flush=True,
+        )
         yield "data: " + json.dumps({"type": "token", "text": "No relevant context was retrieved for this query."}) + "\n\n"
         return
     cfg = PROVIDERS.get(provider) or PROVIDERS['ollama']
     headers = {"Authorization": f"Bearer {cfg['apiKey']}"} if cfg['apiKey'] else {}
+    print(
+        f"[chatApi] Streaming with provider={provider} model={cfg['model']} chunks={len(chunks)}",
+        flush=True,
+    )
     response = requests.post(
         cfg['url'],
         headers=headers,
@@ -154,7 +162,13 @@ def meEndpoint(user=Depends(getCurrentUser)):
 
 @app.post("/api/retrieve")
 def retrieveEndpoint(req: ChatRequest, user=Depends(getCurrentUser)):
-    return {"chunks": retrieve(req.query, mode=req.mode, k=req.k, hops=req.hops, clearance=user['clearance'])}
+    print(
+        f"[chatApi] /api/retrieve query={req.query!r} mode={req.mode} k={req.k} hops={req.hops} clearance={user['clearance']}",
+        flush=True,
+    )
+    chunks = retrieve(req.query, mode=req.mode, k=req.k, hops=req.hops, clearance=user['clearance'])
+    print(f"[chatApi] /api/retrieve returned {len(chunks)} chunks", flush=True)
+    return {"chunks": chunks}
 
 
 def queryGraph(tx, search, entityType, limit):
@@ -268,7 +282,12 @@ def graphEndpoint(
 
 @app.post("/api/chat")
 def chatStream(req: ChatRequest, user=Depends(getCurrentUser)):
+    print(
+        f"[chatApi] /api/chat query={req.query!r} mode={req.mode} k={req.k} hops={req.hops} provider={req.provider} clearance={user['clearance']}",
+        flush=True,
+    )
     chunks = retrieve(req.query, mode=req.mode, k=req.k, hops=req.hops, clearance=user['clearance'])
+    print(f"[chatApi] retrieval returned {len(chunks)} chunks", flush=True)
 
     def eventGen():
         yield "data: " + json.dumps({"type": "citations", "citations": chunks}) + "\n\n"
