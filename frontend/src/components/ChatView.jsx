@@ -52,7 +52,7 @@ function cssEscape(s) {
 }
 
 export default function ChatView({ chatState }) {
-  const { currentChat, updateChat, createChat } = chatState;
+  const { currentChat, updateChat, createChat, refreshCurrentChat, refreshChats } = chatState;
   const [query, setQuery] = useState('');
   const [streaming, setStreaming] = useState(false);
   const [settings, setSettings] = useState(loadSettings);
@@ -80,6 +80,9 @@ export default function ChatView({ chatState }) {
 
     let chat = currentChat;
     if (!chat) chat = createChat();
+    if (chat instanceof Promise) {
+      chat = await chat;
+    }
 
     const userMsg = { role: 'user', text };
     const placeholder = {
@@ -107,6 +110,7 @@ export default function ChatView({ chatState }) {
         headers: { 'Content-Type': 'application/json', ...authHeaders() },
         body: JSON.stringify({
           query: text,
+          chatId: chat.id,
           mode: settings.mode,
           k: settings.k,
           hops: settings.hops,
@@ -132,6 +136,8 @@ export default function ChatView({ chatState }) {
             messages = patchLast(messages, { citations: evt.citations });
           } else if (evt.type === 'token') {
             messages = patchLast(messages, { text: messages[messages.length - 1].text + evt.text });
+          } else if (evt.type === 'done' && evt.chatId && !chat.id) {
+            chat.id = evt.chatId;
           }
           updateChat(chat.id, { messages });
         }
@@ -141,6 +147,8 @@ export default function ChatView({ chatState }) {
     }
     messages = patchLast(messages, { streaming: false });
     updateChat(chat.id, { messages });
+    await refreshCurrentChat();
+    await refreshChats();
     setStreaming(false);
   }
 
