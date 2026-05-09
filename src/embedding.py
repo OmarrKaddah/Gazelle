@@ -14,6 +14,10 @@ NEO4J_PASSWORD = os.environ['NEO4J_PASSWORD']
 EMBED_DIM = 1024
 BATCH_SIZE = 16
 BGE_M3_PATH = os.environ.get('BGE_M3_PATH', 'BAAI/bge-m3')
+HF_HUB_OFFLINE = os.environ.get('HF_HUB_OFFLINE', '') == '1'
+
+if BGE_M3_PATH == 'BAAI/bge-m3' and HF_HUB_OFFLINE:
+    raise RuntimeError('Set BGE_M3_PATH to a local BGE-M3 snapshot when HF_HUB_OFFLINE=1')
 
 model = BGEM3FlagModel(BGE_M3_PATH, use_fp16=True)
 
