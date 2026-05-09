@@ -16,7 +16,7 @@ export default function App() {
     const v = localStorage.getItem(SIDEBAR_KEY);
     return v === null ? true : v === '1';
   });
-  const chatState = useChats();
+  const chatState = useChats(auth.token);
 
   useEffect(() => {
     localStorage.setItem(SIDEBAR_KEY, sidebarOpen ? '1' : '0');

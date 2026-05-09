@@ -1,73 +1,63 @@
+import hashlib
 import secrets
-from fastapi import HTTPException, Depends
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
+import bcrypt
+from fastapi import Depends, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from sqlalchemy.ext.asyncio import AsyncSession
 
-# Mock user directory. Passwords are plaintext for development testing only.
-USERS = {
-    'omar': {
-        'name': 'Omar Akaddah',
-        'role': 'Admin',
-        'password': 'admin123',
-        'clearance': 'restricted',
-    },
-    'sara': {
-        'name': 'Sara Hassan',
-        'role': 'Senior Compliance',
-        'password': 'compliance123',
-        'clearance': 'confidential',
-    },
-    'ahmed': {
-        'name': 'Ahmed Ali',
-        'role': 'Compliance Analyst',
-        'password': 'staff123',
-        'clearance': 'internal',
-    },
-    'guest': {
-        'name': 'Guest',
-        'role': 'External',
-        'password': 'guest',
-        'clearance': 'public',
-    },
-}
+from db.repositories.authRepo import createSession, deleteSessionByTokenHash, getUserByTokenHash, getUserByUsername
+from db.session import getDbSession
 
-SESSIONS = {}  # token -> username
 
 bearer = HTTPBearer(auto_error=False)
 
 
-def login(username, password):
-    user = USERS.get(username)
-    if not user or user['password'] != password:
+def hashToken(token: str):
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
+def verifyPassword(password: str, passwordHash: str):
+    return bcrypt.checkpw(password.encode("utf-8"), passwordHash.encode("utf-8"))
+
+
+async def login(username: str, password: str, session: AsyncSession):
+    user = await getUserByUsername(session, username)
+    if not user:
+        return None
+    if not verifyPassword(password, user.passwordHash):
         return None
     token = secrets.token_urlsafe(32)
-    SESSIONS[token] = username
+    await createSession(session, user.id, hashToken(token))
+    await session.commit()
     return token
 
 
-def logout(token):
-    SESSIONS.pop(token, None)
+async def logout(token: str, session: AsyncSession):
+    await deleteSessionByTokenHash(session, hashToken(token))
+    await session.commit()
 
 
-def userFromToken(token):
-    username = SESSIONS.get(token)
-    if not username:
-        return None
-    user = USERS.get(username)
+async def userFromToken(token: str, session: AsyncSession):
+    user = await getUserByTokenHash(session, hashToken(token))
     if not user:
         return None
     return {
-        'username': username,
-        'name': user['name'],
-        'role': user['role'],
-        'clearance': user['clearance'],
+        "id": str(user.id),
+        "username": user.username,
+        "name": user.username,
+        "role": user.role,
+        "clearance": user.clearance,
     }
 
 
-def getCurrentUser(creds: HTTPAuthorizationCredentials = Depends(bearer)):
+async def getCurrentUser(
+    creds: HTTPAuthorizationCredentials = Depends(bearer),
+    session: AsyncSession = Depends(getDbSession),
+):
     if not creds:
-        raise HTTPException(status_code=401, detail='Missing credentials')
-    user = userFromToken(creds.credentials)
+        raise HTTPException(status_code=401, detail="Missing credentials")
+    user = await userFromToken(creds.credentials, session)
     if not user:
-        raise HTTPException(status_code=401, detail='Invalid or expired token')
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
     return user
