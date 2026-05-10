@@ -1,14 +1,18 @@
 import json
+import os
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import requests
 from pathlib import Path
+from dotenv import load_dotenv
 from ontology import ENTITIES, RELATIONSHIPS
 
 
-OLLAMA_URL = "http://localhost:11434/v1/chat/completions"
-OLLAMA_TEXT_MODEL = "qwen3-vl:8b-instruct-q4_K_M"
-PARALLEL_CHUNKS = 4  # Match OLLAMA_NUM_PARALLEL on the Ollama server.
+load_dotenv()
+
+OLLAMA_URL = os.getenv('OLLAMA_URL', 'http://localhost:11434/v1/chat/completions')
+OLLAMA_TEXT_MODEL = os.getenv('OLLAMA_TEXT_MODEL', 'qwen2.5:72b-instruct-q4_K_M')
+PARALLEL_CHUNKS = int(os.getenv('OLLAMA_NUM_PARALLEL', '4'))
 
 
 def slugify(text):
