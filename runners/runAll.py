@@ -3,6 +3,9 @@ import argparse
 import json
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from parser import parseDoc, dumpParsed
 
@@ -13,7 +16,14 @@ if CHUNKER_TYPE == 'semantic':
     from semantic_chunker import chunkDoc, dumpChunks
 else:
     from chunker import chunkDoc, dumpChunks
-from glinerExtract import extractEntities, dumpEntities
+
+# Choose NER strategy: 'gliner', 'llm', or 'hybrid'
+NER_STRATEGY = os.getenv('NER_STRATEGY', 'hybrid').lower()
+if NER_STRATEGY == 'llm':
+    from llmNER import extractEntities, dumpEntities
+else:
+    from glinerExtract import extractEntities, dumpEntities
+
 from llmExtract import extractDoc, dumpExtractions
 from kgWriter import writeDoc
 from embedding import embedDoc
@@ -89,9 +99,12 @@ def process_file(path: str, skip_kg: bool = False, skip_embed: bool = False):
     dumpChunks(chunks, stem)
     print(f"Wrote {len(chunks)} chunks to chunks/{stem}.json")
 
+    ner_label = 'LLM' if NER_STRATEGY == 'llm' else 'GLiNER'
+    print(f"\n[NER Strategy: {NER_STRATEGY.upper()}] Using {ner_label} for entity extraction")
+    
     ents = extractEntities(stem)
     dumpEntities(ents, stem)
-    print(f"Wrote {len(ents)} GLiNER spans to extractions/{stem}_entities.json")
+    print(f"Wrote {len(ents)} entity spans to extractions/{stem}_entities.json")
 
     rels = extractDoc(stem)
     dumpExtractions(rels, stem)
@@ -109,7 +122,17 @@ def process_file(path: str, skip_kg: bool = False, skip_embed: bool = False):
 
 
 def main():
-    ap = argparse.ArgumentParser(description='Run full pipeline for one or more source files')
+    ap = argparse.ArgumentParser(
+        description='Run full pipeline for one or more source files',
+        epilog=f"""
+NER Strategy (from .env NER_STRATEGY):
+  - hybrid: GLiNER for entities + LLM for relationships (recommended) [current: {NER_STRATEGY}]
+  - gliner: Fast GLiNER-only entity extraction (baseline)
+  - llm: LLM-based entity extraction (slower but more accurate, uses Ollama)
+
+Configure in .env: NER_STRATEGY, GLINER_MODEL, GLINER_THRESHOLD, OLLAMA_TEXT_MODEL
+        """
+    )
     ap.add_argument('source', nargs='?', default='Documents', help='File or directory to process')
     ap.add_argument('--extensions', nargs='+', default=None, help='Limit to these file extensions (e.g. .pdf .docx)')
     ap.add_argument('--skip-kg', action='store_true', help='Skip writing to Neo4j')
