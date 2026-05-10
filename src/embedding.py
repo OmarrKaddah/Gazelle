@@ -19,11 +19,18 @@ HF_HUB_OFFLINE = os.environ.get('HF_HUB_OFFLINE', '') == '1'
 if BGE_M3_PATH == 'BAAI/bge-m3' and HF_HUB_OFFLINE:
     raise RuntimeError('Set BGE_M3_PATH to a local BGE-M3 snapshot when HF_HUB_OFFLINE=1')
 
-model = BGEM3FlagModel(BGE_M3_PATH, use_fp16=True)
+_embeddingModel = None
+
+
+def embeddingModel():
+    global _embeddingModel
+    if _embeddingModel is None:
+        _embeddingModel = BGEM3FlagModel(BGE_M3_PATH, use_fp16=True)
+    return _embeddingModel
 
 
 def embedTexts(texts):
-    out = model.encode(texts, max_length=8192, return_dense=True, return_sparse=False, return_colbert_vecs=False)
+    out = embeddingModel().encode(texts, max_length=8192, return_dense=True, return_sparse=False, return_colbert_vecs=False)
     return out['dense_vecs'].tolist()
 
 
