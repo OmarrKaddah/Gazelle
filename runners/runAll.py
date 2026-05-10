@@ -5,7 +5,14 @@ import os
 from pathlib import Path
 
 from parser import parseDoc, dumpParsed
-from chunker import chunkDoc, dumpChunks
+
+# Choose chunker implementation via environment variable CHUNKER_TYPE
+# valid values: "default" (src/chunker.py) or "semantic" (src/semantic_chunker.py)
+CHUNKER_TYPE = os.getenv('CHUNKER_TYPE', 'default').lower()
+if CHUNKER_TYPE == 'semantic':
+    from semantic_chunker import chunkDoc, dumpChunks
+else:
+    from chunker import chunkDoc, dumpChunks
 from glinerExtract import extractEntities, dumpEntities
 from llmExtract import extractDoc, dumpExtractions
 from kgWriter import writeDoc
