@@ -49,8 +49,8 @@ frontend/         ─► React + Tailwind: chat with citations, graph explorer, 
 - **OCR**: Qwen3-VL via Ollama (or llama-server)
 - **Word**: docling
 - **Tokenizer**: BGE-M3 (chunk sizing)
-- **NER**: GLiNER `NAMAA-Space/gliner_arabic-v2.1`
-- **Relation extraction**: any LLM via Ollama (default `command-r7b-arabic` / `llama3.1:8b`) or Groq Cloud
+- **NER**: GLiNER `NAMAA-Space/gliner_arabic-v2.1` by default, with optional LLM-only or hybrid modes via `.env`
+- **Relation extraction**: any LLM via Ollama (default `qwen2.5:72b-instruct-q4_K_M`) or Groq Cloud
 - **Graph DB**: Neo4j (vector + fulltext indexes on Chunk; relationship graph on Entity)
 - **Embeddings**: BGE-M3 dense (1024-dim, fp16) — stored on Chunk nodes
 - **API**: FastAPI + uvicorn, SSE streaming
@@ -64,7 +64,7 @@ frontend/         ─► React + Tailwind: chat with citations, graph explorer, 
 ```
 Graph/
 ├── src/                ← module code (importable Python)
-├── runners/            ← scripts (one per pipeline stage)
+├── runners/            ← scripts (one per pipeline stage + benchmark runner)
 ├── eval/               ← retrieval evaluation harness
 ├── frontend/           ← React + Vite SPA
 ├── Documents/          ← source PDFs, images, docx
@@ -72,9 +72,10 @@ Graph/
 ├── output/             ← OCR per-page JSON sidecars
 ├── parsed/             ← structured ParsedElement lists
 ├── chunks/             ← token-budgeted chunks
-├── extractions/        ← entities + relationships (GLiNER + LLM)
+├── extractions/        ← entities + relationships (GLiNER or LLM + LLM)
 ├── gold/               ← gold-set annotations (manual)
-├── .env                ← Neo4j creds, Groq API key, BGE-M3 path
+├── .env                ← Neo4j creds, Groq API key, BGE-M3 path, NER/LLM strategy
+├── .env-example        ← sanitized example config
 ├── Modelfile           ← Ollama Modelfile (vision model)
 ├── requirements.txt
 ├── CLAUDE.md           ← coding conventions for Claude Code
@@ -100,8 +101,11 @@ Maintains a heading stack so every element inherits a `sectionPath` like `["Chap
 #### `src/chunker.py` — Stage 3: Chunking
 Section-aware packing with overlap. Walks elements in order, groups consecutive elements with the same `sectionPath`, packs them until adding the next element would exceed the token budget (default 600, measured by BGE-M3 tokenizer). When flushing, the last element of the previous chunk carries into the next as **overlap** (preserves meaning across split sections). Tables are atomic — never split, always their own chunk. Heading-only elements are skipped (their text already lives in `sectionPath`). The leaf section heading is **prepended to chunk text** for embedding context. Output: `chunks/{doc}.json`.
 
-#### `src/glinerExtract.py` — Stage 4a: NER
-Loads the Arabic GLiNER model `NAMAA-Space/gliner_arabic-v2.1` once at module import. Pulls labels from `ontology.ENTITIES.keys()` (single source of truth). For each chunk, runs `model.predict_entities()` with threshold 0.5; emits one entity record per detected span with `chunkId`, char offsets, type, and confidence score. Output: `extractions/{doc}_entities.json` (raw spans, no deduplication).
+#### `src/glinerExtract.py` — Stage 4a: NER (GLiNER path)
+Loads the GLiNER model once at module import. The model is configurable through `.env` (`GLINER_MODEL`), and the confidence threshold is configurable through `.env` (`GLINER_THRESHOLD`). Pulls labels from `ontology.ENTITIES.keys()` (single source of truth). For each chunk, runs `model.predict_entities()` and emits one entity record per detected span with `chunkId`, char offsets, type, and confidence score. Output: `extractions/{doc}_entities.json` (raw spans, no deduplication).
+
+#### `src/llmNER.py` — Stage 4a alternative: NER (LLM-only path)
+Uses Ollama to extract entities directly from chunk text when `NER_STRATEGY=llm`. Returns the same entity shape as the GLiNER path so the rest of the pipeline can stay unchanged. This is the slower but more flexible option for mixed Arabic/English documents or when you want a pure-LLM extraction path.
 
 #### `src/llmExtract.py` — Stage 4b: Relationship extraction
 Two-step:
@@ -109,6 +113,8 @@ Two-step:
 2. **`extractRelationships()`** — LLM call. For each chunk, sends a focused prompt: ontology relationship spec + direction rules + the canonical entities present in this chunk + the chunk text. The LLM returns only relationships, not entities. Strict JSON output via `response_format: {type: "json_object"}`.
 
 Parallelized via `ThreadPoolExecutor` (`PARALLEL_CHUNKS = 4`; needs `OLLAMA_NUM_PARALLEL=4` on the Ollama server). Output: `extractions/{doc}.json` (per-chunk entity list + relationships).
+
+`OLLAMA_URL`, `OLLAMA_TEXT_MODEL`, and `OLLAMA_NUM_PARALLEL` are configurable through `.env`.
 
 #### `src/kgWriter.py` — Stage 5: Knowledge graph
 Idempotent MERGE writes into Neo4j. Schema:
@@ -230,6 +236,7 @@ Explains methodology for evaluating each layer (retrieval / extraction / end-to-
 
 - **`.env`** — `NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD`, `GROQ_API_KEY` (optional), `GROQ_MODEL`, `OLLAMA_TEXT_MODEL`, `BGE_M3_PATH`.
 - **`requirements.txt`** — Python deps.
+- **`.env-example`** — sanitized example config for NER, Ollama, Neo4j, embeddings, and pipeline flags.
 - **`Modelfile`** — Ollama Modelfile for the vision model used by OCR.
 - **`CLAUDE.md`** — coding conventions for Claude Code (camelCase functions, no defensive code, etc.).
 
@@ -257,6 +264,10 @@ ollama serve                               # in its own terminal
 #   NEO4J_USER=neo4j
 #   NEO4J_PASSWORD=...
 #   BGE_M3_PATH=C:/Users/.../bge-m3/snapshots/<hash>
+#   NER_STRATEGY=hybrid
+#   GLINER_MODEL=NAMAA-Space/gliner_arabic-v2.1
+#   OLLAMA_URL=http://localhost:11434/v1/chat/completions
+#   OLLAMA_TEXT_MODEL=qwen2.5:72b-instruct-q4_K_M
 ```
 
 ### Per-document ingestion (run once per source doc)
@@ -270,6 +281,9 @@ python runners\runGliner.py     # NER
 python runners\runLlm.py        # relations
 python runners\runKg.py         # write to Neo4j
 python runners\runEmbed.py      # embeddings + indexes
+
+# Optional: compare gliner / llm / hybrid NER strategies on the same chunk file
+python runners\runNerBenchmark.py chapter_3 --output ner_benchmark.json
 ```
 
 ### Serve
@@ -300,7 +314,8 @@ python eval\runEval.py
 runOcr      ─►  Doc_Out/, output/
 runParser   ─►  parsed/                         (needs output/ sidecar)
 runChunker  ─►  chunks/                         (needs parsed/)
-runGliner   ─►  extractions/_entities.json     (needs chunks/)
+runGliner   ─►  extractions/_entities.json     (needs chunks/, uses GLiNER or hybrid path)
+runNerBenchmark ─► timing/results for gliner | llm | hybrid
 runLlm      ─►  extractions/.json              (needs chunks/ AND extractions/_entities.json)
 runKg       ─►  Neo4j                          (needs chunks/ AND extractions/.json)
 runEmbed    ─►  Neo4j Chunk.embedding          (needs Neo4j chunks already written by runKg)
@@ -318,3 +333,4 @@ If any stage is skipped, downstream stages fail silently or with empty results �
 - **Access control at retrieval**: chunks the user can't see never reach the LLM. Filtered in Cypher (`WHERE node.docName IN $allowed`), not just hidden in the UI.
 - **Schema-validated extraction**: entities are typed against the ontology; relationships are dropped if subject/object types don't match the schema.
 - **Single source of truth**: ontology lives in one Python file, imported by GLiNER, LLM, and KG validation alike.
+- **Configurable NER strategy**: choose `gliner`, `llm`, or `hybrid` from `.env` to match the hardware and document mix.
