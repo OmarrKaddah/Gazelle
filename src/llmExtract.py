@@ -4,15 +4,18 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import requests
 from pathlib import Path
 from ontology import ENTITIES, RELATIONSHIPS
-
-
-OLLAMA_URL = "http://localhost:11434/v1/chat/completions"
-OLLAMA_TEXT_MODEL = "qwen3-vl:8b-instruct-q4_K_M"
-PARALLEL_CHUNKS = 4  # Match OLLAMA_NUM_PARALLEL on the Ollama server.
+from config import OLLAMA_URL, OLLAMA_EXTRACT_MODEL, PARALLEL_CHUNKS
 
 
 def slugify(text):
     return re.sub(r'\s+', '-', text.strip()).lower()
+
+
+def normalizeArabic(text):
+    text = re.sub(r'[ً-ٟ]', '', text)             # strip tashkeel
+    text = re.sub(r'[أإآ]', 'ا', text)  # أ إ آ → ا
+    text = re.sub(r'ى', 'ي', text)                 # ى → ي
+    return re.sub(r'\s+', ' ', text).strip()
 
 
 def loadChunks(docName):
@@ -29,15 +32,19 @@ def canonicalizeEntities(rawEntities):
         if e['type'] not in ENTITIES:
             continue
         text = e['text'].strip()
-        key = (text, e['type'])
+        key = (normalizeArabic(text), e['type'])
         if key not in grouped:
             grouped[key] = {
-                'canonicalId': slugify(text) + '-' + e['type'].lower(),
+                'canonicalId': slugify(key[0]) + '-' + e['type'].lower(),
                 'canonicalName': text,
                 'type': e['type'],
                 'aliases': [],
                 'chunkIds': set(),
             }
+        else:
+            existing = grouped[key]
+            if text != existing['canonicalName'] and text not in existing['aliases']:
+                existing['aliases'].append(text)
         grouped[key]['chunkIds'].add(e['chunkId'])
     out = []
     for v in grouped.values():
@@ -101,7 +108,7 @@ def callOllama(prompt):
     response = requests.post(
         OLLAMA_URL,
         json={
-            "model": OLLAMA_TEXT_MODEL,
+            "model": OLLAMA_EXTRACT_MODEL,
             "messages": [{"role": "user", "content": prompt}],
             "temperature": 0,
             "response_format": {"type": "json_object"},
@@ -134,7 +141,7 @@ def extractDoc(docName):
         for cid in ent['chunkIds']:
             entitiesByChunk.setdefault(cid, []).append(ent)
 
-    results = [None] * len(chunks)
+    results: list = [None] * len(chunks)
 
     def processChunk(i, chunk):
         chunkEnts = entitiesByChunk.get(chunk['chunkId'], [])

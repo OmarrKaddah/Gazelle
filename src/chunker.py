@@ -3,9 +3,9 @@ from dataclasses import dataclass, asdict
 from pathlib import Path
 from transformers import AutoTokenizer
 from parser import ParsedElement
+from config import BGE_M3_PATH, CHUNK_TARGET_TOKENS
 
-
-tokenizer = AutoTokenizer.from_pretrained('BAAI/bge-m3')
+tokenizer = AutoTokenizer.from_pretrained(BGE_M3_PATH)
 
 
 @dataclass
@@ -88,7 +88,7 @@ def buildChunk(elems, sectionPath, docName, counter):
     )
 
 
-def chunkDoc(elements, target=600):
+def chunkDoc(elements, target=CHUNK_TARGET_TOKENS):
     chunks = []
     counter = 0
     docName = elements[0].docName

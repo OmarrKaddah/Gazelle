@@ -7,26 +7,16 @@ from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from neo4j import GraphDatabase
-from dotenv import load_dotenv
 from retriever import retrieve
 from auth import login, logout, userFromToken, getCurrentUser, USERS
 from docAccess import LEVELS, DOC_ACCESS
-
-
-load_dotenv()
-NEO4J_URI = os.environ['NEO4J_URI']
-NEO4J_USER = os.environ['NEO4J_USER']
-NEO4J_PASSWORD = os.environ['NEO4J_PASSWORD']
-
-OLLAMA_URL = "http://localhost:11434/v1/chat/completions"
-GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
-
-OLLAMA_TEXT_MODEL = os.environ.get('OLLAMA_TEXT_MODEL', 'qwen3-vl:8b-instruct-q4_K_M')
-GROQ_MODEL = os.environ.get('GROQ_MODEL', 'llama-3.3-70b-versatile')
-GROQ_API_KEY = os.environ.get('GROQ_API_KEY')
+from config import (
+    NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD,
+    OLLAMA_URL, GROQ_URL, OLLAMA_CHAT_MODEL, GROQ_MODEL, GROQ_API_KEY,
+)
 
 PROVIDERS = {
-    'ollama': {'url': OLLAMA_URL, 'model': OLLAMA_TEXT_MODEL, 'apiKey': None},
+    'ollama': {'url': OLLAMA_URL, 'model': OLLAMA_CHAT_MODEL, 'apiKey': None},
     'groq': {'url': GROQ_URL, 'model': GROQ_MODEL, 'apiKey': GROQ_API_KEY},
 }
 
@@ -45,7 +35,6 @@ class ChatRequest(BaseModel):
     query: str
     mode: str = "vector"
     k: int = 5
-    hops: int = 1
     provider: str = "ollama"
 
 
@@ -121,7 +110,7 @@ def streamTokens(query, chunks, provider='ollama'):
 def infoEndpoint():
     return {
         "providers": {
-            "ollama": {"model": OLLAMA_TEXT_MODEL, "available": True},
+            "ollama": {"model": OLLAMA_CHAT_MODEL, "available": True},
             "groq": {"model": GROQ_MODEL, "available": bool(GROQ_API_KEY)},
         },
         "levels": LEVELS,
@@ -154,7 +143,7 @@ def meEndpoint(user=Depends(getCurrentUser)):
 
 @app.post("/api/retrieve")
 def retrieveEndpoint(req: ChatRequest, user=Depends(getCurrentUser)):
-    return {"chunks": retrieve(req.query, mode=req.mode, k=req.k, hops=req.hops, clearance=user['clearance'])}
+    return {"chunks": retrieve(req.query, mode=req.mode, k=req.k, clearance=user['clearance'])}
 
 
 def queryGraph(tx, search, entityType, limit):
@@ -268,7 +257,7 @@ def graphEndpoint(
 
 @app.post("/api/chat")
 def chatStream(req: ChatRequest, user=Depends(getCurrentUser)):
-    chunks = retrieve(req.query, mode=req.mode, k=req.k, hops=req.hops, clearance=user['clearance'])
+    chunks = retrieve(req.query, mode=req.mode, k=req.k, clearance=user['clearance'])
 
     def eventGen():
         yield "data: " + json.dumps({"type": "citations", "citations": chunks}) + "\n\n"

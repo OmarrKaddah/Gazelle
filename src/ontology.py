@@ -27,3 +27,19 @@ RELATIONSHIPS = {
     'EFFECTIVE_FROM': (['Law', 'License'],              ['Date']),
     'APPLIES_TO':     (['Law', 'Article'],              ['BankingInstitution']),
 }
+
+# Natural-language descriptions used to embed each relationship type so the
+# retriever can score query–relation semantic similarity. Bilingual on purpose:
+# BGE-M3 handles cross-lingual matching, but Arabic queries hit Arabic phrasings
+# more reliably.
+RELATIONSHIP_DESCRIPTIONS = {
+    'ISSUED_BY':      'صادر عن جهة، يصدر من، صادر بقرار من — issued by, granted by, authorized by',
+    'GOVERNS':        'يحكم، ينظم، يضع قواعد على — governs, regulates, controls',
+    'AMENDS':         'يعدل، يغير، يحدث قانوناً — amends, modifies, updates',
+    'SUPERSEDES':     'يلغي، يحل محل، يستبدل — supersedes, replaces, overrides',
+    'PART_OF':        'مادة من، فقرة من، جزء من قانون — part of, section of, contained in',
+    'REQUIRES':       'يتطلب، يوجب، يفرض شرطاً — requires, mandates, demands',
+    'SIGNED_BY':      'موقع من، اعتمد بتوقيع — signed by, approved by',
+    'EFFECTIVE_FROM': 'نافذ من تاريخ، يسري من — effective from, in force since',
+    'APPLIES_TO':     'ينطبق على، يسري على، يخضع له — applies to, covers, pertains to',
+}

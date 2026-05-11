@@ -6,14 +6,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import pypdfium2
 import requests
-
-# Switch between "local" (llama-server) and "ollama"
-PROVIDER = "ollama"
-PARALLEL_PAGES = 1
-
-LLAMA_SERVER_URL = "http://localhost:8080/v1/chat/completions"
-OLLAMA_URL = "http://localhost:11434/v1/chat/completions"
-OLLAMA_MODEL = "qwen3-vl:8b-instruct-q4_K_M"
+from config import OCR_PROVIDER, OCR_PARALLEL_PAGES, LLAMA_SERVER_URL, OLLAMA_URL, OLLAMA_VISION_MODEL
 
 OCR_PROMPT = (
     "Extract every visible character from this image exactly as it appears. "
@@ -84,7 +77,7 @@ def parse_ollama(path: str) -> str:
     response = requests.post(
         OLLAMA_URL,
         json={
-            "model": OLLAMA_MODEL,
+            "model": OLLAMA_VISION_MODEL,
             "messages": [
                 {
                     "role": "user",
@@ -103,7 +96,7 @@ def parse_ollama(path: str) -> str:
 
 
 def ocr(path: str) -> str:
-    if PROVIDER == "ollama":
+    if OCR_PROVIDER == "ollama":
         return parse_ollama(path)
     return parse_local(path)
 
@@ -123,7 +116,7 @@ def process_pdf(path: str) -> list[dict]:
     render_scale = int(round(200 / 72))
     n_pages = len(doc)
     results: dict[int, str] = {}
-    with ThreadPoolExecutor(max_workers=PARALLEL_PAGES) as pool:
+    with ThreadPoolExecutor(max_workers=OCR_PARALLEL_PAGES) as pool:
         futures = {pool.submit(render_and_ocr, doc, render_scale, i): i for i in range(n_pages)}
         for future in as_completed(futures):
             idx, text = future.result()

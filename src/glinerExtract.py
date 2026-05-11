@@ -2,11 +2,10 @@ import json
 from pathlib import Path
 from gliner import GLiNER
 from ontology import ENTITIES
+from config import GLINER_MODEL, GLINER_THRESHOLD
 
-
-THRESHOLD = 0.5
 labels = list(ENTITIES.keys())
-model = GLiNER.from_pretrained('NAMAA-Space/gliner_arabic-v2.1')
+model = GLiNER.from_pretrained(GLINER_MODEL)
 
 
 def loadChunks(docName):
@@ -14,7 +13,7 @@ def loadChunks(docName):
 
 
 def extractFromChunk(chunk):
-    spans = model.predict_entities(chunk['text'], labels, threshold=THRESHOLD)
+    spans = model.predict_entities(chunk['text'], labels, threshold=GLINER_THRESHOLD)
     return [
         {
             'chunkId': chunk['chunkId'],

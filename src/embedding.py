@@ -1,26 +1,13 @@
 import json
-import os
+import requests
 from pathlib import Path
-from FlagEmbedding import BGEM3FlagModel
 from neo4j import GraphDatabase
-from dotenv import load_dotenv
-
-
-load_dotenv()
-NEO4J_URI = os.environ['NEO4J_URI']
-NEO4J_USER = os.environ['NEO4J_USER']
-NEO4J_PASSWORD = os.environ['NEO4J_PASSWORD']
-
-EMBED_DIM = 1024
-BATCH_SIZE = 16
-BGE_M3_PATH = os.environ.get('BGE_M3_PATH', 'BAAI/bge-m3')
-
-model = BGEM3FlagModel(BGE_M3_PATH, use_fp16=True)
+from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, EMBED_DIM, CHUNK_EMBED_BATCH, OLLAMA_EMBED_URL, OLLAMA_EMBED_MODEL
 
 
 def embedTexts(texts):
-    out = model.encode(texts, max_length=8192, return_dense=True, return_sparse=False, return_colbert_vecs=False)
-    return out['dense_vecs'].tolist()
+    resp = requests.post(OLLAMA_EMBED_URL, json={"model": OLLAMA_EMBED_MODEL, "input": texts})
+    return resp.json()["embeddings"]
 
 
 def embedQuery(query):
@@ -63,10 +50,10 @@ def embedDoc(docName):
         with driver.session() as session:
             session.execute_write(setupVectorIndex)
             session.execute_write(setupFulltextIndex)
-            for i in range(0, len(chunks), BATCH_SIZE):
-                batch = chunks[i:i + BATCH_SIZE]
+            for i in range(0, len(chunks), CHUNK_EMBED_BATCH):
+                batch = chunks[i:i + CHUNK_EMBED_BATCH]
                 texts = [c['text'] for c in batch]
                 embs = embedTexts(texts)
                 for chunk, emb in zip(batch, embs):
                     session.execute_write(writeEmbedding, chunk['chunkId'], emb)
-                print(f"Embedded {min(i + BATCH_SIZE, len(chunks))}/{len(chunks)}", flush=True)
+                print(f"Embedded {min(i + CHUNK_EMBED_BATCH, len(chunks))}/{len(chunks)}", flush=True)
