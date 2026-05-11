@@ -195,6 +195,7 @@ def vectorSearch(query, k, allowed):
     with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
         with driver.session() as session:
             results = session.execute_read(vectorQuery, emb, k, allowed)
+    print(f"[retriever] vectorSearch returned {len(results)} chunks", flush=True)
     for r in results:
         r['source'] = 'vector'
     print(f"[DEBUG] vectorSearch: final results={len(results)}")

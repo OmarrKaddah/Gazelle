@@ -18,11 +18,11 @@ OCR_PARALLEL_PAGES = 1
 OLLAMA_VISION_MODEL = "qwen3-vl:8b-instruct-q4_K_M"
 
 # Relation extraction
-OLLAMA_EXTRACT_MODEL = os.environ.get('OLLAMA_EXTRACT_MODEL', 'command-r7b-arabic:latest')
+OLLAMA_EXTRACT_MODEL = os.environ.get('OLLAMA_EXTRACT_MODEL', 'granite4.1:8b')
 PARALLEL_CHUNKS = 4              # Match OLLAMA_NUM_PARALLEL on the Ollama server
 
 # Chat API
-OLLAMA_CHAT_MODEL = os.environ.get('OLLAMA_CHAT_MODEL', 'qwen3-vl:8b-instruct-q4_K_M')
+OLLAMA_CHAT_MODEL = os.environ.get('OLLAMA_CHAT_MODEL', 'granite4.1:8b')
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 GROQ_MODEL = os.environ.get('GROQ_MODEL', 'llama-3.3-70b-versatile')
 GROQ_API_KEY = os.environ.get('GROQ_API_KEY')
