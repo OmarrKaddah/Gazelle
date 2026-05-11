@@ -1,15 +1,27 @@
+import asyncio
 import json
 import os
-import requests
-from fastapi import FastAPI, Depends
+import uuid
+
+import httpx
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
 from neo4j import GraphDatabase
 from retriever import retrieve
-from auth import login, logout, userFromToken, getCurrentUser, USERS
-from docAccess import LEVELS, DOC_ACCESS
+from auth import bearer, getCurrentUser, login, logout, userFromToken
+from docAccess import LEVELS
+from db.session import asyncSessionFactory, getDbSession
+from db.repositories.chatRepo import (
+    createChat, listChats, getChatById, deleteChat, createMessage, listMessages,
+)
+from db.repositories.memoryRepo import (
+    upsertChatMemory, getChatMemory, listUserMemory, upsertUserMemory,
+)
+from db.repositories.auditRepo import logAudit
 from config import (
     NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD,
     OLLAMA_URL, GROQ_URL, OLLAMA_CHAT_MODEL, GROQ_MODEL, GROQ_API_KEY,
@@ -33,9 +45,31 @@ app.add_middleware(
 
 class ChatRequest(BaseModel):
     query: str
+    chatId: str | None = None
     mode: str = "vector"
     k: int = 5
+    hops: int = 1
     provider: str = "ollama"
+
+
+class CreateChatRequest(BaseModel):
+    title: str | None = None
+
+
+class UpdateChatRequest(BaseModel):
+    title: str
+
+
+class UpsertChatMemoryRequest(BaseModel):
+    summary: str
+    extractedEntities: dict
+    metadata: dict | None = None
+
+
+class UpsertUserMemoryRequest(BaseModel):
+    memoryValue: str
+    confidence: float = 1.0
+    metadata: dict | None = None
 
 
 def buildContext(chunks):
@@ -71,39 +105,101 @@ def buildPrompt(query, chunks):
     )
 
 
-def streamTokens(query, chunks, provider='ollama'):
+async def streamTokens(query, chunks, provider='ollama'):
     if not chunks:
+        print(
+            f"[chatApi] No chunks to stream for query={query!r} provider={provider}",
+            flush=True,
+        )
         yield "data: " + json.dumps({"type": "token", "text": "No relevant context was retrieved for this query."}) + "\n\n"
         return
     cfg = PROVIDERS.get(provider) or PROVIDERS['ollama']
     headers = {"Authorization": f"Bearer {cfg['apiKey']}"} if cfg['apiKey'] else {}
-    response = requests.post(
-        cfg['url'],
-        headers=headers,
-        json={
-            "model": cfg['model'],
-            "messages": [
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": buildPrompt(query, chunks)},
-            ],
-            "temperature": 0,
-            "stream": True,
-        },
-        stream=True,
-        timeout=300,
+    print(
+        f"[chatApi] Streaming with provider={provider} model={cfg['model']} chunks={len(chunks)}",
+        flush=True,
     )
-    response.raise_for_status()
-    response.encoding = 'utf-8'
-    for raw in response.iter_lines(decode_unicode=True):
-        if not raw or not raw.startswith("data: "):
-            continue
-        payload = raw[6:]
-        if payload == "[DONE]":
-            break
-        chunk = json.loads(payload)
-        delta = chunk["choices"][0].get("delta", {}).get("content", "")
-        if delta:
-            yield "data: " + json.dumps({"type": "token", "text": delta}) + "\n\n"
+    async with httpx.AsyncClient(timeout=300) as client:
+        async with client.stream(
+            "POST",
+            cfg['url'],
+            headers=headers,
+            json={
+                "model": cfg['model'],
+                "messages": [
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": buildPrompt(query, chunks)},
+                ],
+                "temperature": 0,
+                "stream": True,
+            },
+        ) as response:
+            response.raise_for_status()
+            async for raw in response.aiter_lines():
+                if not raw or not raw.startswith("data: "):
+                    continue
+                payload = raw[6:]
+                if payload == "[DONE]":
+                    break
+                chunk = json.loads(payload)
+                delta = chunk["choices"][0].get("delta", {}).get("content", "")
+                if delta:
+                    yield "data: " + json.dumps({"type": "token", "text": delta}) + "\n\n"
+
+
+def serializeChat(chat):
+    return {
+        "id": str(chat.id),
+        "userId": str(chat.userId),
+        "title": chat.title,
+        "createdAt": chat.createdAt.isoformat(),
+        "updatedAt": chat.updatedAt.isoformat(),
+    }
+
+
+def serializeMessage(message):
+    return {
+        "id": str(message.id),
+        "chatId": str(message.chatId),
+        "role": message.role,
+        "text": message.content,
+        "tokenCount": message.tokenCount,
+        "createdAt": message.createdAt.isoformat(),
+    }
+
+
+def serializeUserMemory(row):
+    return {
+        "id": str(row.id),
+        "memoryKey": row.memoryKey,
+        "memoryValue": row.memoryValue,
+        "confidence": row.confidence,
+        "metadata": row.metadataJson,
+        "updatedAt": row.updatedAt.isoformat(),
+    }
+
+
+def serializeChatMemory(row):
+    if not row:
+        return None
+    return {
+        "id": str(row.id),
+        "chatId": str(row.chatId),
+        "summary": row.summary,
+        "extractedEntities": row.extractedEntities,
+        "metadata": row.metadataJson,
+        "updatedAt": row.updatedAt.isoformat(),
+    }
+
+
+def countTokens(text: str):
+    return len(text.split())
+
+
+def buildChatSummary(userQuery: str, assistantAnswer: str):
+    userPart = userQuery.strip()[:500]
+    assistantPart = assistantAnswer.strip()[:1200]
+    return f"User: {userPart}\nAssistant: {assistantPart}"
 
 
 @app.get("/api/info")
@@ -123,21 +219,26 @@ class LoginRequest(BaseModel):
 
 
 @app.post("/api/login")
-def loginEndpoint(req: LoginRequest):
-    token = login(req.username, req.password)
+async def loginEndpoint(req: LoginRequest, session: AsyncSession = Depends(getDbSession)):
+    token = await login(req.username, req.password, session)
     if not token:
         return {"ok": False, "error": "Invalid credentials"}
-    user = userFromToken(token)
+    user = await userFromToken(token, session)
     return {"ok": True, "token": token, "user": user}
 
 
 @app.post("/api/logout")
-def logoutEndpoint(user=Depends(getCurrentUser)):
+async def logoutEndpoint(
+    creds=Depends(bearer),
+    session: AsyncSession = Depends(getDbSession),
+):
+    if creds:
+        await logout(creds.credentials, session)
     return {"ok": True}
 
 
 @app.get("/api/me")
-def meEndpoint(user=Depends(getCurrentUser)):
+async def meEndpoint(user=Depends(getCurrentUser)):
     return {"user": user}
 
 
@@ -214,7 +315,7 @@ def querySeedGraph(tx, seed, hops, limit):
 
 
 @app.get("/api/graph")
-def graphEndpoint(
+async def graphEndpoint(
     search: str = "",
     type: str = "",
     seed: str = "",
@@ -255,16 +356,169 @@ def graphEndpoint(
     }
 
 
+async def chatEventGen(query, chunks, chatId, userId, req):
+    yield "data: " + json.dumps({"type": "citations", "citations": chunks}) + "\n\n"
+    parts = []
+    async for event in streamTokens(query, chunks, req.provider):
+        payload = json.loads(event[6:].strip())
+        if payload.get("type") == "token":
+            parts.append(payload.get("text", ""))
+        yield event
+    assistantText = "".join(parts)
+    chatSummary = buildChatSummary(query, assistantText)
+    extractedEntities = {"chunkIds": sorted({c["chunkId"] for c in chunks if c.get("chunkId")})}
+    chatMetadata = {"mode": req.mode, "provider": req.provider, "k": req.k, "hops": req.hops}
+    async with asyncSessionFactory() as session:
+        await createMessage(session, chatId, "assistant", assistantText, countTokens(assistantText))
+        await upsertChatMemory(session, chatId, chatSummary, extractedEntities, chatMetadata)
+        await logAudit(session, userId, "message.create", "chat", str(chatId))
+        await session.commit()
+    yield "data: " + json.dumps({"type": "done", "chatId": str(chatId)}) + "\n\n"
+
+
 @app.post("/api/chat")
-def chatStream(req: ChatRequest, user=Depends(getCurrentUser)):
-    chunks = retrieve(req.query, mode=req.mode, k=req.k, clearance=user['clearance'])
+async def chatStream(req: ChatRequest, user=Depends(getCurrentUser)):
+    chunks = await asyncio.to_thread(retrieve, req.query, mode=req.mode, k=req.k, clearance=user['clearance'])
+    userId = uuid.UUID(user["id"])
+    async with asyncSessionFactory() as session:
+        if req.chatId:
+            chatId = uuid.UUID(req.chatId)
+        else:
+            chat = await createChat(session, userId, req.query[:60])
+            await session.commit()
+            chatId = chat.id
+        await createMessage(session, chatId, "user", req.query, countTokens(req.query))
+        await logAudit(session, userId, "message.create", "chat", str(chatId))
+        await session.commit()
+    return StreamingResponse(
+        chatEventGen(req.query, chunks, chatId, userId, req),
+        media_type="text/event-stream; charset=utf-8",
+    )
 
-    def eventGen():
-        yield "data: " + json.dumps({"type": "citations", "citations": chunks}) + "\n\n"
-        yield from streamTokens(req.query, chunks, req.provider)
-        yield "data: " + json.dumps({"type": "done"}) + "\n\n"
 
-    return StreamingResponse(eventGen(), media_type="text/event-stream; charset=utf-8")
+@app.get("/api/chats")
+async def listChatsEndpoint(
+    limit: int = 30,
+    offset: int = 0,
+    user=Depends(getCurrentUser),
+    session: AsyncSession = Depends(getDbSession),
+):
+    rows = await listChats(session, uuid.UUID(user["id"]), limit, offset)
+    return {"chats": [serializeChat(row) for row in rows]}
+
+
+@app.post("/api/chats")
+async def createChatEndpoint(
+    req: CreateChatRequest,
+    user=Depends(getCurrentUser),
+    session: AsyncSession = Depends(getDbSession),
+):
+    row = await createChat(session, uuid.UUID(user["id"]), req.title or "New conversation")
+    await logAudit(session, uuid.UUID(user["id"]), "chat.create", "chat", str(row.id))
+    await session.commit()
+    messages = await listMessages(session, row.id, 200, 0)
+    return {"chat": {**serializeChat(row), "messages": [serializeMessage(msg) for msg in messages]}}
+
+
+@app.get("/api/chats/{chatId}")
+async def getChatEndpoint(
+    chatId: str,
+    limit: int = 200,
+    offset: int = 0,
+    user=Depends(getCurrentUser),
+    session: AsyncSession = Depends(getDbSession),
+):
+    row = await getChatById(session, uuid.UUID(user["id"]), uuid.UUID(chatId))
+    if not row:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    messages = await listMessages(session, row.id, limit, offset)
+    return {"chat": {**serializeChat(row), "messages": [serializeMessage(msg) for msg in messages]}}
+
+
+@app.patch("/api/chats/{chatId}")
+async def updateChatEndpoint(
+    chatId: str,
+    req: UpdateChatRequest,
+    user=Depends(getCurrentUser),
+    session: AsyncSession = Depends(getDbSession),
+):
+    row = await getChatById(session, uuid.UUID(user["id"]), uuid.UUID(chatId))
+    if not row:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    row.title = req.title
+    await logAudit(session, uuid.UUID(user["id"]), "chat.update", "chat", str(row.id))
+    await session.commit()
+    return {"chat": serializeChat(row)}
+
+
+@app.delete("/api/chats/{chatId}")
+async def deleteChatEndpoint(
+    chatId: str,
+    user=Depends(getCurrentUser),
+    session: AsyncSession = Depends(getDbSession),
+):
+    await deleteChat(session, uuid.UUID(user["id"]), uuid.UUID(chatId))
+    await logAudit(session, uuid.UUID(user["id"]), "chat.delete", "chat", chatId)
+    await session.commit()
+    return {"ok": True}
+
+
+@app.get("/api/chats/{chatId}/memory")
+async def getChatMemoryEndpoint(
+    chatId: str,
+    user=Depends(getCurrentUser),
+    session: AsyncSession = Depends(getDbSession),
+):
+    row = await getChatById(session, uuid.UUID(user["id"]), uuid.UUID(chatId))
+    if not row:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    memory = await getChatMemory(session, row.id)
+    return {"memory": serializeChatMemory(memory)}
+
+
+@app.put("/api/chats/{chatId}/memory")
+async def putChatMemoryEndpoint(
+    chatId: str,
+    req: UpsertChatMemoryRequest,
+    user=Depends(getCurrentUser),
+    session: AsyncSession = Depends(getDbSession),
+):
+    row = await getChatById(session, uuid.UUID(user["id"]), uuid.UUID(chatId))
+    if not row:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    memory = await upsertChatMemory(session, row.id, req.summary, req.extractedEntities, req.metadata)
+    await logAudit(session, uuid.UUID(user["id"]), "chat.memory.upsert", "chat", chatId)
+    await session.commit()
+    return {"memory": serializeChatMemory(memory)}
+
+
+@app.get("/api/memory/user")
+async def getUserMemoryEndpoint(
+    user=Depends(getCurrentUser),
+    session: AsyncSession = Depends(getDbSession),
+):
+    rows = await listUserMemory(session, uuid.UUID(user["id"]))
+    return {"memory": [serializeUserMemory(row) for row in rows]}
+
+
+@app.put("/api/memory/user/{memoryKey}")
+async def putUserMemoryEndpoint(
+    memoryKey: str,
+    req: UpsertUserMemoryRequest,
+    user=Depends(getCurrentUser),
+    session: AsyncSession = Depends(getDbSession),
+):
+    row = await upsertUserMemory(
+        session,
+        uuid.UUID(user["id"]),
+        memoryKey,
+        req.memoryValue,
+        req.confidence,
+        req.metadata,
+    )
+    await logAudit(session, uuid.UUID(user["id"]), "user.memory.upsert", "user", user["id"])
+    await session.commit()
+    return {"memory": serializeUserMemory(row)}
 
 
 if os.path.isdir("frontend/dist"):
