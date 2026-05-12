@@ -65,6 +65,7 @@ Graph/
 ├── runners/            ← scripts (one per pipeline stage + benchmark runner)
 ├── eval/               ← retrieval evaluation harness
 ├── frontend/           ← React + Vite SPA
+├── streamlit/          ← read-only internal dashboard (Streamlit)
 ├── Documents/          ← source PDFs, images, docx
 ├── Doc_Out/            ← OCR markdown output
 ├── output/             ← OCR per-page JSON sidecars
@@ -316,6 +317,17 @@ npm run dev                     # Vite :5173 with /api proxy
 ```
 
 Open http://localhost:5173 → log in (any mock user) → start chatting.
+
+### Streamlit dashboard
+
+The repo also includes a separate read-only internal dashboard in `streamlit/` that reuses the same FastAPI backend.
+
+```powershell
+pip install -r requirements.txt
+streamlit run streamlit\app.py
+```
+
+Set `GAZELLE_API_URL` if the API is not running on `http://localhost:8000`.
 
 ### Evaluate
 

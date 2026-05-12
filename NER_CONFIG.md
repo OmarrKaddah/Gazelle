@@ -34,19 +34,23 @@ python runners/runAll.py Documents/
 ### Strategy 1: `hybrid` (Recommended)
 
 **What it does:**
+
 - GLiNER (fast) extracts raw entities from each chunk
 - LLM refines and extracts relationships
 
 **Pros:**
+
 - ✅ Best accuracy + speed balance
 - ✅ Handles Arabic + English naturally
 - ✅ Lower hallucination risk
 - ✅ Leverages your 5090 GPU for relationships
 
 **Cons:**
+
 - Uses both models (more VRAM)
 
 **Configuration:**
+
 ```env
 NER_STRATEGY=hybrid
 GLINER_MODEL=urchade/gliner_multi
@@ -60,20 +64,24 @@ OLLAMA_TEXT_MODEL=qwen2.5:72b-instruct-q4_K_M
 ### Strategy 2: `gliner`
 
 **What it does:**
+
 - Only GLiNER entity extraction
 - No LLM entity extraction
 - LLM still used for relationships
 
 **Pros:**
+
 - ✅ Fast (no LLM for entities)
 - ✅ Low VRAM usage
 - ✅ Good for Arabic (with Arabic model)
 
 **Cons:**
+
 - ❌ Misses complex/implicit entities
 - ❌ Weaker on English or code-switched text
 
 **Configuration:**
+
 ```env
 NER_STRATEGY=gliner
 GLINER_MODEL=NAMAA-Space/gliner_arabic-v2.1
@@ -81,6 +89,7 @@ GLINER_THRESHOLD=0.5
 ```
 
 **When to use:**
+
 - When you want fastest throughput
 - When you only have Arabic documents
 - When VRAM is limited
@@ -90,22 +99,26 @@ GLINER_THRESHOLD=0.5
 ### Strategy 3: `llm`
 
 **What it does:**
+
 - Only LLM for entity extraction (no GLiNER)
 - LLM also handles relationship extraction
 
 **Pros:**
+
 - ✅ Most accurate (if LLM is good)
 - ✅ Handles complex domain concepts
 - ✅ Multi-lingual naturally
 - ✅ Fewer false positives with good prompt
 
 **Cons:**
+
 - ❌ Much slower (every entity via LLM)
 - ❌ Higher cost (API or local inference)
 - ❌ Hallucination risk (LLM invents entities)
 - ❌ Requires good LLM model
 
 **Configuration:**
+
 ```env
 NER_STRATEGY=llm
 OLLAMA_URL=http://localhost:11434/v1/chat/completions
@@ -114,6 +127,7 @@ OLLAMA_NUM_PARALLEL=4
 ```
 
 **When to use:**
+
 - When accuracy > speed
 - When you have powerful local LLM
 - When dealing with very technical jargon
@@ -123,11 +137,11 @@ OLLAMA_NUM_PARALLEL=4
 
 ## Available GLiNER Models
 
-| Model | Language | Speed | Accuracy | Size |
-|-------|----------|-------|----------|------|
-| `NAMAA-Space/gliner_arabic-v2.1` | Arabic | ⚡⚡⚡ | High | ~300MB |
-| `urchade/gliner_multi` | Multi-lingual | ⚡⚡ | Good | ~300MB |
-| `urchade/gliner_base` | English | ⚡⚡⚡ | Good | ~300MB |
+| Model                            | Language      | Speed  | Accuracy | Size   |
+| -------------------------------- | ------------- | ------ | -------- | ------ |
+| `NAMAA-Space/gliner_arabic-v2.1` | Arabic        | ⚡⚡⚡ | High     | ~300MB |
+| `urchade/gliner_multi`           | Multi-lingual | ⚡⚡   | Good     | ~300MB |
+| `urchade/gliner_base`            | English       | ⚡⚡⚡ | Good     | ~300MB |
 
 **For mixed Arabic/English:** Use `urchade/gliner_multi`
 
@@ -137,16 +151,17 @@ OLLAMA_NUM_PARALLEL=4
 
 All of these run well on your 64GB VRAM:
 
-| Model | Size | VRAM (4-bit) | Speed | Arabic Support |
-|-------|------|-------------|-------|----------------|
-| **Qwen2.5 72B** | 72B | ~45GB | ⚡⚡ Fast | Excellent |
-| **Llama 3 70B** | 70B | ~42GB | ⚡⚡ Fast | Good |
-| **Mixtral 8x7B** | 8x7B | ~20GB | ⚡⚡⚡ Very Fast | Good |
-| **Qwen2 7B** | 7B | ~5GB | ⚡⚡⚡ Very Fast | Excellent |
+| Model            | Size | VRAM (4-bit) | Speed            | Arabic Support |
+| ---------------- | ---- | ------------ | ---------------- | -------------- |
+| **Qwen2.5 72B**  | 72B  | ~45GB        | ⚡⚡ Fast        | Excellent      |
+| **Llama 3 70B**  | 70B  | ~42GB        | ⚡⚡ Fast        | Good           |
+| **Mixtral 8x7B** | 8x7B | ~20GB        | ⚡⚡⚡ Very Fast | Good           |
+| **Qwen2 7B**     | 7B   | ~5GB         | ⚡⚡⚡ Very Fast | Excellent      |
 
 **Pick:** `qwen2.5:72b-instruct-q4_K_M` (best balance)
 
 Pull with:
+
 ```bash
 ollama pull qwen2.5:72b-instruct-q4_K_M
 ```
@@ -171,17 +186,18 @@ GLINER_THRESHOLD=0.3   # Loose: catch more entities
 
 ## Performance Comparison
 
-| Strategy | Speed | Accuracy | VRAM | Cost |
-|----------|-------|----------|------|------|
-| GLiNER only | ⚡⚡⚡ 30 sec | 70% | 2GB | Free |
-| LLM only | ⚡ 2-3 min | 85% | 45GB | High |
-| Hybrid (recommended) | ⚡⚡ 1-1.5 min | 80% | 47GB | Medium |
+| Strategy             | Speed          | Accuracy | VRAM | Cost   |
+| -------------------- | -------------- | -------- | ---- | ------ |
+| GLiNER only          | ⚡⚡⚡ 30 sec  | 70%      | 2GB  | Free   |
+| LLM only             | ⚡ 2-3 min     | 85%      | 45GB | High   |
+| Hybrid (recommended) | ⚡⚡ 1-1.5 min | 80%      | 47GB | Medium |
 
 ---
 
 ## Example Configurations
 
 ### Config A: Speed-Focused (Arabic documents)
+
 ```env
 NER_STRATEGY=gliner
 GLINER_MODEL=NAMAA-Space/gliner_arabic-v2.1
@@ -189,6 +205,7 @@ GLINER_THRESHOLD=0.6
 ```
 
 ### Config B: Accuracy-Focused (Mixed Arabic+English)
+
 ```env
 NER_STRATEGY=hybrid
 GLINER_MODEL=urchade/gliner_multi
@@ -196,6 +213,7 @@ OLLAMA_TEXT_MODEL=qwen2.5:72b-instruct-q4_K_M
 ```
 
 ### Config C: Pure LLM (If you trust your LLM)
+
 ```env
 NER_STRATEGY=llm
 OLLAMA_TEXT_MODEL=qwen2.5:72b-instruct-q4_K_M
@@ -207,25 +225,33 @@ GLINER_THRESHOLD=0.5  # Ignored
 ## Troubleshooting
 
 ### Problem: "OLLAMA_URL refused connection"
+
 **Solution:** Make sure Ollama is running:
+
 ```bash
 ollama serve
 ```
 
 ### Problem: Out of Memory (OOM)
-**Solution:** 
+
+**Solution:**
+
 1. Switch to smaller model: `qwen2:7b` instead of `72b`
 2. Use `NER_STRATEGY=gliner` (skip LLM for entities)
 3. Reduce `OLLAMA_NUM_PARALLEL` to 2 or 1
 
 ### Problem: Entity extraction is slow
+
 **Solution:**
+
 1. Use `NER_STRATEGY=gliner` for faster entity extraction
 2. Switch to `urchade/gliner_multi` instead of Arabic-only model
 3. Reduce chunk size in `.env CHUNKER_TYPE` or adjust chunker parameters
 
 ### Problem: Missing entities
+
 **Solution:**
+
 1. Lower `GLINER_THRESHOLD` (e.g., 0.3 instead of 0.5)
 2. Switch to `NER_STRATEGY=llm` (more thorough)
 3. Fine-tune GLiNER on your domain
@@ -235,6 +261,7 @@ ollama serve
 ## Runtime Commands
 
 Show current configuration:
+
 ```bash
 grep NER_STRATEGY .env
 grep GLINER .env
@@ -242,6 +269,7 @@ grep OLLAMA .env
 ```
 
 Run with specific strategy:
+
 ```bash
 # Hybrid (reads from .env)
 python runners/runAll.py Documents/
