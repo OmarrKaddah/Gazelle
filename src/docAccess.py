@@ -15,6 +15,7 @@ DOC_ACCESS = {
     'Chapter_6': 'internal',
     'Chapter_7': 'internal',
     'Chapter_8': 'internal',
+    'Phase - 1 document': 'confidential',
 
 }
 

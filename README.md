@@ -47,8 +47,8 @@ frontend/         ─► React + Tailwind: chat with citations, graph explorer, 
 - **OCR**: Qwen3-VL via Ollama (or llama-server)
 - **Word**: docling
 - **Tokenizer**: BGE-M3 (chunk sizing)
-- **NER**: GLiNER `NAMAA-Space/gliner_arabic-v2.1`
-- **Relation extraction**: any LLM via Ollama (default `command-r7b-arabic` / `llama3.1:8b`) or Groq Cloud
+- **NER**: GLiNER `NAMAA-Space/gliner_arabic-v2.1` by default, with optional LLM-only or hybrid modes via `.env`
+- **Relation extraction**: any LLM via Ollama (default `qwen2.5:72b-instruct-q4_K_M`) or Groq Cloud
 - **Graph DB**: Neo4j (vector + fulltext indexes on Chunk; relationship graph on Entity)
 - **Embeddings**: BGE-M3 dense (1024-dim, fp16) — stored on Chunk nodes
 - **API**: FastAPI + uvicorn, SSE streaming
@@ -64,18 +64,20 @@ frontend/         ─► React + Tailwind: chat with citations, graph explorer, 
 Graph/
 ├── src/                ← module code (importable Python)
 ├── src/db/             ← async SQLAlchemy models, sessions, and repositories
-├── runners/            ← scripts (one per pipeline stage)
+├── runners/            ← scripts (one per pipeline stage + benchmark runner)
 ├── alembic/            ← database migration environment and versions
 ├── eval/               ← retrieval evaluation harness
 ├── frontend/           ← React + Vite SPA
+├── streamlit/          ← read-only internal dashboard (Streamlit)
 ├── Documents/          ← source PDFs, images, docx
 ├── Doc_Out/            ← OCR markdown output
 ├── output/             ← OCR per-page JSON sidecars
 ├── parsed/             ← structured ParsedElement lists
 ├── chunks/             ← token-budgeted chunks
-├── extractions/        ← entities + relationships (GLiNER + LLM)
+├── extractions/        ← entities + relationships (GLiNER or LLM + LLM)
 ├── gold/               ← gold-set annotations (manual)
-├── .env                ← Neo4j creds, PostgreSQL URL, Groq API key, BGE-M3 path
+├── .env                ← Neo4j creds, PostgreSQL URL, Groq API key, BGE-M3 path, NER/LLM strategy
+├── .env-example        ← sanitized example config
 ├── .env-example        ← template for local development
 ├── Modelfile           ← Ollama Modelfile (vision model)
 ├── requirements.txt
@@ -118,6 +120,8 @@ Two-step:
 2. **`extractRelationships()`** — LLM call. For each chunk, sends a focused prompt: ontology relationship spec + direction rules + the canonical entities present in this chunk + the chunk text. The LLM returns only relationships, not entities. Strict JSON output via `response_format: {type: "json_object"}`.
 
 Parallelized via `ThreadPoolExecutor` (`PARALLEL_CHUNKS = 4`; needs `OLLAMA_NUM_PARALLEL=4` on the Ollama server). Output: `extractions/{doc}.json` (per-chunk entity list + relationships).
+
+`OLLAMA_URL`, `OLLAMA_TEXT_MODEL`, and `OLLAMA_NUM_PARALLEL` are configurable through `.env`.
 
 #### `src/kgWriter.py` — Stage 5: Knowledge graph
 
@@ -260,6 +264,7 @@ Explains methodology for evaluating each layer (retrieval / extraction / end-to-
 - **`.env-example`** — starter template for local setup.
 - **`alembic/`** — async SQLAlchemy/Alembic migrations.
 - **`requirements.txt`** — Python deps.
+- **`.env-example`** — sanitized example config for NER, Ollama, Neo4j, embeddings, and pipeline flags.
 - **`Modelfile`** — Ollama Modelfile for the vision model used by OCR.
 - **`CLAUDE.md`** — coding conventions for Claude Code (camelCase functions, no defensive code, etc.).
 
@@ -385,6 +390,9 @@ make eval
 
 # Clean common build artifacts
 make clean
+
+# Optional: compare gliner / llm / hybrid NER strategies on the same chunk file
+python runners\runNerBenchmark.py chapter_3 --output ner_benchmark.json
 ```
 
 ### Serve
@@ -410,6 +418,17 @@ make run-frontend
 
 Open http://localhost:5173 → log in (any mock user) → start chatting.
 
+### Streamlit dashboard
+
+The repo also includes a separate read-only internal dashboard in `streamlit/` that reuses the same FastAPI backend.
+
+```powershell
+pip install -r requirements.txt
+streamlit run streamlit\app.py
+```
+
+Set `GAZELLE_API_URL` if the API is not running on `http://localhost:8000`.
+
 ### Evaluate
 
 ```powershell
@@ -428,7 +447,8 @@ make eval
 runOcr      ─►  Doc_Out/, output/
 runParser   ─►  parsed/                         (needs output/ sidecar)
 runChunker  ─►  chunks/                         (needs parsed/)
-runGliner   ─►  extractions/_entities.json     (needs chunks/)
+runGliner   ─►  extractions/_entities.json     (needs chunks/, uses GLiNER or hybrid path)
+runNerBenchmark ─► timing/results for gliner | llm | hybrid
 runLlm      ─►  extractions/.json              (needs chunks/ AND extractions/_entities.json)
 runKg       ─►  Neo4j                          (needs chunks/ AND extractions/.json)
 runEmbed    ─►  Neo4j Chunk.embedding          (needs Neo4j chunks already written by runKg)
@@ -467,3 +487,4 @@ python eval\runEval.py
 - **Chat persistence**: each authenticated user has isolated chats, messages, and memory in PostgreSQL. The frontend does not own persistence.
 - **Schema-validated extraction**: entities are typed against the ontology; relationships are dropped if subject/object types don't match the schema.
 - **Single source of truth**: ontology lives in one Python file, imported by GLiNER, LLM, and KG validation alike.
+- **Configurable NER strategy**: choose `gliner`, `llm`, or `hybrid` from `.env` to match the hardware and document mix.
