@@ -7,13 +7,16 @@ DEFAULT_LEVEL = 'internal'
 
 DOC_ACCESS = {
     # Mock data — replace with real classifications.
+    'Chapter_1': 'internal',
+    'Chapter_2': 'internal',
     'Chapter_3': 'internal',
-    'chapter_3': 'internal',
-    'chapter_2': 'internal',
-    'Gazma': 'public',
-    'gazma2': 'confidential',
-    'table_ar': 'restricted',
+    'Chapter_4': 'internal',
+    'Chapter_5': 'internal',
+    'Chapter_6': 'internal',
+    'Chapter_7': 'internal',
+    'Chapter_8': 'internal',
     'Phase - 1 document': 'confidential',
+
 }
 
 

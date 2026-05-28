@@ -1,15 +1,9 @@
 import json
-import os
 from pathlib import Path
 from neo4j import GraphDatabase
-from dotenv import load_dotenv
 from ontology import ENTITIES, RELATIONSHIPS
-
-
-load_dotenv()
-NEO4J_URI = os.environ['NEO4J_URI']
-NEO4J_USER = os.environ['NEO4J_USER']
-NEO4J_PASSWORD = os.environ['NEO4J_PASSWORD']
+from llmExtract import canonicalizeEntities
+from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
 
 
 def loadChunks(docName):
@@ -29,11 +23,28 @@ def buildTypeMap(extractions):
     for entry in extractions:
         for entity in entry['entities']:
             if isValidEntity(entity):
-                typeMap[entity['canonicalId']] = entity['type']
+                cid = entity['canonicalId']
+                etype = entity['type']
+                typeMap[cid] = etype
+                # Also index by name-only key (strip the trailing -type suffix) so
+                # relationships that omit the suffix still resolve.
+                namePart = cid.rsplit('-', 1)[0] if '-' in cid else cid
+                if namePart not in typeMap:
+                    typeMap[namePart] = etype
     return typeMap
 
 
+def normalizeRelationship(rel):
+    pred = rel.get('predicate', '')
+    # LLM sometimes uses dashes instead of underscores (ISSUED-BY → ISSUED_BY)
+    rel['predicate'] = pred.replace('-', '_').upper()
+    return rel
+
+
 def isValidRelationship(rel, typeMap):
+    if not isinstance(rel, dict):
+        return False
+    rel = normalizeRelationship(rel)
     predicate = rel.get('predicate')
     if predicate not in RELATIONSHIPS:
         return False
@@ -43,6 +54,13 @@ def isValidRelationship(rel, typeMap):
         return False
     subjects, objects = RELATIONSHIPS[predicate]
     return typeMap.get(sub) in subjects and typeMap.get(obj) in objects
+
+
+def clearDb():
+    with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
+        with driver.session() as session:
+            session.execute_write(lambda tx: tx.run("MATCH (n) DETACH DELETE n"))
+    print("Cleared Neo4j database")
 
 
 def setupSchema(tx):
@@ -109,6 +127,29 @@ def mergeRelationship(tx, rel, chunkId):
         obj=rel['object'],
         chunkIds=[chunkId],
     )
+
+
+def loadGlinerEntities(docName):
+    return json.loads(Path(f'extractions/{docName}_entities.json').read_text(encoding='utf-8'))
+
+
+def writeDocEntitiesOnly(docName):
+    chunks = loadChunks(docName)
+    rawEntities = loadGlinerEntities(docName)
+    canonical = canonicalizeEntities(rawEntities)
+    realDocName = chunks[0]['docName']
+    entCount = 0
+    with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
+        with driver.session() as session:
+            session.execute_write(setupSchema)
+            session.execute_write(mergeDocument, realDocName)
+            for chunk in chunks:
+                session.execute_write(mergeChunk, chunk)
+            for entity in canonical:
+                for chunkId in entity['chunkIds']:
+                    session.execute_write(mergeEntityWithMention, entity, chunkId)
+                    entCount += 1
+    print(f"Wrote {len(chunks)} chunks, {entCount} entity mentions, 0 relationship edges")
 
 
 def writeDoc(docName):

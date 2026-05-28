@@ -1,7 +1,8 @@
 import _bootstrap  # noqa: F401
+from pathlib import Path
 from embedding import embedDoc
 
-docName = "chapter_3"
-
-embedDoc(docName)
-print(f"Done: {docName}")
+for chunk in sorted(Path("chunks").glob("*.json")):
+    docName = chunk.stem
+    print(f"[embed] {docName}")
+    embedDoc(docName)

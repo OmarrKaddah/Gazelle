@@ -4,7 +4,7 @@ from pathlib import Path
 from gliner import GLiNER
 from dotenv import load_dotenv
 from ontology import ENTITIES
-
+from config import GLINER_MODEL, GLINER_THRESHOLD
 
 load_dotenv()
 
@@ -22,7 +22,7 @@ def loadChunks(docName):
 
 
 def extractFromChunk(chunk):
-    spans = model.predict_entities(chunk['text'], labels, threshold=THRESHOLD)
+    spans = model.predict_entities(chunk['text'], labels, threshold=GLINER_THRESHOLD)
     return [
         {
             'chunkId': chunk['chunkId'],

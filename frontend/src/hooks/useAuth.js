@@ -34,7 +34,13 @@ export function useAuth() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),
     });
-    const data = await res.json();
+    const raw = await res.text();
+    let data = {};
+    try {
+      data = raw ? JSON.parse(raw) : {};
+    } catch {
+      return { ok: false, error: 'Server error (invalid response)' };
+    }
     if (!data.ok) {
       return { ok: false, error: data.error || 'Login failed' };
     }

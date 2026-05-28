@@ -2,10 +2,17 @@ import _bootstrap  # noqa: F401
 from pathlib import Path
 from parser import parseDoc, dumpParsed
 
-source = "Doc_Out/Chapter_3.md"
+INPUT_DIR = Path("Doc_Out")
 
-elements = parseDoc(source)
-stem = Path(source).stem
-dumpParsed(elements, stem)
-print(f"Parsed {len(elements)} elements from {source}")
-print(f"Saved: parsed/{stem}.json")
+sources = sorted(INPUT_DIR.glob("*.md"))
+
+for source in sources:
+    docName = source.stem.lower()
+    out = Path(f"parsed/{docName}.json")
+    if out.exists():
+        print(f"[skip] {source.name}")
+        continue
+    print(f"[parse] {source.name}")
+    elements = parseDoc(str(source))
+    dumpParsed(elements, docName)
+    print(f"        -> parsed/{docName}.json")
