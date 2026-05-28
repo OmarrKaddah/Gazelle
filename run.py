@@ -10,7 +10,17 @@ from ocr import runOcrAndDump
 from parser import parseDoc, dumpParsed, loadParsed
 from chunker import chunkDoc, dumpChunks
 from embedding import embedDoc
-from glinerExtract import extractEntities, dumpEntities
+from dotenv import load_dotenv
+load_dotenv()
+import os
+
+# Choose NER strategy (gliner | llm | hybrid). Mirrors runners/runAll.py
+NER_STRATEGY = os.getenv('NER_STRATEGY', 'hybrid').lower()
+if NER_STRATEGY == 'llm':
+    from llmNER import extractEntities as extractEntitiesNER, dumpEntities as dumpEntitiesNER
+else:
+    from glinerExtract import extractEntities as extractEntitiesNER, dumpEntities as dumpEntitiesNER
+
 from llmExtract import extractDoc, dumpExtractions
 from kgWriter import writeDoc, writeDocEntitiesOnly, clearDb
 from entityEmbedding import embedEntities
@@ -69,17 +79,18 @@ def runEmbed():
         embedDoc(docName)
 
 
-def runGliner():
-    print("\n=== GLiNER ===")
+def runEntities():
+    print("\n=== Entity Extraction ===")
+    print(f"[NER_STRATEGY] {NER_STRATEGY}")
     for chunk in sorted(Path("chunks").glob("*.json")):
         docName = chunk.stem
         out = Path(f"extractions/{docName}_entities.json")
         if out.exists():
             print(f"[skip] {docName}")
             continue
-        print(f"[gliner] {docName}")
-        entities = extractEntities(docName)
-        dumpEntities(entities, docName)
+        print(f"[ner  ] {docName}  ({NER_STRATEGY})")
+        entities = extractEntitiesNER(docName)
+        dumpEntitiesNER(entities, docName)
         print(f"         -> extractions/{docName}_entities.json  ({len(entities)} entities)")
 
 
