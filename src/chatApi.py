@@ -20,8 +20,13 @@ from db.repositories.chatRepo import (
 )
 from db.repositories.memoryRepo import (
     upsertChatMemory, getChatMemory, listUserMemory, upsertUserMemory,
+    loadUserMemoryForPrompt, loadRecentMessages,
 )
+from db.repositories.citationRepo import insertCitations
 from db.repositories.auditRepo import logAudit
+from memory.assembler import assembleMessages
+from memory.summarizer import updateChatMemory
+from memory.promoter import maybePromote
 from config import (
     NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD,
     OLLAMA_URL, GROQ_URL, OLLAMA_CHAT_MODEL, GROQ_MODEL, GROQ_API_KEY,
@@ -105,7 +110,7 @@ def buildPrompt(query, chunks):
     )
 
 
-async def streamTokens(query, chunks, provider='ollama'):
+async def streamTokens(query, chunks, userMemRows, chatSummary, recentTurns, provider='ollama'):
     if not chunks:
         print(
             f"[chatApi] No chunks to stream for query={query!r} provider={provider}",
@@ -115,8 +120,17 @@ async def streamTokens(query, chunks, provider='ollama'):
         return
     cfg = PROVIDERS.get(provider) or PROVIDERS['ollama']
     headers = {"Authorization": f"Bearer {cfg['apiKey']}"} if cfg['apiKey'] else {}
+    messages = assembleMessages(
+        systemPrompt=SYSTEM_PROMPT,
+        userMemRows=userMemRows,
+        chatSummary=chatSummary,
+        recentTurns=recentTurns,
+        contextBlock=buildContext(chunks),
+        question=query,
+    )
     print(
-        f"[chatApi] Streaming with provider={provider} model={cfg['model']} chunks={len(chunks)}",
+        f"[chatApi] Streaming provider={provider} model={cfg['model']} chunks={len(chunks)} "
+        f"userMem={len(userMemRows or [])} hasSummary={bool(chatSummary)} recent={len(recentTurns or [])}",
         flush=True,
     )
     async with httpx.AsyncClient(timeout=300) as client:
@@ -126,10 +140,7 @@ async def streamTokens(query, chunks, provider='ollama'):
             headers=headers,
             json={
                 "model": cfg['model'],
-                "messages": [
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": buildPrompt(query, chunks)},
-                ],
+                "messages": messages,
                 "temperature": 0,
                 "stream": True,
             },
@@ -356,23 +367,30 @@ async def graphEndpoint(
     }
 
 
-async def chatEventGen(query, chunks, chatId, userId, req):
+async def chatEventGen(query, chunks, userMemRows, chatSummary, recentTurns, chatId, userId, req):
     yield "data: " + json.dumps({"type": "citations", "citations": chunks}) + "\n\n"
     parts = []
-    async for event in streamTokens(query, chunks, req.provider):
+    async for event in streamTokens(query, chunks, userMemRows, chatSummary, recentTurns, req.provider):
         payload = json.loads(event[6:].strip())
         if payload.get("type") == "token":
             parts.append(payload.get("text", ""))
         yield event
     assistantText = "".join(parts)
-    chatSummary = buildChatSummary(query, assistantText)
-    extractedEntities = {"chunkIds": sorted({c["chunkId"] for c in chunks if c.get("chunkId")})}
     chatMetadata = {"mode": req.mode, "provider": req.provider, "k": req.k, "hops": req.hops}
     async with asyncSessionFactory() as session:
-        await createMessage(session, chatId, "assistant", assistantText, countTokens(assistantText))
-        await upsertChatMemory(session, chatId, chatSummary, extractedEntities, chatMetadata)
+        msg = await createMessage(session, chatId, "assistant", assistantText, countTokens(assistantText))
+        await insertCitations(session, msg.id, chunks)
+        existing = await getChatMemory(session, chatId)
+        if not existing:
+            await upsertChatMemory(session, chatId, "", {}, chatMetadata)
+        else:
+            existing.metadataJson = chatMetadata
+            await session.flush()
         await logAudit(session, userId, "message.create", "chat", str(chatId))
         await session.commit()
+        latestMessageId = msg.id
+    asyncio.create_task(updateChatMemory(chatId, latestMessageId))
+    asyncio.create_task(maybePromote(userId, chatId, query))
     yield "data: " + json.dumps({"type": "done", "chatId": str(chatId)}) + "\n\n"
 
 
@@ -390,8 +408,12 @@ async def chatStream(req: ChatRequest, user=Depends(getCurrentUser)):
         await createMessage(session, chatId, "user", req.query, countTokens(req.query))
         await logAudit(session, userId, "message.create", "chat", str(chatId))
         await session.commit()
+        userMemRows = await loadUserMemoryForPrompt(session, userId)
+        chatMem = await getChatMemory(session, chatId)
+        chatSummary = chatMem.summary if chatMem else ""
+        recentTurns = await loadRecentMessages(session, chatId, n=4)
     return StreamingResponse(
-        chatEventGen(req.query, chunks, chatId, userId, req),
+        chatEventGen(req.query, chunks, userMemRows, chatSummary, recentTurns, chatId, userId, req),
         media_type="text/event-stream; charset=utf-8",
     )
 
