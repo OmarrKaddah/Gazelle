@@ -7,11 +7,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from config import CHUNKER_TYPE
 from parser import parseDoc, dumpParsed
 
-# Choose chunker implementation via environment variable CHUNKER_TYPE
-# valid values: "default" (src/chunker.py) or "semantic" (src/semantic_chunker.py)
-CHUNKER_TYPE = os.getenv('CHUNKER_TYPE', 'default').lower()
 if CHUNKER_TYPE == 'semantic':
     from semantic_chunker import chunkDoc, dumpChunks
 else:

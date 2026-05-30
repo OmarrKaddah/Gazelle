@@ -14,12 +14,19 @@ from dotenv import load_dotenv
 load_dotenv()
 import os
 
+from config import CHUNKER_TYPE
+
 # Choose NER strategy (gliner | llm | hybrid). Mirrors runners/runAll.py
 NER_STRATEGY = os.getenv('NER_STRATEGY', 'hybrid').lower()
 if NER_STRATEGY == 'llm':
     from llmNER import extractEntities as extractEntitiesNER, dumpEntities as dumpEntitiesNER
 else:
     from glinerExtract import extractEntities as extractEntitiesNER, dumpEntities as dumpEntitiesNER
+
+if CHUNKER_TYPE == 'semantic':
+    from semantic_chunker import chunkDoc, dumpChunks
+else:
+    from chunker import chunkDoc, dumpChunks
 
 from llmExtract import extractDoc, dumpExtractions
 from kgWriter import writeDoc, writeDocEntitiesOnly, clearDb
