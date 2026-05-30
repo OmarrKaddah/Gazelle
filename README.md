@@ -42,6 +42,93 @@ chatApi.py        ─► FastAPI: /api/login, /api/chat (SSE streaming), /api/gr
 frontend/         ─► React + Tailwind: chat with citations, graph explorer, RBAC login
 ```
 
+
+---
+
+## Memory Architecture
+
+Gazelle separates conversational memory into two clearly-scoped layers so
+follow-up questions work, user preferences carry across chats, and every
+remembered fact is auditable.
+
+### The problem this fixes
+
+The original system wrote to `chat_memory` and `user_memory` on every turn
+but **never read from them during inference**. Every chat call was
+stateless, so multi-turn questions like *"and what about article 5?"*
+could not resolve against prior turns. The "summary" field was rewritten
+on every turn with just the latest exchange, and the "extracted entities"
+field actually held chunk citation IDs under a misleading name.
+
+### What changed
+
+- `message_citations` — new table. Every assistant answer now stores its
+  cited chunks with rank and similarity score, indexed per message.
+- `chat_memory` — extended with `summaryTokens` and
+  `lastSummarizedMessageId`. The summary is now an LLM-written rolling
+  recap of older turns, produced by a debounced background task. The
+  watermark column makes the summariser incremental, not quadratic.
+- `user_memory` — extended with `category`
+  (`preference | instruction | profile | domain`), `source`
+  (`explicit | promoted | inferred`), and `evidenceChatId`. Long-term
+  preferences are now consumed on every chat turn and carry a full
+  provenance trail.
+- `src/memory/` — new module with three responsibilities:
+  - `assembler.py` packs the LLM prompt with strict per-layer token
+    budgets in a canonical order.
+  - `summarizer.py` updates the chat summary asynchronously, only when
+    enough new turns or tokens have accumulated, with PII redaction in
+    the prompt.
+  - `promoter.py` lifts stable user statements (e.g. *"always answer in
+    Arabic"*) into `user_memory` from a small regex allowlist, with a
+    PII gate that refuses any text containing 10+ digit runs.
+- `src/chatApi.py` — the chat endpoint now loads user memory, chat
+  summary, and the last 4 messages, passes them to the assembler, and
+  writes citations synchronously while scheduling the summariser and
+  promoter as background tasks.
+
+### Setup
+
+The migration applies automatically on the next startup:
+
+```bash
+alembic upgrade head
+```
+
+This adds the new table and columns and is fully reversible via
+`alembic downgrade -1`.
+
+### Verifying the fix
+
+```bash
+python test_memory.py
+```
+
+The script runs 23 checks against your live PostgreSQL covering: the
+promoter regex allowlist, the PII gate, the explicit-wins guarantee,
+top-k user memory filtering, recent-message ordering, prompt assembly
+order and structure, citation roundtrip, cascade-delete behaviour, and
+chat-memory watermark persistence. All 23 are expected to pass.
+
+For deeper background see `docs/MEMORY_ARCHITECTURE.md` (the design) and
+`docs/DESIGN_RATIONALE.md` (why this design, and what alternatives were
+considered and rejected).
+
+### Files ignored on this branch
+
+To keep the repository clean, the following are excluded via
+`.gitignore`:
+
+- Pipeline-derived data: `Doc_Out/`, `output/`, `parsed/`, `chunks/`,
+  `extractions/`
+- Source corpus: `Documents/` (potentially confidential)
+- Local PostgreSQL data directory: `.pgdata/`
+- Editor / agent session caches: `.claude/`
+- Build outputs: `frontend/dist/`, `node_modules/`
+- Local developer helpers: `RUN.bat`, `INSPECT.bat`, `MIGRATE.bat`,
+  `bootstrap.py`, `inspect_memory.py`, PowerShell convenience scripts
+
+
 ## Tech stack
 
 - **OCR**: Qwen3-VL via Ollama (or llama-server)
