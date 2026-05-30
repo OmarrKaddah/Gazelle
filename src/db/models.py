@@ -60,6 +60,21 @@ class Message(Base):
     createdAt: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
     chat: Mapped[Chat] = relationship(back_populates="messages")
+    citations: Mapped[list["MessageCitation"]] = relationship(back_populates="message", cascade="all, delete-orphan")
+
+
+class MessageCitation(Base):
+    __tablename__ = "message_citations"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    messageId: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("messages.id", ondelete="CASCADE"), nullable=False)
+    chunkId: Mapped[str] = mapped_column(Text, nullable=False)
+    docName: Mapped[str] = mapped_column(Text, nullable=False)
+    score: Mapped[float | None] = mapped_column(Float, nullable=True)
+    rank: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    createdAt: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+    message: Mapped[Message] = relationship(back_populates="citations")
 
 
 class ChatMemory(Base):
@@ -68,8 +83,10 @@ class ChatMemory(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     chatId: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("chats.id", ondelete="CASCADE"), nullable=False, unique=True)
     summary: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    summaryTokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     extractedEntities: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
     metadataJson: Mapped[dict] = mapped_column("metadata", JSONB, nullable=False, default=dict)
+    lastSummarizedMessageId: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
     updatedAt: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
     chat: Mapped[Chat] = relationship(back_populates="memory")
@@ -80,16 +97,19 @@ class UserMemory(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     userId: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    category: Mapped[str] = mapped_column(String(32), nullable=False, default="preference")
     memoryKey: Mapped[str] = mapped_column(String(255), nullable=False)
     memoryValue: Mapped[str] = mapped_column(Text, nullable=False)
+    source: Mapped[str] = mapped_column(String(16), nullable=False, default="explicit")
     confidence: Mapped[float] = mapped_column(Float, nullable=False, default=1.0)
+    evidenceChatId: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("chats.id", ondelete="SET NULL"), nullable=True)
     metadataJson: Mapped[dict] = mapped_column("metadata", JSONB, nullable=False, default=dict)
     updatedAt: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
     user: Mapped[User] = relationship(back_populates="memories")
 
     __table_args__ = (
-        UniqueConstraint("userId", "memoryKey", name="uq_user_memory_user_key"),
+        UniqueConstraint("userId", "category", "memoryKey", name="uq_user_memory_user_cat_key"),
     )
 
 
