@@ -29,6 +29,9 @@ HANDWRITING_THRESHOLD = float(os.environ.get('HANDWRITING_THRESHOLD', '0.7'))
 OLLAMA_EXTRACT_MODEL = os.environ.get('OLLAMA_EXTRACT_MODEL', 'granite4.1:8b')
 PARALLEL_CHUNKS = int(os.environ.get('PARALLEL_CHUNKS', '4'))
 
+# Chunking
+CHUNKER_TYPE = os.environ.get('CHUNKER_TYPE', 'semantic').lower() # valid values: "default" (src/chunker.py) or "semantic" (src/semantic_chunker.py)
+
 # Chat API
 OLLAMA_CHAT_MODEL = os.environ.get('OLLAMA_CHAT_MODEL', 'granite4.1:8b')
 GROQ_URL = os.environ.get('GROQ_URL', 'https://api.groq.com/openai/v1/chat/completions')
