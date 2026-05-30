@@ -17,6 +17,14 @@ OCR_PROVIDER = os.environ.get('OCR_PROVIDER', 'ollama')
 OCR_PARALLEL_PAGES = int(os.environ.get('OCR_PARALLEL_PAGES', '1'))
 OLLAMA_VISION_MODEL = os.environ.get('OLLAMA_VISION_MODEL', 'qwen3-vl:8b-instruct-q4_K_M')
 
+# Handwriting removal before OCR
+HANDWRITING_PREPROCESSING = os.environ.get('HANDWRITING_PREPROCESSING', '0') == '1'
+HANDWRITING_MODEL_PATH = os.environ.get('HANDWRITING_MODEL_PATH', 'models/handwriting_removal.joblib')
+HANDWRITING_PATCH_SIZE = int(os.environ.get('HANDWRITING_PATCH_SIZE', '48'))
+HANDWRITING_PATCH_STRIDE = int(os.environ.get('HANDWRITING_PATCH_STRIDE', '24'))
+HANDWRITING_PATCHES_PER_IMAGE = int(os.environ.get('HANDWRITING_PATCHES_PER_IMAGE', '256'))
+HANDWRITING_THRESHOLD = float(os.environ.get('HANDWRITING_THRESHOLD', '0.7'))
+
 # Relation extraction
 OLLAMA_EXTRACT_MODEL = os.environ.get('OLLAMA_EXTRACT_MODEL', 'granite4.1:8b')
 PARALLEL_CHUNKS = int(os.environ.get('PARALLEL_CHUNKS', '4'))
