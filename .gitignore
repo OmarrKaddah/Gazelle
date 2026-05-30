@@ -96,3 +96,5 @@ eval/results.json
 *.bak
 plans/
 .ini
+
+ocr_dataset/

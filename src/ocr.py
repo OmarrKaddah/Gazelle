@@ -2,11 +2,21 @@ import base64
 import json
 import os
 import tempfile
+from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import pypdfium2
 import requests
-from config import OCR_PROVIDER, OCR_PARALLEL_PAGES, LLAMA_SERVER_URL, OLLAMA_URL, OLLAMA_VISION_MODEL
+from config import (
+    HANDWRITING_MODEL_PATH,
+    HANDWRITING_PREPROCESSING,
+    LLAMA_SERVER_URL,
+    OCR_PARALLEL_PAGES,
+    OCR_PROVIDER,
+    OLLAMA_URL,
+    OLLAMA_VISION_MODEL,
+)
+from ocrPreprocessing import preprocessImageFile
 
 OCR_PROMPT = (
     "Extract every visible character from this image exactly as it appears. "
@@ -45,6 +55,13 @@ OCR_PROMPT = (
     "محمد أحمد عبد اللطيف\n\n"
     "Output only the extracted content."
 )
+
+
+def prepareImageForOcr(path: str) -> tuple[str, str | None]:
+    if not HANDWRITING_PREPROCESSING or not Path(HANDWRITING_MODEL_PATH).is_file():
+        return path, None
+    cleanedPath = preprocessImageFile(path, modelPath=HANDWRITING_MODEL_PATH)
+    return cleanedPath, cleanedPath
 
 
 def parse_local(path: str) -> str:
@@ -96,9 +113,14 @@ def parse_ollama(path: str) -> str:
 
 
 def ocr(path: str) -> str:
-    if OCR_PROVIDER == "ollama":
-        return parse_ollama(path)
-    return parse_local(path)
+    preparedPath, tempPath = prepareImageForOcr(path)
+    try:
+        if OCR_PROVIDER == "ollama":
+            return parse_ollama(preparedPath)
+        return parse_local(preparedPath)
+    finally:
+        if tempPath is not None and tempPath != path:
+            os.unlink(tempPath)
 
 
 def render_and_ocr(doc: pypdfium2.PdfDocument, render_scale: int, i: int) -> tuple[int, str]:
