@@ -99,3 +99,4 @@ eval/results.json
 *.json
 plans/
 .ini
+ocr_dataset/*
