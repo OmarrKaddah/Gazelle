@@ -8,7 +8,11 @@ from featureExtract import tokenize, posTag, tokenFeatures, loadGazetteer
 
 
 def loadModel():
-    return pickle.loads(Path('models/crf.pkl').read_bytes())
+    path = Path('models/crf.pkl')
+    print(f"[loadModel] reading {path}")
+    crf = pickle.loads(path.read_bytes())
+    print(f"[loadModel] loaded — classes: {crf.classes_}")
+    return crf
 
 
 def loadChunks(docName):
@@ -53,29 +57,58 @@ def predictChunk(crf, chunk, gazSets, orgTriggers, moneyTriggers, monthNames):
         for i in range(len(tokens))
     ]
     labels = crf.predict([feats])[0]
-    return bioToSpans(tokens, labels, chunk['chunkId'], chunk['docName'])
+    spans  = bioToSpans(tokens, labels, chunk['chunkId'], chunk['docName'])
+    non_o  = sum(1 for l in labels if l != 'O')
+    if non_o:
+        print(f"    chunk {chunk['chunkId']}: {len(tokens)} tokens, {non_o} entity tokens, {len(spans)} spans")
+    return spans
 
 
 def dumpEntities(entities, docName):
     Path('extractions/crf').mkdir(parents=True, exist_ok=True)
-    Path(f'extractions/crf/{docName}_crf_entities.json').write_text(
-        json.dumps(entities, ensure_ascii=False, indent=2), encoding='utf-8'
-    )
+    out = Path(f'extractions/crf/{docName}_crf_entities.json')
+    out.write_text(json.dumps(entities, ensure_ascii=False, indent=2), encoding='utf-8')
+    print(f"  saved -> {out}")
 
 
 def runDoc(crf, docName, gazSets, orgTriggers, moneyTriggers, monthNames):
     chunks   = loadChunks(docName)
+    print(f"[runDoc] {docName} — {len(chunks)} chunks")
     entities = []
     for chunk in chunks:
         entities.extend(predictChunk(crf, chunk, gazSets, orgTriggers, moneyTriggers, monthNames))
     dumpEntities(entities, docName)
-    print(f"{docName}: {len(entities)} entities")
+    type_counts = {}
+    for e in entities:
+        type_counts[e['type']] = type_counts.get(e['type'], 0) + 1
+    print(f"  total: {len(entities)} entities — {type_counts}")
     return entities
 
 
 if __name__ == '__main__':
+    print("=" * 50)
+    print("STEP 1 — load model")
     crf = loadModel()
+
+    print("=" * 50)
+    print("STEP 2 — load gazetteer")
     gazSets, orgTriggers, moneyTriggers, monthNames = loadGazetteer()
-    docNames = [p.stem for p in Path('chunks').glob('*.json')]
-    for docName in sorted(docNames):
-        runDoc(crf, docName, gazSets, orgTriggers, moneyTriggers, monthNames)
+
+    print("=" * 50)
+    print("STEP 3 — run inference on all documents")
+    docNames = sorted(p.stem for p in Path('chunks').glob('*.json'))
+    print(f"  found {len(docNames)} documents: {docNames}")
+
+    all_entities = []
+    for docName in docNames:
+        entities = runDoc(crf, docName, gazSets, orgTriggers, moneyTriggers, monthNames)
+        all_entities.extend(entities)
+
+    print("=" * 50)
+    total_type_counts = {}
+    for e in all_entities:
+        total_type_counts[e['type']] = total_type_counts.get(e['type'], 0) + 1
+    print(f"DONE — {len(all_entities)} total entities across {len(docNames)} documents")
+    for etype, count in sorted(total_type_counts.items()):
+        print(f"  {etype}: {count}")
+    print("=" * 50)

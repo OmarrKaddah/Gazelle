@@ -4,11 +4,15 @@ from pathlib import Path
 from camel_tools.disambig.mle import MLEDisambiguator
 from camel_tools.tagger.default import DefaultTagger
 
+print("[featureExtract] loading CAMeL POS tagger...")
 _tagger = DefaultTagger(MLEDisambiguator.pretrained('calima-msa-r13'), 'pos')
+print("[featureExtract] tagger ready")
 
 
 def loadAnnotations():
-    raw = json.loads(Path('annotations/corrected.json').read_text(encoding='utf-8'))
+    path = Path('annotations/corrected.json')
+    print(f"[loadAnnotations] reading {path}")
+    raw = json.loads(path.read_text(encoding='utf-8'))
     out = []
     for task in raw:
         text = task['data']['text']
@@ -24,17 +28,24 @@ def loadAnnotations():
             if ann.get('type') == 'labels'
         ]
         out.append({'text': text, 'spans': spans, 'meta': task.get('meta', {})})
+    total_spans = sum(len(a['spans']) for a in out)
+    print(f"[loadAnnotations] {len(out)} tasks, {total_spans} labeled spans")
     return out
 
 
 # TODO: This is a basic gazetteer loader — expand trigger sets after reviewing bank documents
 def loadGazetteer():
-    raw = json.loads(Path('gazetteer/gazetteer.json').read_text(encoding='utf-8'))
+    path = Path('gazetteer/gazetteer.json')
+    print(f"[loadGazetteer] reading {path}")
+    raw = json.loads(path.read_text(encoding='utf-8'))
     gazSets = {etype: set(forms) for etype, forms in raw.items()}
+    for etype, s in gazSets.items():
+        print(f"  {etype}: {len(s)} entries")
     orgTriggers   = {'بنك', 'شركة', 'هيئة', 'وزارة', 'مؤسسة', 'صندوق', 'اتحاد', 'لجنة', 'إدارة', 'مجلس'}
     moneyTriggers = {'جنيه', 'دولار', 'يورو', 'مليار', 'مليون', 'ألف', 'جنيهاً', 'دولاراً'}
     monthNames    = {'يناير', 'فبراير', 'مارس', 'إبريل', 'أبريل', 'مايو', 'يونيو',
                      'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'}
+    print(f"[loadGazetteer] {len(orgTriggers)} org triggers, {len(moneyTriggers)} money triggers, {len(monthNames)} month names")
     return gazSets, orgTriggers, moneyTriggers, monthNames
 
 
@@ -187,16 +198,38 @@ def dumpTraining(sequences):
     Path('training/train_data.json').write_text(
         json.dumps(out, ensure_ascii=False, indent=2), encoding='utf-8'
     )
-    print(f"Saved {len(sequences)} sequences -> training/train_data.json")
+    print(f"[dumpTraining] saved {len(sequences)} sequences -> training/train_data.json")
 
 
 if __name__ == '__main__':
+    print("=" * 50)
+    print("STEP 1 — load gazetteer")
     gazSets, orgTriggers, moneyTriggers, monthNames = loadGazetteer()
+
+    print("=" * 50)
+    print("STEP 2 — load annotations")
     annotations = loadAnnotations()
-    sequences = [
-        extractChunk(a['text'], a['spans'], gazSets, orgTriggers, moneyTriggers, monthNames)
-        for a in annotations
-    ]
+
+    print("=" * 50)
+    print("STEP 3 — extract features")
+    sequences = []
+    for i, a in enumerate(annotations):
+        seq = extractChunk(a['text'], a['spans'], gazSets, orgTriggers, moneyTriggers, monthNames)
+        sequences.append(seq)
+        entity_tokens = sum(1 for _, label in seq if label != 'O')
+        print(f"  chunk {i+1}/{len(annotations)} | {len(seq)} tokens | {entity_tokens} entity tokens | doc: {a['meta'].get('docName', '?')}")
+
+    print("=" * 50)
+    print("STEP 4 — dump training data")
     dumpTraining(sequences)
     total_tokens = sum(len(s) for s in sequences)
+    label_counts = {}
+    for seq in sequences:
+        for _, label in seq:
+            label_counts[label] = label_counts.get(label, 0) + 1
     print(f"Total tokens: {total_tokens} across {len(sequences)} chunks")
+    print("Label distribution:")
+    for label, count in sorted(label_counts.items()):
+        print(f"  {label}: {count}")
+    print("=" * 50)
+    print("featureExtract done")
