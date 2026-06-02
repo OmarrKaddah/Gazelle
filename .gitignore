@@ -100,3 +100,5 @@ plans/
 ocr_dataset/
 classical_env/*
 gliner_env/*
+*.json
+*.pkl
