@@ -149,9 +149,12 @@ def runEntityAlign():
 
 if __name__ == '__main__':
     runOcr()
+    print("\n=== DONE OCR ===")
     runParser()
+    print("\n=== DONE PARSER ===")
     runChunker()
     runEmbed()
+    print("\n=== DONE CHUNKER & EMBED ===")
     runGliner()
     runLlm()
     runKg()
