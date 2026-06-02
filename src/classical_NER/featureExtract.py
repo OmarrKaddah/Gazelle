@@ -4,13 +4,15 @@ from pathlib import Path
 from camel_tools.disambig.mle import MLEDisambiguator
 from camel_tools.tagger.default import DefaultTagger
 
+BASE_DIR = Path(__file__).resolve().parent
+
 print("[featureExtract] loading CAMeL POS tagger...")
 _tagger = DefaultTagger(MLEDisambiguator.pretrained('calima-msa-r13'), 'pos')
 print("[featureExtract] tagger ready")
 
 
 def loadAnnotations():
-    path = Path('annotations/corrected.json')
+    path = BASE_DIR / 'annotations' / 'corrected.json'
     print(f"[loadAnnotations] reading {path}")
     raw = json.loads(path.read_text(encoding='utf-8'))
     out = []
@@ -35,7 +37,7 @@ def loadAnnotations():
 
 # TODO: This is a basic gazetteer loader — expand trigger sets after reviewing bank documents
 def loadGazetteer():
-    path = Path('gazetteer/gazetteer.json')
+    path = BASE_DIR / 'gazetteer' / 'gazetteer.json'
     print(f"[loadGazetteer] reading {path}")
     raw = json.loads(path.read_text(encoding='utf-8'))
     gazSets = {etype: set(forms) for etype, forms in raw.items()}
@@ -180,12 +182,12 @@ def extractChunk(text, spans, orgTriggers, moneyTriggers, monthNames):
 
 
 def dumpTraining(sequences):
-    Path('training').mkdir(exist_ok=True)
+    (BASE_DIR / 'training').mkdir(exist_ok=True)
     out = [
         [[feats, label] for feats, label in seq]
         for seq in sequences
     ]
-    Path('training/train_data.json').write_text(
+    (BASE_DIR / 'training' / 'train_data.json').write_text(
         json.dumps(out, ensure_ascii=False, indent=2), encoding='utf-8'
     )
     print(f"[dumpTraining] saved {len(sequences)} sequences -> training/train_data.json")

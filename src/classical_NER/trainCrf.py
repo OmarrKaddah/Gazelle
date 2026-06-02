@@ -8,7 +8,8 @@ from seqeval.metrics import classification_report
 
 
 def loadTraining():
-    path = Path('training/train_data.json')
+    base = Path(__file__).resolve().parent
+    path = base / 'training' / 'train_data.json'
     print(f"[loadTraining] reading {path}")
     raw = json.loads(path.read_text(encoding='utf-8'))
     X = [[pair[0] for pair in seq] for seq in raw]
@@ -55,9 +56,12 @@ def evaluate(crf, X_test, y_test):
 
 
 def saveModel(crf):
-    Path('models').mkdir(exist_ok=True)
-    Path('models/crf.pkl').write_bytes(pickle.dumps(crf))
-    print("[saveModel] saved -> models/crf.pkl")
+    base = Path(__file__).resolve().parent
+    model_dir = base / 'models'
+    model_dir.mkdir(exist_ok=True)
+    model_path = model_dir / 'crf.pkl'
+    model_path.write_bytes(pickle.dumps(crf))
+    print(f"[saveModel] saved -> {model_path}")
 
 
 if __name__ == '__main__':
