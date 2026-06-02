@@ -34,6 +34,10 @@ export default function App() {
     return () => window.removeEventListener('keydown', handler);
   }, [chatState]);
 
+  if (!auth.ready) {
+    return null;
+  }
+
   if (!auth.token || !auth.user) {
     return <Login onLogin={auth.login} />;
   }

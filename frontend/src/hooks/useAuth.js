@@ -2,6 +2,14 @@ import { useState, useEffect, useCallback } from 'react';
 
 const TOKEN_KEY = 'gazelle.auth.token';
 const USER_KEY = 'gazelle.auth.user';
+const MOCK_RUNTIME_TOKEN = 'mock-runtime-token';
+const MOCK_RUNTIME_USER = {
+  id: '11111111-1111-1111-1111-111111111111',
+  username: 'local-admin',
+  name: 'Local Admin',
+  role: 'admin',
+  clearance: 'restricted',
+};
 
 export function loadAuth() {
   return {
@@ -27,8 +35,15 @@ export function authHeaders() {
 
 export function useAuth() {
   const [auth, setAuth] = useState(loadAuth);
+  const [ready, setReady] = useState(false);
+  const [mockRuntime, setMockRuntime] = useState(false);
 
   const login = useCallback(async (username, password) => {
+    if (mockRuntime) {
+      saveAuth(MOCK_RUNTIME_TOKEN, MOCK_RUNTIME_USER);
+      setAuth({ token: MOCK_RUNTIME_TOKEN, user: MOCK_RUNTIME_USER });
+      return { ok: true };
+    }
     const res = await fetch('/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -47,29 +62,52 @@ export function useAuth() {
     saveAuth(data.token, data.user);
     setAuth({ token: data.token, user: data.user });
     return { ok: true };
-  }, []);
+  }, [mockRuntime]);
 
   const logout = useCallback(async () => {
+    if (mockRuntime) {
+      saveAuth(MOCK_RUNTIME_TOKEN, MOCK_RUNTIME_USER);
+      setAuth({ token: MOCK_RUNTIME_TOKEN, user: MOCK_RUNTIME_USER });
+      return;
+    }
     try {
       await fetch('/api/logout', { method: 'POST', headers: authHeaders() });
     } catch {}
     clearAuth();
     setAuth({ token: null, user: null });
-  }, []);
+  }, [mockRuntime]);
 
   // On mount, verify token is still valid
   useEffect(() => {
-    if (!auth.token) return;
-    fetch('/api/me', { headers: authHeaders() })
-      .then((r) => (r.ok ? r.json() : null))
+    fetch('/api/info')
+      .then((r) => r.json())
       .then((d) => {
-        if (!d) {
-          clearAuth();
-          setAuth({ token: null, user: null });
+        const nextMockRuntime = !!d.mockRuntime;
+        setMockRuntime(nextMockRuntime);
+        if (nextMockRuntime) {
+          const user = d.auth?.user || MOCK_RUNTIME_USER;
+          saveAuth(MOCK_RUNTIME_TOKEN, user);
+          setAuth({ token: MOCK_RUNTIME_TOKEN, user });
+          setReady(true);
+          return;
         }
+        if (!auth.token) {
+          setReady(true);
+          return;
+        }
+        fetch('/api/me', { headers: authHeaders() })
+          .then((r) => (r.ok ? r.json() : null))
+          .then((d2) => {
+            if (!d2) {
+              clearAuth();
+              setAuth({ token: null, user: null });
+            }
+            setReady(true);
+          })
+          .catch(() => setReady(true));
       })
-      .catch(() => {});
+      .catch(() => setReady(true));
   }, [auth.token]);
 
-  return { ...auth, login, logout };
+  return { ...auth, login, logout, ready };
 }

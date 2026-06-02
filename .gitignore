@@ -102,3 +102,4 @@ classical_env/*
 gliner_env/*
 *.json
 *.pkl
+gliner_env/*

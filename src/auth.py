@@ -1,13 +1,20 @@
+from __future__ import annotations
+
 import hashlib
 import secrets
 
 import bcrypt
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from db.repositories.authRepo import createSession, deleteSessionByTokenHash, getUserByTokenHash, getUserByUsername
+from config import MOCK_RUNTIME
 from db.session import getDbSession
+
+if MOCK_RUNTIME:
+    from mockRuntime import getMockUser, issueMockToken, revokeMockToken
+else:
+    from sqlalchemy.ext.asyncio import AsyncSession
+
+    from db.repositories.authRepo import createSession, deleteSessionByTokenHash, getUserByTokenHash, getUserByUsername
 
 
 bearer = HTTPBearer(auto_error=False)
@@ -22,6 +29,8 @@ def verifyPassword(password: str, passwordHash: str):
 
 
 async def login(username: str, password: str, session: AsyncSession):
+    if MOCK_RUNTIME:
+        return issueMockToken()
     user = await getUserByUsername(session, username)
     if not user:
         return None
@@ -34,11 +43,16 @@ async def login(username: str, password: str, session: AsyncSession):
 
 
 async def logout(token: str, session: AsyncSession):
+    if MOCK_RUNTIME:
+        revokeMockToken(token)
+        return
     await deleteSessionByTokenHash(session, hashToken(token))
     await session.commit()
 
 
 async def userFromToken(token: str, session: AsyncSession):
+    if MOCK_RUNTIME:
+        return getMockUser()
     user = await getUserByTokenHash(session, hashToken(token))
     if not user:
         return None
@@ -55,6 +69,8 @@ async def getCurrentUser(
     creds: HTTPAuthorizationCredentials = Depends(bearer),
     session: AsyncSession = Depends(getDbSession),
 ):
+    if MOCK_RUNTIME:
+        return getMockUser()
     if not creds:
         raise HTTPException(status_code=401, detail="Missing credentials")
     user = await userFromToken(creds.credentials, session)

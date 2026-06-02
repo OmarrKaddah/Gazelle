@@ -3,6 +3,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+MOCK_RUNTIME = os.environ.get('MOCK_RUNTIME', '0').lower() in {'1', 'true', 'yes', 'on'}
+DATABASE_URL = os.environ.get('DATABASE_URL')
+print(f'MOCK_RUNTIME={MOCK_RUNTIME}')
+
 # Neo4j
 NEO4J_URI = os.environ['NEO4J_URI']
 NEO4J_USER = os.environ['NEO4J_USER']

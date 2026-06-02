@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from neo4j import GraphDatabase
 from retriever import retrieve
 from auth import bearer, getCurrentUser, login, logout, userFromToken
+from config import MOCK_RUNTIME
 from docAccess import LEVELS
 from db.session import asyncSessionFactory, getDbSession
 from db.repositories.chatRepo import (
@@ -26,6 +27,7 @@ from config import (
     NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD,
     OLLAMA_URL, GROQ_URL, OLLAMA_CHAT_MODEL, GROQ_MODEL, GROQ_API_KEY,
 )
+from mockRuntime import getMockUser
 
 PROVIDERS = {
     'ollama': {'url': OLLAMA_URL, 'model': OLLAMA_CHAT_MODEL, 'apiKey': None},
@@ -205,6 +207,11 @@ def buildChatSummary(userQuery: str, assistantAnswer: str):
 @app.get("/api/info")
 def infoEndpoint():
     return {
+        "mockRuntime": MOCK_RUNTIME,
+        "auth": {
+            "mockRuntime": MOCK_RUNTIME,
+            "user": getMockUser() if MOCK_RUNTIME else None,
+        },
         "providers": {
             "ollama": {"model": OLLAMA_CHAT_MODEL, "available": True},
             "groq": {"model": GROQ_MODEL, "available": bool(GROQ_API_KEY)},

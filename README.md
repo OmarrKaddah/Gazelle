@@ -52,7 +52,7 @@ frontend/         ─► React + Tailwind: chat with citations, graph explorer, 
 - **Graph DB**: Neo4j (vector + fulltext indexes on Chunk; relationship graph on Entity)
 - **Embeddings**: BGE-M3 dense (1024-dim, fp16) — stored on Chunk nodes
 - **API**: FastAPI + uvicorn, SSE streaming
-- **Persistence**: PostgreSQL + async SQLAlchemy + Alembic for users, chats, messages, chat memory, and user memory
+- **Persistence**: PostgreSQL + async SQLAlchemy + Alembic for users, chats, messages, chat memory, and user memory. Set `MOCK_RUNTIME=true` to bypass PostgreSQL and keep auth, chats, memory, and audit logs in memory on machines without Postgres.
 - **Frontend**: Vite + React + Tailwind, cytoscape.js for graph viz
 - **Auth**: PostgreSQL-backed seeded users with bcrypt passwords and bearer token sessions
 
