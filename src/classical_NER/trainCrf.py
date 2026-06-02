@@ -1,6 +1,7 @@
 import json
 import pickle
 import random
+import sys
 from pathlib import Path
 import sklearn_crfsuite
 from seqeval.metrics import classification_report
@@ -60,28 +61,37 @@ def saveModel(crf):
 
 
 if __name__ == '__main__':
+    use_all = '--all' in sys.argv
+
     print("=" * 50)
     print("STEP 1 — load training data")
     X, y = loadTraining()
     total_tokens = sum(len(s) for s in X)
     print(f"  {len(X)} sequences, {total_tokens} tokens")
 
-    print("=" * 50)
-    print("STEP 2 — split train/test (80/20)")
-    X_train, y_train, X_test, y_test = splitData(X, y)
-    print(f"  train: {len(X_train)} sequences ({sum(len(s) for s in X_train)} tokens)")
-    print(f"  test:  {len(X_test)} sequences ({sum(len(s) for s in X_test)} tokens)")
+    if use_all:
+        print("=" * 50)
+        print("STEP 2 — using ALL data for training (official test set will be used for eval)")
+        X_train, y_train = X, y
+        print(f"  train: {len(X_train)} sequences ({sum(len(s) for s in X_train)} tokens)")
+    else:
+        print("=" * 50)
+        print("STEP 2 — split train/test (80/20)")
+        X_train, y_train, X_test, y_test = splitData(X, y)
+        print(f"  train: {len(X_train)} sequences ({sum(len(s) for s in X_train)} tokens)")
+        print(f"  test:  {len(X_test)} sequences ({sum(len(s) for s in X_test)} tokens)")
 
     print("=" * 50)
     print("STEP 3 — train")
     crf = trainCrf(X_train, y_train)
 
-    print("=" * 50)
-    print("STEP 4 — evaluate on test set")
-    evaluate(crf, X_test, y_test)
+    if not use_all:
+        print("=" * 50)
+        print("STEP 4 — evaluate on internal test set")
+        evaluate(crf, X_test, y_test)
 
     print("=" * 50)
-    print("STEP 5 — save model")
+    print("STEP 4 — save model" if use_all else "STEP 5 — save model")
     saveModel(crf)
     print("=" * 50)
     print("trainCrf done")

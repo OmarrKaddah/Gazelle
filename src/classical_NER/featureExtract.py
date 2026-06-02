@@ -146,11 +146,11 @@ def tokenFeatures(tokens, pos, i, orgTriggers, moneyTriggers, monthNames):
     def safePos(j):
         if j < 0: return '__START__'
         if j >= n: return '__END__'
-        return pos[j]
+        return pos[j] if pos[j] is not None else 'UNK'
 
     feats = {
         'word':     word,
-        'pos':      pos[i],
+        'pos':      pos[i] if pos[i] is not None else 'UNK',
         'is_first': i == 0,
         'prev_is_org_trigger': safeWord(i - 1) in orgTriggers,
         'w-1': safeWord(i - 1),
