@@ -126,25 +126,15 @@ def charNgrams(word):
     return feats
 
 
-def gazFeatures(word, gazSets, orgTriggers, moneyTriggers, monthNames):
-    w = normalizeForLookup(word)
-
-    # TODO: add per-type gazetteer features for each ontology entity type
-    # TODO: add multi-word phrase lookup (current lookup is single-token only)
-    # TODO: add fuzzy/partial match for unseen morphological variants
-    # TODO: add law number pattern (e.g. قانون رقم \d+) as a trigger feature
-
+def contextTriggerFeatures(word, orgTriggers, moneyTriggers, monthNames):
     return {
-        'in_org_gaz':       w in gazSets.get('RegulatoryBody', set()) or
-                            w in gazSets.get('BankingInstitution', set()),
-        'in_any_gaz':       any(w in s for s in gazSets.values()),
         'is_org_trigger':   word in orgTriggers,
         'in_money_trigger': word in moneyTriggers,
         'in_month':         word in monthNames,
     }
 
 
-def tokenFeatures(tokens, pos, i, gazSets, orgTriggers, moneyTriggers, monthNames):
+def tokenFeatures(tokens, pos, i, orgTriggers, moneyTriggers, monthNames):
     word = tokens[i]['word']
     n    = len(tokens)
 
@@ -174,17 +164,17 @@ def tokenFeatures(tokens, pos, i, gazSets, orgTriggers, moneyTriggers, monthName
     feats.update(morphFeatures(word))
     feats.update(scriptFeatures(word))
     feats.update(charNgrams(word))
-    feats.update(gazFeatures(word, gazSets, orgTriggers, moneyTriggers, monthNames))
+    feats.update(contextTriggerFeatures(word, orgTriggers, moneyTriggers, monthNames))
     return feats
 
 
-def extractChunk(text, spans, gazSets, orgTriggers, moneyTriggers, monthNames):
+def extractChunk(text, spans, orgTriggers, moneyTriggers, monthNames):
     tokens = tokenize(text)
     words  = [t['word'] for t in tokens]
     pos    = posTag(words)
     labels = bioAlign(tokens, spans)
     return [
-        (tokenFeatures(tokens, pos, i, gazSets, orgTriggers, moneyTriggers, monthNames), labels[i])
+        (tokenFeatures(tokens, pos, i, orgTriggers, moneyTriggers, monthNames), labels[i])
         for i in range(len(tokens))
     ]
 
@@ -204,7 +194,7 @@ def dumpTraining(sequences):
 if __name__ == '__main__':
     print("=" * 50)
     print("STEP 1 — load gazetteer")
-    gazSets, orgTriggers, moneyTriggers, monthNames = loadGazetteer()
+    _, orgTriggers, moneyTriggers, monthNames = loadGazetteer()
 
     print("=" * 50)
     print("STEP 2 — load annotations")
@@ -214,7 +204,7 @@ if __name__ == '__main__':
     print("STEP 3 — extract features")
     sequences = []
     for i, a in enumerate(annotations):
-        seq = extractChunk(a['text'], a['spans'], gazSets, orgTriggers, moneyTriggers, monthNames)
+        seq = extractChunk(a['text'], a['spans'], orgTriggers, moneyTriggers, monthNames)
         sequences.append(seq)
         entity_tokens = sum(1 for _, label in seq if label != 'O')
         print(f"  chunk {i+1}/{len(annotations)} | {len(seq)} tokens | {entity_tokens} entity tokens | doc: {a['meta'].get('docName', '?')}")

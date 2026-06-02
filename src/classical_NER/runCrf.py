@@ -48,12 +48,12 @@ def bioToSpans(tokens, labels, chunkId, docName):
     return spans
 
 
-def predictChunk(crf, chunk, gazSets, orgTriggers, moneyTriggers, monthNames):
+def predictChunk(crf, chunk, orgTriggers, moneyTriggers, monthNames):
     tokens = tokenize(chunk['text'])
     words  = [t['word'] for t in tokens]
     pos    = posTag(words)
     feats  = [
-        tokenFeatures(tokens, pos, i, gazSets, orgTriggers, moneyTriggers, monthNames)
+        tokenFeatures(tokens, pos, i, orgTriggers, moneyTriggers, monthNames)
         for i in range(len(tokens))
     ]
     labels = crf.predict([feats])[0]
@@ -71,12 +71,12 @@ def dumpEntities(entities, docName):
     print(f"  saved -> {out}")
 
 
-def runDoc(crf, docName, gazSets, orgTriggers, moneyTriggers, monthNames):
+def runDoc(crf, docName, orgTriggers, moneyTriggers, monthNames):
     chunks   = loadChunks(docName)
     print(f"[runDoc] {docName} — {len(chunks)} chunks")
     entities = []
     for chunk in chunks:
-        entities.extend(predictChunk(crf, chunk, gazSets, orgTriggers, moneyTriggers, monthNames))
+        entities.extend(predictChunk(crf, chunk, orgTriggers, moneyTriggers, monthNames))
     dumpEntities(entities, docName)
     type_counts = {}
     for e in entities:
@@ -92,7 +92,7 @@ if __name__ == '__main__':
 
     print("=" * 50)
     print("STEP 2 — load gazetteer")
-    gazSets, orgTriggers, moneyTriggers, monthNames = loadGazetteer()
+    _, orgTriggers, moneyTriggers, monthNames = loadGazetteer()
 
     print("=" * 50)
     print("STEP 3 — run inference on all documents")
@@ -101,7 +101,7 @@ if __name__ == '__main__':
 
     all_entities = []
     for docName in docNames:
-        entities = runDoc(crf, docName, gazSets, orgTriggers, moneyTriggers, monthNames)
+        entities = runDoc(crf, docName, orgTriggers, moneyTriggers, monthNames)
         all_entities.extend(entities)
 
     print("=" * 50)
