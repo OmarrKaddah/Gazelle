@@ -98,3 +98,4 @@ plans/
 .ini
 
 ocr_dataset/
+classical_env/*
