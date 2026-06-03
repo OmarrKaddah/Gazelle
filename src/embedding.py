@@ -5,13 +5,25 @@ from neo4j import GraphDatabase
 from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, EMBED_DIM, CHUNK_EMBED_BATCH, OLLAMA_EMBED_URL, OLLAMA_EMBED_MODEL
 
 
+_session = requests.Session()
+_session.trust_env = False
+
+
 def embedTexts(texts):
-    resp = requests.post(OLLAMA_EMBED_URL, json={"model": OLLAMA_EMBED_MODEL, "input": texts})
+    resp = _session.post(OLLAMA_EMBED_URL, json={"model": OLLAMA_EMBED_MODEL, "input": texts})
+    if resp.status_code != 200:
+        sample = [t[:80] for t in texts[:3]]
+        raise RuntimeError(f"ollama embed {resp.status_code}: {resp.text[:300]} | batch={len(texts)} maxlen={max(len(t) for t in texts)} sample={sample}")
     return resp.json()["embeddings"]
 
 
 def embedQuery(query):
-    return embedTexts([query])[0]
+    try:
+        return embedTexts([query])[0]
+    except RuntimeError as e:
+        if 'NaN' not in str(e):
+            raise
+        return embedTexts([query + ' .'])[0]
 
 
 def loadChunks(docName):

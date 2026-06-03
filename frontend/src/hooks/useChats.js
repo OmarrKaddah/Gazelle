@@ -31,7 +31,18 @@ export function useChats(authToken) {
       return;
     }
     const data = await res.json();
-    setCurrentChat(data.chat || null);
+    const fresh = data.chat || null;
+    setCurrentChat((prev) => {
+      if (!fresh || !prev?.messages?.length) return fresh;
+      return {
+        ...fresh,
+        messages: fresh.messages.map((msg, i) => ({
+          ...msg,
+          citations: prev.messages[i]?.citations ?? msg.citations,
+          mode: prev.messages[i]?.mode ?? msg.mode,
+        })),
+      };
+    });
   }, [authToken, currentChatId]);
 
   useEffect(() => {

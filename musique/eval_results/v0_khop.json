@@ -1,0 +1,6362 @@
+{
+  "version": "v0",
+  "label": "khop",
+  "notes": "Pre-PPR baseline: fixed-depth k-hop traversal mirroring the original src/retriever.py architecture, adapted to walk MuSiQue edge types (COOCCURS_WITH|SYNONYM|TRIPLE). Path score = mean entity cosine. Each entity on each path contributes its score to all chunks it appears in (max wins). Same KG as v1-v7b.",
+  "config": {
+    "retriever": "khop",
+    "khopDepth": 3,
+    "seedK": 8,
+    "pathLimit": 300
+  },
+  "aggregate": {
+    "recall@1": 0.21717171717171718,
+    "hit@1": 0.43434343434343436,
+    "recall@2": 0.2904040404040404,
+    "hit@2": 0.46464646464646464,
+    "recall@5": 0.36363636363636365,
+    "hit@5": 0.5252525252525253,
+    "recall@10": 0.398989898989899,
+    "hit@10": 0.5353535353535354
+  },
+  "byHop": {
+    "2hop": {
+      "recall@1": 0.21717171717171718,
+      "hit@1": 0.43434343434343436,
+      "recall@2": 0.2904040404040404,
+      "hit@2": 0.46464646464646464,
+      "recall@5": 0.36363636363636365,
+      "hit@5": 0.5252525252525253,
+      "recall@10": 0.398989898989899,
+      "hit@10": 0.5353535353535354
+    }
+  },
+  "perQuestion": [
+    {
+      "id": "2hop__460946_294723",
+      "hop": "2hop",
+      "question": "Who is the spouse of the Green performer?",
+      "answer": "Miquette Giraudy",
+      "goldChunkIds": [
+        "musique-0e17a36cca270204",
+        "musique-a9063ca2d73d3d05"
+      ],
+      "retrievedChunkIds": [
+        "musique-a9063ca2d73d3d05",
+        "musique-0e17a36cca270204",
+        "musique-02402782afde2616",
+        "musique-2f6203dfd31ffb7c",
+        "musique-5a0deb8e71f89c6b",
+        "musique-ce7cc4b8915d05f8",
+        "musique-7ce3c04d3a945371",
+        "musique-bcfd333652913eee",
+        "musique-edb15dd66f654e65",
+        "musique-f77fcb9fe2ec1b2a"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__252311_366220",
+      "hop": "2hop",
+      "question": "Who founded the company that distributed the film UHF?",
+      "answer": "Mike Medavoy",
+      "goldChunkIds": [
+        "musique-0f67e6b349794bab",
+        "musique-d5f5e42594a6cbc7"
+      ],
+      "retrievedChunkIds": [
+        "musique-f35d9bb3bbeb0e5d",
+        "musique-61f3f01aebad709b",
+        "musique-57e0c435df09e46c",
+        "musique-910057e3ccc3a6dc",
+        "musique-a3bd6ed86209a7a5",
+        "musique-f307f932ded1bdc5",
+        "musique-0d603052e74ca0ee",
+        "musique-0dabb6d3416212dc",
+        "musique-a4582d5f53b696a1",
+        "musique-7d93359c93c6015d"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__701895_752697",
+      "hop": "2hop",
+      "question": "What administrative territorial entity is the owner of Ciudad Deportiva located?",
+      "answer": "Tamaulipas",
+      "goldChunkIds": [
+        "musique-06fa5d33dc70c63e",
+        "musique-833883fcc39e6e85"
+      ],
+      "retrievedChunkIds": [
+        "musique-06fa5d33dc70c63e",
+        "musique-833883fcc39e6e85",
+        "musique-1eddcf3afe3bef83",
+        "musique-3c6aa7faabc747b9",
+        "musique-6730535fc9b56120",
+        "musique-d37a8a2eb5f036f0",
+        "musique-58332d1e9a825013",
+        "musique-e50bc8bb4fad94a8",
+        "musique-8634d70d9047fc87",
+        "musique-22d06d8393dc8c44"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__259228_793698",
+      "hop": "2hop",
+      "question": "Where is Ulrich Walter's employer headquartered?",
+      "answer": "Cologne",
+      "goldChunkIds": [
+        "musique-18cbac6423bfe945",
+        "musique-ad9f5bab2c7f0b57"
+      ],
+      "retrievedChunkIds": [
+        "musique-8ff257b88844cbf1",
+        "musique-7aa7ace37f30bd1f",
+        "musique-a9063ca2d73d3d05",
+        "musique-1d8cec2ac58f4a18",
+        "musique-ba65e4a4d0fa5d1d",
+        "musique-ab1ce33ef7af6478",
+        "musique-fdaa15ebb4cfb642",
+        "musique-67f2f5f18f7abd11",
+        "musique-f6c68266c7c6a192",
+        "musique-1002baadb0b8e2cf"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__481349_302087",
+      "hop": "2hop",
+      "question": "Which company owns the manufacturer of Learjet 60?",
+      "answer": "Bombardier Inc.",
+      "goldChunkIds": [
+        "musique-40e392e7a7f814fc",
+        "musique-ad786343dee671a0"
+      ],
+      "retrievedChunkIds": [
+        "musique-fa2c07ae387c184d",
+        "musique-4ba4d2f35c80cd90",
+        "musique-18cbac6423bfe945",
+        "musique-59a75f5f0ebb386e",
+        "musique-29d0100d1e388527",
+        "musique-674a37ecfe33eaac",
+        "musique-40a5972249823027",
+        "musique-973b6e533db6293e",
+        "musique-7b51d24e1784738d",
+        "musique-ea7f999b75f85d4a"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__697790_864352",
+      "hop": "2hop",
+      "question": "Who is the child of Caroline LeRoy's spouse?",
+      "answer": "Fletcher Webster",
+      "goldChunkIds": [
+        "musique-c204827cf505037e",
+        "musique-f17c72589fc8ded1"
+      ],
+      "retrievedChunkIds": [
+        "musique-c204827cf505037e",
+        "musique-a302c631c3cdfb40",
+        "musique-cf54b7f0b7011ac1",
+        "musique-579e400f53166f07",
+        "musique-94752601a81ad4e7",
+        "musique-bd9832f6da0c8756",
+        "musique-20a8430cc4e04285",
+        "musique-f37bef031c9c867d",
+        "musique-db0faa2dad3ca726",
+        "musique-baa65f38d8e78ce9"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__207476_625987",
+      "hop": "2hop",
+      "question": "Who is the grandmother of Philippe, Duke of Orl\u00e9ans?",
+      "answer": "Marie de' Medici",
+      "goldChunkIds": [
+        "musique-2e09f5d1fae49fb4",
+        "musique-ff74ad5cfc5d6fb3"
+      ],
+      "retrievedChunkIds": [
+        "musique-ff74ad5cfc5d6fb3",
+        "musique-4a8ba39a2790a4c6",
+        "musique-a8ee5aa7eb27373a",
+        "musique-b1d2adc50e454be3",
+        "musique-f821e1f612e155d9",
+        "musique-271c06fdd762d02e",
+        "musique-0e17a36cca270204",
+        "musique-bc185490931ab47c",
+        "musique-a8886760874d0cde",
+        "musique-5a62e139696cf80e"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__390947_232243",
+      "hop": "2hop",
+      "question": "What is the goal of the group that European Movement Germany is a member of?",
+      "answer": "European integration",
+      "goldChunkIds": [
+        "musique-b43b22d29b01c164",
+        "musique-cc0a03139d2433b9"
+      ],
+      "retrievedChunkIds": [
+        "musique-cc0a03139d2433b9",
+        "musique-54ffa2cb5f6e5809",
+        "musique-ad9f5bab2c7f0b57",
+        "musique-f447fd4de2bf3df6",
+        "musique-0b1be95b706cd39d",
+        "musique-7e2b73e3458034c9",
+        "musique-b7363a9c9197be44",
+        "musique-b0feb72f8caaaaf2",
+        "musique-1fab930344d350fe",
+        "musique-7aa540fe3b0b844d"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__354635_174222",
+      "hop": "2hop",
+      "question": "What company succeeded the owner of Empire Sports Network?",
+      "answer": "Time Warner Cable",
+      "goldChunkIds": [
+        "musique-6b5c58196c7bbd72",
+        "musique-7e0336b78e2536fa"
+      ],
+      "retrievedChunkIds": [
+        "musique-7e0336b78e2536fa",
+        "musique-2c354dacef183272",
+        "musique-770dae197a9debf4",
+        "musique-5968b51386d5e35f",
+        "musique-1f8136f1000ef6d6",
+        "musique-96ebd3bea8f69778",
+        "musique-962400fb01b5b232",
+        "musique-8805973ee00604a7",
+        "musique-977e76ed8ab2096e",
+        "musique-88c4a9819bc41217"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__635187_861533",
+      "hop": "2hop",
+      "question": "What province shares a border with the province where Lago District is located?",
+      "answer": "Cabo Delgado Province",
+      "goldChunkIds": [
+        "musique-592eb8b2e9ad221f",
+        "musique-c95ad4adeb55757b"
+      ],
+      "retrievedChunkIds": [
+        "musique-592eb8b2e9ad221f",
+        "musique-c95ad4adeb55757b",
+        "musique-d186bd3971715bcf",
+        "musique-03a8bea25ac54cf8",
+        "musique-ba65e4a4d0fa5d1d",
+        "musique-0736b91a21ea37a6",
+        "musique-e258b45e8f20f80d",
+        "musique-ad84a75f32ab6d48",
+        "musique-fa847fb691ed4680",
+        "musique-9c11051fa88efa11"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__166824_185403",
+      "hop": "2hop",
+      "question": "What league does the team that plays in Stadio Ciro Vigorito play for?",
+      "answer": "Lega Pro Prima Divisione",
+      "goldChunkIds": [
+        "musique-1f8a0e609ee3b49e",
+        "musique-bbdd0288256a2fc2"
+      ],
+      "retrievedChunkIds": [
+        "musique-bbdd0288256a2fc2",
+        "musique-c31dff5559baa312",
+        "musique-62708f503f7292b4",
+        "musique-d47e104f3837c488",
+        "musique-a3d66db02f6977e0",
+        "musique-ef504aeb105d7272",
+        "musique-130a30a0b29bedf1",
+        "musique-6531448904cdb278",
+        "musique-511443237600bde2",
+        "musique-71225e28ada33fd9"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__698577_851686",
+      "hop": "2hop",
+      "question": "What is a notable work written by the author of The Timothy files?",
+      "answer": "Anderson Tapes",
+      "goldChunkIds": [
+        "musique-1f8136f1000ef6d6",
+        "musique-4908c98d381676f7"
+      ],
+      "retrievedChunkIds": [
+        "musique-4908c98d381676f7",
+        "musique-1f8136f1000ef6d6",
+        "musique-18cbac6423bfe945",
+        "musique-d8a12f2f97de7e6d",
+        "musique-ab1ce33ef7af6478",
+        "musique-e584ba5479adf30d",
+        "musique-b2e269c4c462c82b",
+        "musique-5294d5508f4bb9f6",
+        "musique-2c7bc358f0660e6c",
+        "musique-92d07fda5448f8cd"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__362107_652514",
+      "hop": "2hop",
+      "question": "In which borough was Callum McManaman born?",
+      "answer": "Knowsley",
+      "goldChunkIds": [
+        "musique-45015b3f96cba437",
+        "musique-f75ace3b8597eb6b"
+      ],
+      "retrievedChunkIds": [
+        "musique-f75ace3b8597eb6b",
+        "musique-45015b3f96cba437",
+        "musique-6c8060687dbae7bb",
+        "musique-40cc8c47137080f3",
+        "musique-322d9dc8e16193c3",
+        "musique-a1cd4f47dc8093bd",
+        "musique-71d9dfca8f431bb9",
+        "musique-f7e989bd97948104",
+        "musique-86d107dc7055d0f4",
+        "musique-fe24dfe0196e7e2b"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__402530_774333",
+      "hop": "2hop",
+      "question": "What other county does the county where Imperial is located share a border with?",
+      "answer": "Crockett County",
+      "goldChunkIds": [
+        "musique-1266afd395e8f33f",
+        "musique-458e1784a8781b9d"
+      ],
+      "retrievedChunkIds": [
+        "musique-605439ebc1653a11",
+        "musique-cf9a319ac49252b7",
+        "musique-7b51d24e1784738d",
+        "musique-deb929a8e815b282",
+        "musique-30cf7f5e4baa8e2c",
+        "musique-92d07fda5448f8cd",
+        "musique-b7e48619fee3a04a",
+        "musique-538863bd49d22551",
+        "musique-a9d7fa8c404d034a",
+        "musique-262846bc2c880383"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__195917_575657",
+      "hop": "2hop",
+      "question": "In what county is William W. Blair's birthplace located?",
+      "answer": "Orleans County",
+      "goldChunkIds": [
+        "musique-8805973ee00604a7",
+        "musique-aef98e4e514304fd"
+      ],
+      "retrievedChunkIds": [
+        "musique-638afd0c63b5df77",
+        "musique-9b7f932d5a9d08cf",
+        "musique-2e8d2ad6566cae9a",
+        "musique-40ae5feac1ce373c",
+        "musique-34d4f9bbaa372ca1",
+        "musique-66540855cf310764",
+        "musique-a61168d03a2cfcce",
+        "musique-d1c0acf6b86dd232",
+        "musique-a5b95410cc0ab79a",
+        "musique-41df7496621b2252"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__683835_709167",
+      "hop": "2hop",
+      "question": "What award did the author of The Red Tree receive?",
+      "answer": "Academy Award for Best Animated Short Film",
+      "goldChunkIds": [
+        "musique-159072021767139f",
+        "musique-7dec5fab63d2dabb"
+      ],
+      "retrievedChunkIds": [
+        "musique-159072021767139f",
+        "musique-4d41b561b2ff83c0",
+        "musique-3fcb7ee89bbd2886",
+        "musique-4f47d4f91ddc17f7",
+        "musique-f6c68266c7c6a192",
+        "musique-71065fc8da4f7d6b",
+        "musique-9ec39c5e2f7b88f5",
+        "musique-0279535fecaa0b9f",
+        "musique-bdbe67f7d1698fe6",
+        "musique-ca28fb79e39890da"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__197470_271394",
+      "hop": "2hop",
+      "question": "Where was Tyler MacDuff's child educated?",
+      "answer": "Blair High School",
+      "goldChunkIds": [
+        "musique-29d0100d1e388527",
+        "musique-638afd0c63b5df77"
+      ],
+      "retrievedChunkIds": [
+        "musique-29d0100d1e388527",
+        "musique-12902ef044696c8d",
+        "musique-ea60602eeffc4844",
+        "musique-fab6366607ab4a26",
+        "musique-4d41b561b2ff83c0",
+        "musique-912a2035ff4cf807",
+        "musique-c4bef5640775ae67",
+        "musique-343bd947a1c9f314",
+        "musique-8da80395c94447c1",
+        "musique-5cae29558cf0bd6a"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__458131_174974",
+      "hop": "2hop",
+      "question": "Who is the spouse of the Rabbit Hole's producer?",
+      "answer": "Keith Urban",
+      "goldChunkIds": [
+        "musique-990dafeee7139edf",
+        "musique-b3e316b07b8cb2e1"
+      ],
+      "retrievedChunkIds": [
+        "musique-2a31cf83a54a1002",
+        "musique-f43b48300459c6ac",
+        "musique-747487e89bc47b30",
+        "musique-4be2c90e06a9ca41",
+        "musique-9d30a163e7be4d4e",
+        "musique-0e29db77e17a017f",
+        "musique-ebfd07a2b7833243",
+        "musique-eebbf97c7158c33c",
+        "musique-994ac5d541c47da0",
+        "musique-3ed3a22860c43256"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__299142_347613",
+      "hop": "2hop",
+      "question": "Who is the child of Sigrid Eskilsdotter's child?",
+      "answer": "Svante Stensson Sture",
+      "goldChunkIds": [
+        "musique-467c98218a441272",
+        "musique-541987abf415b222"
+      ],
+      "retrievedChunkIds": [
+        "musique-467c98218a441272",
+        "musique-829c4908fd6c9227",
+        "musique-21df8523af90b419",
+        "musique-d79792da5382e5f4",
+        "musique-7aa540fe3b0b844d",
+        "musique-4662361418958cb1",
+        "musique-7b9972e637b6b3cb",
+        "musique-1c134b6782bc61da",
+        "musique-54ffa2cb5f6e5809",
+        "musique-ad9f5bab2c7f0b57"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__528263_865831",
+      "hop": "2hop",
+      "question": "In which county is Kimbrough Memorial Stadium located?",
+      "answer": "Randall County",
+      "goldChunkIds": [
+        "musique-044c03cce2d40960",
+        "musique-5936ce16acf8afa4"
+      ],
+      "retrievedChunkIds": [
+        "musique-044c03cce2d40960",
+        "musique-93c0304a9a0fee37",
+        "musique-1266afd395e8f33f",
+        "musique-5936ce16acf8afa4",
+        "musique-32e18d3a865e9fef",
+        "musique-98e4264e8dba22fb",
+        "musique-bdcc63605fda87a9",
+        "musique-f6a6a093db3061ca",
+        "musique-d37a2c26bcb34ac9",
+        "musique-f8c5a736d3a7460a"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__569582_304416",
+      "hop": "2hop",
+      "question": "What record label is the performer of Almost Made Ya signed to?",
+      "answer": "Derrty Entertainment",
+      "goldChunkIds": [
+        "musique-2f701a762884ecd3",
+        "musique-c49b55070829ced5"
+      ],
+      "retrievedChunkIds": [
+        "musique-5968b51386d5e35f",
+        "musique-6c1c301ce6f9161c",
+        "musique-4d41b561b2ff83c0",
+        "musique-6fa67873cf05cb65",
+        "musique-0f67e6b349794bab",
+        "musique-ba57dfa3319d55b8",
+        "musique-46929a8081629b2a",
+        "musique-e03ec1c7887de256",
+        "musique-d4f40970cbbeb58f",
+        "musique-b08d6d0f7d8c9e7e"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__505860_650613",
+      "hop": "2hop",
+      "question": "Where was the author of Hannibal and Scipio educated at?",
+      "answer": "Exeter College",
+      "goldChunkIds": [
+        "musique-2bafc1d6138d1f3b",
+        "musique-fdaa15ebb4cfb642"
+      ],
+      "retrievedChunkIds": [
+        "musique-2bafc1d6138d1f3b",
+        "musique-0fb741aa7bdc2522",
+        "musique-d1a2848c4d129a7f",
+        "musique-b4d95b366d8025c4",
+        "musique-de3d028d393ebbda",
+        "musique-a302c631c3cdfb40",
+        "musique-18330955cddeaca1",
+        "musique-739bb6d8f1b448ba",
+        "musique-8d0d672bd1bbb88c",
+        "musique-7b3957e012de3e19"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__821197_368148",
+      "hop": "2hop",
+      "question": "In which county is Southern Maryland Electric Cooperative headquartered?",
+      "answer": "Charles County",
+      "goldChunkIds": [
+        "musique-13ced1e55816f200",
+        "musique-34e586db80b2bd2f"
+      ],
+      "retrievedChunkIds": [
+        "musique-34e586db80b2bd2f",
+        "musique-3aeda5fd8be689a1",
+        "musique-2e42a22b7648ceb4",
+        "musique-f88e92f6f7e65c02",
+        "musique-13ced1e55816f200",
+        "musique-e763a332f522e77a",
+        "musique-69d99a7c8f5df4fa",
+        "musique-16f50597db41130f",
+        "musique-ddc6994b835cff9a",
+        "musique-564f82dcac19a98b"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__554167_451128",
+      "hop": "2hop",
+      "question": "Who is the child of the Victim of Romance performer?",
+      "answer": "Chynna Phillips",
+      "goldChunkIds": [
+        "musique-8949009baf434b79",
+        "musique-8c14a17d9774f51b"
+      ],
+      "retrievedChunkIds": [
+        "musique-8949009baf434b79",
+        "musique-8c14a17d9774f51b",
+        "musique-4d41b561b2ff83c0",
+        "musique-6fa67873cf05cb65",
+        "musique-0f67e6b349794bab",
+        "musique-ba57dfa3319d55b8",
+        "musique-46929a8081629b2a",
+        "musique-e03ec1c7887de256",
+        "musique-d4f40970cbbeb58f",
+        "musique-5968b51386d5e35f"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__702496_430061",
+      "hop": "2hop",
+      "question": "What county was Tim Dubois born in?",
+      "answer": "McDonald County",
+      "goldChunkIds": [
+        "musique-5f9f1dfc6067a548",
+        "musique-ca836d0199569534"
+      ],
+      "retrievedChunkIds": [
+        "musique-5f9f1dfc6067a548",
+        "musique-37540dea81942bd6",
+        "musique-4d41b561b2ff83c0",
+        "musique-6fa67873cf05cb65",
+        "musique-0f67e6b349794bab",
+        "musique-ba57dfa3319d55b8",
+        "musique-46929a8081629b2a",
+        "musique-e03ec1c7887de256",
+        "musique-d4f40970cbbeb58f",
+        "musique-5968b51386d5e35f"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__549146_223121",
+      "hop": "2hop",
+      "question": "What record label did the person who is part of The Bruce Lee Band start?",
+      "answer": "Asian Man Records",
+      "goldChunkIds": [
+        "musique-098cde9341522d77",
+        "musique-674a37ecfe33eaac"
+      ],
+      "retrievedChunkIds": [
+        "musique-098cde9341522d77",
+        "musique-674a37ecfe33eaac",
+        "musique-ff9c3ec25fdf5db2",
+        "musique-11979f06097bf658",
+        "musique-092473f4a60167ef",
+        "musique-adbb3fdec9466a69",
+        "musique-b2c00dc72d93aad0",
+        "musique-96282fa2ebc09898",
+        "musique-840c01a0bcfa1434",
+        "musique-e89edcd7c3a98cb6"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__647996_551681",
+      "hop": "2hop",
+      "question": "What is another notable work made by the author of Miss Sara Sampson?",
+      "answer": "Emilia Galotti",
+      "goldChunkIds": [
+        "musique-ad704788474403b7",
+        "musique-c9f896d63cecc074"
+      ],
+      "retrievedChunkIds": [
+        "musique-c9f896d63cecc074",
+        "musique-0e17a36cca270204",
+        "musique-bc185490931ab47c",
+        "musique-a8886760874d0cde",
+        "musique-5a62e139696cf80e",
+        "musique-0e4122d57988f257",
+        "musique-65afcfde26159592",
+        "musique-d864c32be453c900",
+        "musique-a36146a4fe19a837",
+        "musique-9de5b6d89cd6783f"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__673655_316668",
+      "hop": "2hop",
+      "question": "What instrument is played by the person from The Blackout All-Stars?",
+      "answer": "conga",
+      "goldChunkIds": [
+        "musique-4261759acadff6cb",
+        "musique-9fcf760408dae763"
+      ],
+      "retrievedChunkIds": [
+        "musique-4261759acadff6cb",
+        "musique-9fcf760408dae763",
+        "musique-0324df0e2c0e6735",
+        "musique-ffb7ed8dc39b10df",
+        "musique-44e9a17399f00270",
+        "musique-211fbc6b3ae2a18b",
+        "musique-1685bc563cbe0403",
+        "musique-867d4d4a36ee4cad",
+        "musique-de97ad41bf9874bc",
+        "musique-24b1a0b7ef9ef702"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__574419_270105",
+      "hop": "2hop",
+      "question": "What is the seat of the county where Van Hook Township is located?",
+      "answer": "Stanley",
+      "goldChunkIds": [
+        "musique-4afcd54cfe9dfaa3",
+        "musique-a3407d3a46c993df"
+      ],
+      "retrievedChunkIds": [
+        "musique-a3407d3a46c993df",
+        "musique-4be2c90e06a9ca41",
+        "musique-96ebd3bea8f69778",
+        "musique-962400fb01b5b232",
+        "musique-4afcd54cfe9dfaa3",
+        "musique-1cf41894575a107c",
+        "musique-193d0d37e8ec2f77",
+        "musique-d5bbd8b767cd0e26",
+        "musique-fd4041bf3e6b47a6",
+        "musique-162621b96afa8a36"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__403712_793210",
+      "hop": "2hop",
+      "question": "Who is the father of Edward Baring, 1st Baron Revelstoke's father?",
+      "answer": "Sir Francis Baring, 1st Baronet",
+      "goldChunkIds": [
+        "musique-94752601a81ad4e7",
+        "musique-9a4ab1c82ee2f761"
+      ],
+      "retrievedChunkIds": [
+        "musique-94752601a81ad4e7",
+        "musique-a302c631c3cdfb40",
+        "musique-c204827cf505037e",
+        "musique-cf54b7f0b7011ac1",
+        "musique-579e400f53166f07",
+        "musique-bd9832f6da0c8756",
+        "musique-20a8430cc4e04285",
+        "musique-f37bef031c9c867d",
+        "musique-db0faa2dad3ca726",
+        "musique-baa65f38d8e78ce9"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__832795_350510",
+      "hop": "2hop",
+      "question": "What group was the performer of Be the One a member of?",
+      "answer": "Jackson 5",
+      "goldChunkIds": [
+        "musique-49cf6034c3e2f93f",
+        "musique-77c5bce65646d360"
+      ],
+      "retrievedChunkIds": [
+        "musique-49cf6034c3e2f93f",
+        "musique-77c5bce65646d360",
+        "musique-d33af2ed50bc8890",
+        "musique-6bc97ac8b9cb71d9",
+        "musique-1fc16f3517425771",
+        "musique-e7a490cd1dc7fbd0",
+        "musique-7affdd83e3446133"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__744055_408817",
+      "hop": "2hop",
+      "question": "Who is the lead singer of the band performing Bang Bang Rock & Roll?",
+      "answer": "Eddie Argos",
+      "goldChunkIds": [
+        "musique-6f49abc16cc2e208",
+        "musique-8696876cfc3a3f89"
+      ],
+      "retrievedChunkIds": [
+        "musique-8696876cfc3a3f89",
+        "musique-6f49abc16cc2e208",
+        "musique-32755599420c2dfb",
+        "musique-e286bc3688ef0099",
+        "musique-c5eb5c0b8546eb71",
+        "musique-a3f42bde2c568403",
+        "musique-68b74038171028cb",
+        "musique-3c596289098dc46e",
+        "musique-a8d3223a44c9b19a",
+        "musique-bdbe67f7d1698fe6"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__726717_610238",
+      "hop": "2hop",
+      "question": "What is the network which National Cycle Route 57 is part of an example of?",
+      "answer": "national cycling route network",
+      "goldChunkIds": [
+        "musique-6c9ad1255e333e4a",
+        "musique-9108267770b560a9"
+      ],
+      "retrievedChunkIds": [
+        "musique-9108267770b560a9",
+        "musique-6c9ad1255e333e4a",
+        "musique-e28f45b07ebc8462",
+        "musique-62ec4c0cedce10f0",
+        "musique-71065fc8da4f7d6b",
+        "musique-0967c70d8b410150",
+        "musique-1ad8f1d9029700cb",
+        "musique-c54abef67e19ff3a",
+        "musique-b7363a9c9197be44",
+        "musique-018e3c8ff06f94bf"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__499577_617190",
+      "hop": "2hop",
+      "question": "Who is the spouse of the child of Peter Andreas Heiberg?",
+      "answer": "Johanne Luise Heiberg",
+      "goldChunkIds": [
+        "musique-6178ae5217bedf7e",
+        "musique-696184401831c05e"
+      ],
+      "retrievedChunkIds": [
+        "musique-696184401831c05e",
+        "musique-ad8c472fc697f154",
+        "musique-0d332700c7d1bde1",
+        "musique-6178ae5217bedf7e",
+        "musique-b7363a9c9197be44",
+        "musique-7607add7c4d957d5",
+        "musique-538863bd49d22551",
+        "musique-dd9aabd02b294425",
+        "musique-89dff105731e8db1",
+        "musique-ce7ce969df5f4eec"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__685280_510757",
+      "hop": "2hop",
+      "question": "The Unwinding author volunteered for which organisation?",
+      "answer": "Peace Corps",
+      "goldChunkIds": [
+        "musique-93879aa3819663e5",
+        "musique-9ded9668313e0b8e"
+      ],
+      "retrievedChunkIds": [
+        "musique-f5c625162cd857fe",
+        "musique-a56c25ada2d09abd",
+        "musique-fdaa15ebb4cfb642",
+        "musique-310da1ef03eac987",
+        "musique-4edd51f505b4041f",
+        "musique-5b4a9213d339141c",
+        "musique-651c5031990fb3b5",
+        "musique-9968cb443c793c9c",
+        "musique-7fdc239e7323dca6",
+        "musique-ab1ce33ef7af6478"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__341305_332933",
+      "hop": "2hop",
+      "question": "What is the capital of the county that Pine Springs is located in?",
+      "answer": "Van Horn",
+      "goldChunkIds": [
+        "musique-32e18d3a865e9fef",
+        "musique-98e4264e8dba22fb"
+      ],
+      "retrievedChunkIds": [
+        "musique-98e4264e8dba22fb",
+        "musique-f43b48300459c6ac",
+        "musique-747487e89bc47b30",
+        "musique-4be2c90e06a9ca41",
+        "musique-9d30a163e7be4d4e",
+        "musique-0e29db77e17a017f",
+        "musique-ebfd07a2b7833243",
+        "musique-eebbf97c7158c33c",
+        "musique-994ac5d541c47da0",
+        "musique-3ed3a22860c43256"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__731228_609866",
+      "hop": "2hop",
+      "question": "What district is the headquarter of Julia's House located?",
+      "answer": "East Dorset",
+      "goldChunkIds": [
+        "musique-3875409717f1bf74",
+        "musique-71d9dfca8f431bb9"
+      ],
+      "retrievedChunkIds": [
+        "musique-3875409717f1bf74",
+        "musique-511443237600bde2",
+        "musique-96acaae668b37228",
+        "musique-45015b3f96cba437",
+        "musique-ab1ce33ef7af6478",
+        "musique-67f2f5f18f7abd11",
+        "musique-322d9dc8e16193c3",
+        "musique-9fa891ef33cc3aa5",
+        "musique-0b65a3fc5c739d1b",
+        "musique-71d9dfca8f431bb9"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__693444_220151",
+      "hop": "2hop",
+      "question": "Who is the spouse of Young Man Luther's author?",
+      "answer": "Joan Erikson",
+      "goldChunkIds": [
+        "musique-3f2871a0880a1b3d",
+        "musique-c4389cafe8f159b5"
+      ],
+      "retrievedChunkIds": [
+        "musique-c4389cafe8f159b5",
+        "musique-7fe4ecd96da9f80e",
+        "musique-6d3ac5ae69d86cb0",
+        "musique-07b103fd55deb1a1",
+        "musique-1a0a119be6bb4bab",
+        "musique-686211ac92ffa630",
+        "musique-d7147929061dac67",
+        "musique-3f2871a0880a1b3d",
+        "musique-66704112e1278a67",
+        "musique-d47e88c2ff1c014b"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__235471_565925",
+      "hop": "2hop",
+      "question": "What record label did the performer of The Place and the Time belong to?",
+      "answer": "Columbia Records",
+      "goldChunkIds": [
+        "musique-2ac0f0b76c1191d0",
+        "musique-34d4f9bbaa372ca1"
+      ],
+      "retrievedChunkIds": [
+        "musique-5968b51386d5e35f",
+        "musique-6c1c301ce6f9161c",
+        "musique-4d41b561b2ff83c0",
+        "musique-6fa67873cf05cb65",
+        "musique-0f67e6b349794bab",
+        "musique-ba57dfa3319d55b8",
+        "musique-46929a8081629b2a",
+        "musique-e03ec1c7887de256",
+        "musique-d4f40970cbbeb58f",
+        "musique-b08d6d0f7d8c9e7e"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__310456_846599",
+      "hop": "2hop",
+      "question": "Who is the child of the person who followed Tihomir of Serbia?",
+      "answer": "Saint Sava",
+      "goldChunkIds": [
+        "musique-b3261b256b31d063",
+        "musique-e72cbebf5439ab2d"
+      ],
+      "retrievedChunkIds": [
+        "musique-e72cbebf5439ab2d"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__335418_279684",
+      "hop": "2hop",
+      "question": "What team was Anna Benson's husband on?",
+      "answer": "Pittsburgh Pirates",
+      "goldChunkIds": [
+        "musique-16249c32ca0e9c78",
+        "musique-44cfccc878ca7769"
+      ],
+      "retrievedChunkIds": [
+        "musique-16249c32ca0e9c78",
+        "musique-4d41b561b2ff83c0",
+        "musique-6fa67873cf05cb65",
+        "musique-0f67e6b349794bab",
+        "musique-ba57dfa3319d55b8",
+        "musique-46929a8081629b2a",
+        "musique-e03ec1c7887de256",
+        "musique-d4f40970cbbeb58f",
+        "musique-5968b51386d5e35f",
+        "musique-b08d6d0f7d8c9e7e"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__191125_781346",
+      "hop": "2hop",
+      "question": "What place does the administrative territorial entity that Juba is located in share a border with?",
+      "answer": "Eastern Equatoria",
+      "goldChunkIds": [
+        "musique-199d6684052fb6f0",
+        "musique-3b7b41238cad1d55"
+      ],
+      "retrievedChunkIds": [
+        "musique-3b7b41238cad1d55",
+        "musique-199d6684052fb6f0",
+        "musique-84c7f32908185966",
+        "musique-e757d4ab2fdcb941",
+        "musique-ad605ddf9092a146",
+        "musique-77cea01d970db2d5",
+        "musique-7cd2e8fbae2613ec",
+        "musique-cea0ded1465c6b08",
+        "musique-bfdaa6a922703147",
+        "musique-9651a3655a9ae174"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__475070_532404",
+      "hop": "2hop",
+      "question": "Where was the spouse of Frances Tupper born?",
+      "answer": "Amherst",
+      "goldChunkIds": [
+        "musique-e238f235092550c8",
+        "musique-e58f403386ff9a66"
+      ],
+      "retrievedChunkIds": [
+        "musique-e58f403386ff9a66",
+        "musique-e238f235092550c8",
+        "musique-47db45415ea53c99",
+        "musique-4515f9ef5e69ef00",
+        "musique-94775ad8563c2bf8",
+        "musique-6f26d1c91cc525d4",
+        "musique-b39d04736315d198",
+        "musique-b5231f0d1be0976f",
+        "musique-3fcb7ee89bbd2886",
+        "musique-57e0c435df09e46c"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__700093_455653",
+      "hop": "2hop",
+      "question": "Who founded the political party of Dimuthu Bandara Abayakoon?",
+      "answer": "Rohana Wijeweera",
+      "goldChunkIds": [
+        "musique-3ebf5c37e2cdbae1",
+        "musique-ad84a75f32ab6d48"
+      ],
+      "retrievedChunkIds": [
+        "musique-3ebf5c37e2cdbae1",
+        "musique-ad84a75f32ab6d48",
+        "musique-e258b45e8f20f80d",
+        "musique-03a8bea25ac54cf8",
+        "musique-02b9ad717ce01553",
+        "musique-fa847fb691ed4680",
+        "musique-53d4b255d18f2f24",
+        "musique-baa1ace45bd584e9",
+        "musique-da07dd9d90e22e51",
+        "musique-2c7bc358f0660e6c"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__512773_346751",
+      "hop": "2hop",
+      "question": "Bancroft's county borders what county?",
+      "answer": "Haliburton County",
+      "goldChunkIds": [
+        "musique-14d6ff7edb45c0ff",
+        "musique-b998520e512d96cc"
+      ],
+      "retrievedChunkIds": [
+        "musique-b998520e512d96cc",
+        "musique-3fcb7ee89bbd2886",
+        "musique-57e0c435df09e46c",
+        "musique-96ebd3bea8f69778",
+        "musique-962400fb01b5b232",
+        "musique-1753c5875197f944",
+        "musique-c51ee76b9674991e",
+        "musique-e496f5e80b678388",
+        "musique-4f00d5b30998d887",
+        "musique-14d6ff7edb45c0ff"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__411091_625230",
+      "hop": "2hop",
+      "question": "In which county is Mark Dismore's birthplace located?",
+      "answer": "Hancock County",
+      "goldChunkIds": [
+        "musique-1e5aa279c4168c12",
+        "musique-c74cec746a5d92bc"
+      ],
+      "retrievedChunkIds": [
+        "musique-c74cec746a5d92bc",
+        "musique-184b8365bd27e841",
+        "musique-737cc3b100c60b62",
+        "musique-a28012b36eabf312",
+        "musique-18c6b4b823fee4cc",
+        "musique-d4628a135c647a1a",
+        "musique-9b24c7b899126a25",
+        "musique-6be89e287bde8b77",
+        "musique-4052a3965b5ece6b",
+        "musique-0b65a3fc5c739d1b"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__423972_540249",
+      "hop": "2hop",
+      "question": "Who was the sibling of Nannina de' Medici?",
+      "answer": "Giuliano de' Medici",
+      "goldChunkIds": [
+        "musique-32138f9e891a2a92",
+        "musique-d714c96af365c0b6"
+      ],
+      "retrievedChunkIds": [
+        "musique-d714c96af365c0b6",
+        "musique-32138f9e891a2a92",
+        "musique-d4cec8e9c0acfd5a",
+        "musique-7c38d4197fa7d34b",
+        "musique-a968c82151d8875a",
+        "musique-7817da00e77f1817",
+        "musique-7dbc0e8573faf056",
+        "musique-ed73ea320b6204f6",
+        "musique-ce3d64f8b73499b2",
+        "musique-511443237600bde2"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__455158_247871",
+      "hop": "2hop",
+      "question": "What county is the NRHEG High School located in?",
+      "answer": "Waseca County",
+      "goldChunkIds": [
+        "musique-a0e65ff0b744e2e0",
+        "musique-a1271e6ad0e0526c"
+      ],
+      "retrievedChunkIds": [
+        "musique-a0e65ff0b744e2e0",
+        "musique-f43b48300459c6ac",
+        "musique-6eda861895bdc30c",
+        "musique-59a24ee96e1a9047",
+        "musique-96ebd3bea8f69778",
+        "musique-962400fb01b5b232",
+        "musique-8c3f408ecd947266",
+        "musique-a1271e6ad0e0526c",
+        "musique-d0082b28c53678e1",
+        "musique-1f785eaf41383910"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__189094_612080",
+      "hop": "2hop",
+      "question": "What league does the team that occupies the Rabat Ajax Football Ground belong to?",
+      "answer": "Maltese Premier League",
+      "goldChunkIds": [
+        "musique-8715eb267b213d6b",
+        "musique-b8c8e8077052a577"
+      ],
+      "retrievedChunkIds": [
+        "musique-91ae06f1f79e2c3a",
+        "musique-910057e3ccc3a6dc",
+        "musique-b8c8e8077052a577",
+        "musique-f35d9bb3bbeb0e5d",
+        "musique-57e0c435df09e46c",
+        "musique-a3bd6ed86209a7a5",
+        "musique-f307f932ded1bdc5",
+        "musique-0d603052e74ca0ee",
+        "musique-0dabb6d3416212dc",
+        "musique-a4582d5f53b696a1"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__765678_310556",
+      "hop": "2hop",
+      "question": "Who was married to the star of No Escape?",
+      "answer": "John Profumo",
+      "goldChunkIds": [
+        "musique-7343dada2248d833",
+        "musique-7e2b91930ae31c30"
+      ],
+      "retrievedChunkIds": [
+        "musique-7343dada2248d833",
+        "musique-7e2b91930ae31c30",
+        "musique-a9063ca2d73d3d05",
+        "musique-7c2ff3f4c632b1db",
+        "musique-ddc5c06f016535d0",
+        "musique-a28012b36eabf312",
+        "musique-fe17961954ed0067",
+        "musique-320dfefd03e501c0",
+        "musique-fc83949f3505b754",
+        "musique-d1881c4f3233ecdf"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__304852_758385",
+      "hop": "2hop",
+      "question": "What administrative territorial entity contains the place where KPRM is licensed to broadcast to?",
+      "answer": "Hubbard County",
+      "goldChunkIds": [
+        "musique-1f785eaf41383910",
+        "musique-d0082b28c53678e1"
+      ],
+      "retrievedChunkIds": [
+        "musique-d0082b28c53678e1",
+        "musique-f43b48300459c6ac",
+        "musique-6eda861895bdc30c",
+        "musique-59a24ee96e1a9047",
+        "musique-96ebd3bea8f69778",
+        "musique-962400fb01b5b232",
+        "musique-8c3f408ecd947266",
+        "musique-a0e65ff0b744e2e0",
+        "musique-a1271e6ad0e0526c",
+        "musique-1f785eaf41383910"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__628752_538661",
+      "hop": "2hop",
+      "question": "Where are the headquarters for the publisher of In the Shadow of Greatness?",
+      "answer": "Annapolis",
+      "goldChunkIds": [
+        "musique-39108f6edc8d704f",
+        "musique-69d99a7c8f5df4fa"
+      ],
+      "retrievedChunkIds": [
+        "musique-9968cb443c793c9c",
+        "musique-f5c625162cd857fe",
+        "musique-651c5031990fb3b5",
+        "musique-7fdc239e7323dca6",
+        "musique-a56c25ada2d09abd",
+        "musique-fdaa15ebb4cfb642",
+        "musique-310da1ef03eac987",
+        "musique-4edd51f505b4041f",
+        "musique-5b4a9213d339141c",
+        "musique-b82a213f14f8e30b"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__661847_288421",
+      "hop": "2hop",
+      "question": "Who is part of the band that performed Full Cooperation?",
+      "answer": "Erick Sermon",
+      "goldChunkIds": [
+        "musique-11879531b819bf84",
+        "musique-dffb61d0f363069e"
+      ],
+      "retrievedChunkIds": [
+        "musique-cc1a431d9138752d",
+        "musique-4d41b561b2ff83c0",
+        "musique-6fa67873cf05cb65",
+        "musique-0f67e6b349794bab",
+        "musique-ba57dfa3319d55b8",
+        "musique-46929a8081629b2a",
+        "musique-e03ec1c7887de256",
+        "musique-d4f40970cbbeb58f",
+        "musique-5968b51386d5e35f",
+        "musique-b08d6d0f7d8c9e7e"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__496732_658428",
+      "hop": "2hop",
+      "question": "The territory containing Bansaan Island is located at which island?",
+      "answer": "Panglao Island",
+      "goldChunkIds": [
+        "musique-648caaed709f7e5f",
+        "musique-fa5805cdeaeda961"
+      ],
+      "retrievedChunkIds": [
+        "musique-fa5805cdeaeda961",
+        "musique-d838b77e1a483ed0",
+        "musique-d32ca540e5eb9d60",
+        "musique-56a90b8e9344c945",
+        "musique-3c596289098dc46e",
+        "musique-3afe38896867a592",
+        "musique-c079c27126f98f60",
+        "musique-b3cbf4f80f7f6584",
+        "musique-78f8923bc0e64730",
+        "musique-8555bac1b462b47f"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__175175_347233",
+      "hop": "2hop",
+      "question": "In which county did Snappy Tomato Pizza form?",
+      "answer": "Kenton County",
+      "goldChunkIds": [
+        "musique-012726b0e03a6fba",
+        "musique-ef227f36e3257c1f"
+      ],
+      "retrievedChunkIds": [
+        "musique-012726b0e03a6fba",
+        "musique-bbcbe1c03c8c67eb",
+        "musique-ef227f36e3257c1f",
+        "musique-df217006c057fa79",
+        "musique-82197737aa3ac82d",
+        "musique-e358968fa70c5e5f",
+        "musique-8517d9463725163f",
+        "musique-52b44edda07864e2",
+        "musique-f43b48300459c6ac",
+        "musique-747487e89bc47b30"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__496961_554601",
+      "hop": "2hop",
+      "question": "What's the place of birth of the former member of The Sunnyboys?",
+      "answer": "Kingscliff",
+      "goldChunkIds": [
+        "musique-12da1bb3f4d4367c",
+        "musique-8da80395c94447c1"
+      ],
+      "retrievedChunkIds": [
+        "musique-12da1bb3f4d4367c",
+        "musique-8da80395c94447c1",
+        "musique-0aac12885a2dce30",
+        "musique-19450d74aa9c7b98",
+        "musique-9862c0775c7d8180",
+        "musique-3f6f67610344abfd",
+        "musique-899dc4c53e348025",
+        "musique-20e84e871fa83a0c",
+        "musique-3fae6b5c52f25a43",
+        "musique-8ead0850f5f6cc73"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__274110_413723",
+      "hop": "2hop",
+      "question": "In which district was Ernie Watts born?",
+      "answer": "West Berkshire",
+      "goldChunkIds": [
+        "musique-4fe6abb362e17874",
+        "musique-67a0fdb3626019e6"
+      ],
+      "retrievedChunkIds": [
+        "musique-3a1d3c15cb106953"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__231890_595414",
+      "hop": "2hop",
+      "question": "Which county does Lloyd Dane's birthplace belong to?",
+      "answer": "Miller County",
+      "goldChunkIds": [
+        "musique-62f668f3b5fd4136",
+        "musique-7da31327f442078a"
+      ],
+      "retrievedChunkIds": [
+        "musique-7da31327f442078a",
+        "musique-4dc20ad7507e1e61",
+        "musique-9c199fe8ba10455b",
+        "musique-701817761c8200a8",
+        "musique-ef893ae2b3c95221",
+        "musique-f43b48300459c6ac",
+        "musique-747487e89bc47b30",
+        "musique-4be2c90e06a9ca41",
+        "musique-9d30a163e7be4d4e",
+        "musique-0e29db77e17a017f"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__342746_679190",
+      "hop": "2hop",
+      "question": "Who is the spouse of the screenwriter of The Actress?",
+      "answer": "Garson Kanin",
+      "goldChunkIds": [
+        "musique-379d7491a15136a9",
+        "musique-aa3f12b0e6414b19"
+      ],
+      "retrievedChunkIds": [
+        "musique-71803417be7a29ac",
+        "musique-2a31cf83a54a1002",
+        "musique-f039ed0f886df694",
+        "musique-cbb686e4d4c5e066",
+        "musique-f43b48300459c6ac",
+        "musique-747487e89bc47b30",
+        "musique-4be2c90e06a9ca41",
+        "musique-9d30a163e7be4d4e",
+        "musique-0e29db77e17a017f",
+        "musique-ebfd07a2b7833243"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__860241_766393",
+      "hop": "2hop",
+      "question": "What award was received by the person who authored Missing Person?",
+      "answer": "Nobel Prize in Literature",
+      "goldChunkIds": [
+        "musique-00482ce1b8564b8e",
+        "musique-38042cce7b0d5f1b"
+      ],
+      "retrievedChunkIds": [
+        "musique-465041101df9674d",
+        "musique-48b2eeaca5f91436",
+        "musique-f4ecbdd65f5bff13",
+        "musique-f63e36c7c0e9ff49",
+        "musique-53aec4a96adb2248",
+        "musique-71f056b7a6145c5d",
+        "musique-ec08122b460824b3",
+        "musique-4515f9ef5e69ef00",
+        "musique-7607add7c4d957d5",
+        "musique-cf618be2bd6a38eb"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__29368_29376",
+      "hop": "2hop",
+      "question": "What event caused the founder of Australia's liberal party to become Prime Minister?",
+      "answer": "Lyons' death in 1939",
+      "goldChunkIds": [
+        "musique-172f7dd78647b258",
+        "musique-c231d5fdf42ba81b"
+      ],
+      "retrievedChunkIds": [
+        "musique-b39d04736315d198",
+        "musique-3fcb7ee89bbd2886",
+        "musique-57e0c435df09e46c",
+        "musique-96ebd3bea8f69778",
+        "musique-962400fb01b5b232",
+        "musique-1753c5875197f944",
+        "musique-c51ee76b9674991e",
+        "musique-e496f5e80b678388",
+        "musique-4f00d5b30998d887",
+        "musique-14d6ff7edb45c0ff"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__29367_29376",
+      "hop": "2hop",
+      "question": "What event caused the Liberal Party of Australia's longest-serving leader to become Prime Minister?",
+      "answer": "Lyons' death in 1939",
+      "goldChunkIds": [
+        "musique-172f7dd78647b258",
+        "musique-c231d5fdf42ba81b"
+      ],
+      "retrievedChunkIds": [
+        "musique-67bcca56c0ebaec8",
+        "musique-52285181c140ae15",
+        "musique-3c81a9adaf01a823",
+        "musique-695f5ba73a0c1791",
+        "musique-7eb8fb180f9ce3b9",
+        "musique-92d07fda5448f8cd",
+        "musique-32f26845aa77e86d",
+        "musique-61c1cd2cdabba755",
+        "musique-5769b607d5c161f9",
+        "musique-26ee3685f0c033fd"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__21075_5028",
+      "hop": "2hop",
+      "question": "What was the average per capita GVA in 2013 of the country which created Burma's academic system?",
+      "answer": "\u00a323,755",
+      "goldChunkIds": [
+        "musique-1ad8f1d9029700cb",
+        "musique-2fa4969c513d9467"
+      ],
+      "retrievedChunkIds": [
+        "musique-b87c9286b2d4da65",
+        "musique-511443237600bde2",
+        "musique-96acaae668b37228",
+        "musique-45015b3f96cba437",
+        "musique-ab1ce33ef7af6478",
+        "musique-67f2f5f18f7abd11",
+        "musique-322d9dc8e16193c3",
+        "musique-9fa891ef33cc3aa5",
+        "musique-0b65a3fc5c739d1b",
+        "musique-3875409717f1bf74"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__557411_652060",
+      "hop": "2hop",
+      "question": "Who is the spouse of the creator of The Nanny Reunion: A Nosh to Remember?",
+      "answer": "Peter Marc Jacobson",
+      "goldChunkIds": [
+        "musique-30cf7f5e4baa8e2c",
+        "musique-c5d5978a86e6142c"
+      ],
+      "retrievedChunkIds": [
+        "musique-8e1dec5d86d464f1",
+        "musique-c613259c83f6e257",
+        "musique-cc488981cb9c4681",
+        "musique-0a0c265a54c38e9a",
+        "musique-8b3d7a964238781a",
+        "musique-5e1725afe1369135",
+        "musique-5a0deb8e71f89c6b",
+        "musique-b82a213f14f8e30b",
+        "musique-4d41b561b2ff83c0",
+        "musique-6fa67873cf05cb65"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__677929_696450",
+      "hop": "2hop",
+      "question": "Who founded the publisher of The Final Testament of the Holy Bible?",
+      "answer": "Larry Gagosian",
+      "goldChunkIds": [
+        "musique-7a5eb349d941c857",
+        "musique-b5dda934d46f4574"
+      ],
+      "retrievedChunkIds": [
+        "musique-b5dda934d46f4574",
+        "musique-a28012b36eabf312",
+        "musique-18c6b4b823fee4cc",
+        "musique-d4628a135c647a1a",
+        "musique-9b24c7b899126a25",
+        "musique-6be89e287bde8b77",
+        "musique-4052a3965b5ece6b",
+        "musique-0b65a3fc5c739d1b",
+        "musique-8234c6257fedf928",
+        "musique-cf727cbc6b190b6c"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__132909_33564",
+      "hop": "2hop",
+      "question": "During which era was the company that makes Nirbhay founded?",
+      "answer": "From the 1950s to the 1970s",
+      "goldChunkIds": [
+        "musique-b3516b00d5130ae3",
+        "musique-d326784708396815"
+      ],
+      "retrievedChunkIds": [
+        "musique-928f8da937714a44",
+        "musique-af83e8f1a646e8c6",
+        "musique-fa2c07ae387c184d",
+        "musique-27290c6d7a6a1733",
+        "musique-29bd7dca704fe570",
+        "musique-cc16e8434f1fa29d",
+        "musique-54772025784722c8",
+        "musique-6a1203aa6ab62045",
+        "musique-f4ab3b0e98f1bbd5",
+        "musique-b526e85ed230756f"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__199216_33564",
+      "hop": "2hop",
+      "question": "During what era was the manufacturer of Agni-V founded?",
+      "answer": "From the 1950s to the 1970s",
+      "goldChunkIds": [
+        "musique-b3516b00d5130ae3",
+        "musique-c7e3b544dbd1f5b0"
+      ],
+      "retrievedChunkIds": [
+        "musique-cead1d7b93b56aae",
+        "musique-d1a0d100feb167d0",
+        "musique-010e050a7ecd04c5",
+        "musique-8c10fcf99047f769",
+        "musique-c2dd071bf2a831de",
+        "musique-a362a7bbc0948654",
+        "musique-cd7b587a746ae36e",
+        "musique-3a91c1371cd4efa3",
+        "musique-8f9e53429ab1cc5f",
+        "musique-18cbac6423bfe945"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__133241_33564",
+      "hop": "2hop",
+      "question": "In what era was the company known as the manufacturer of Agni-V founded?",
+      "answer": "From the 1950s to the 1970s",
+      "goldChunkIds": [
+        "musique-b3516b00d5130ae3",
+        "musique-c7e3b544dbd1f5b0"
+      ],
+      "retrievedChunkIds": [
+        "musique-cead1d7b93b56aae",
+        "musique-d1a0d100feb167d0",
+        "musique-010e050a7ecd04c5",
+        "musique-8c10fcf99047f769",
+        "musique-c2dd071bf2a831de",
+        "musique-a362a7bbc0948654",
+        "musique-cd7b587a746ae36e",
+        "musique-3a91c1371cd4efa3",
+        "musique-8f9e53429ab1cc5f",
+        "musique-62ec4c0cedce10f0"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__636597_480615",
+      "hop": "2hop",
+      "question": "What city is located in the county containing Qiantong?",
+      "answer": "Ningbo",
+      "goldChunkIds": [
+        "musique-29bd7dca704fe570",
+        "musique-af83e8f1a646e8c6"
+      ],
+      "retrievedChunkIds": [
+        "musique-594458b5a986e62f",
+        "musique-1e5aa279c4168c12",
+        "musique-f43b48300459c6ac",
+        "musique-747487e89bc47b30",
+        "musique-4be2c90e06a9ca41",
+        "musique-9d30a163e7be4d4e",
+        "musique-0e29db77e17a017f",
+        "musique-ebfd07a2b7833243",
+        "musique-eebbf97c7158c33c",
+        "musique-994ac5d541c47da0"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__373759_136043",
+      "hop": "2hop",
+      "question": "What is the performer of Heartbeat named after?",
+      "answer": "Natalie Albino",
+      "goldChunkIds": [
+        "musique-07ce38bc04db5a5a",
+        "musique-595fe785901c5f72"
+      ],
+      "retrievedChunkIds": [
+        "musique-595fe785901c5f72",
+        "musique-ef4155575a23a426",
+        "musique-07ce38bc04db5a5a",
+        "musique-98aff74d174e2124",
+        "musique-cc488981cb9c4681",
+        "musique-0a0c265a54c38e9a",
+        "musique-8b3d7a964238781a",
+        "musique-5e1725afe1369135",
+        "musique-5a0deb8e71f89c6b",
+        "musique-4d41b561b2ff83c0"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__709357_136043",
+      "hop": "2hop",
+      "question": "The Move Ya Body song's band is named after who?",
+      "answer": "Natalie Albino",
+      "goldChunkIds": [
+        "musique-07ce38bc04db5a5a",
+        "musique-98aff74d174e2124"
+      ],
+      "retrievedChunkIds": [
+        "musique-3206aacffc60a7f9",
+        "musique-5f0972bba9afad4f",
+        "musique-287226a1830f7678",
+        "musique-ec08122b460824b3",
+        "musique-c9356340cd63381b",
+        "musique-912a2035ff4cf807",
+        "musique-0d332700c7d1bde1",
+        "musique-4d3797c00b122003",
+        "musique-0ee95df7e1497e29",
+        "musique-67c7b13f7349ac14"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__32254_84601",
+      "hop": "2hop",
+      "question": "When did the spacecraft that detected storms on Neptune leave our solar system?",
+      "answer": "August 30, 2007",
+      "goldChunkIds": [
+        "musique-adbb3fdec9466a69",
+        "musique-d77e77c3aa02022e"
+      ],
+      "retrievedChunkIds": [
+        "musique-f3c9e98e0130b902",
+        "musique-a6f00ccd0938267a",
+        "musique-c99bfecddcd3e135",
+        "musique-0f8bda7545f0e38f",
+        "musique-4e3cffc86749bc6f",
+        "musique-72a60a11a24ac114",
+        "musique-e7a490cd1dc7fbd0",
+        "musique-9174f47a222bbdd0",
+        "musique-b577924ec69a229a",
+        "musique-f78e5710518c5858"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__471509_136043",
+      "hop": "2hop",
+      "question": "The Nicole and Natalie album's band is named after who?",
+      "answer": "Natalie Albino",
+      "goldChunkIds": [
+        "musique-07ce38bc04db5a5a",
+        "musique-ef4155575a23a426"
+      ],
+      "retrievedChunkIds": [
+        "musique-07ce38bc04db5a5a",
+        "musique-6ddb8e2623d655b9",
+        "musique-aed5861c4a8189fc",
+        "musique-595fe785901c5f72",
+        "musique-98aff74d174e2124",
+        "musique-ef4155575a23a426",
+        "musique-cc488981cb9c4681",
+        "musique-0a0c265a54c38e9a",
+        "musique-8b3d7a964238781a",
+        "musique-5e1725afe1369135"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__87589_362941",
+      "hop": "2hop",
+      "question": "Where was the founder of the National Women's Party born?",
+      "answer": "Mount Laurel Township",
+      "goldChunkIds": [
+        "musique-00493a8baac0a64f",
+        "musique-48353926fa5e5fac"
+      ],
+      "retrievedChunkIds": [
+        "musique-48353926fa5e5fac",
+        "musique-9c3b38bc6a07e798",
+        "musique-219a6128d9160f87",
+        "musique-3d3e2f5914350383",
+        "musique-f206403a2bc51eae",
+        "musique-1f01c63a2f3da8da",
+        "musique-cb304a8d5663ade6",
+        "musique-00493a8baac0a64f",
+        "musique-f224b317a36bc692",
+        "musique-6b17fa6c67ca7e92"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__61318_362941",
+      "hop": "2hop",
+      "question": "What is the place of birth of the person who submitted the first version of the equal rights amendment to congress in 1923?",
+      "answer": "Mount Laurel Township",
+      "goldChunkIds": [
+        "musique-00493a8baac0a64f",
+        "musique-f224b317a36bc692"
+      ],
+      "retrievedChunkIds": [
+        "musique-8e5e08bcc1e2417d",
+        "musique-58facee19900b220",
+        "musique-98a30d388068cd1b",
+        "musique-96de6916a62b4551",
+        "musique-4887c4415884a6ff",
+        "musique-7bf75bcabed24e70",
+        "musique-4ba4d2f35c80cd90",
+        "musique-a69deeaf5ea56211",
+        "musique-a1271e6ad0e0526c",
+        "musique-12da1bb3f4d4367c"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__20268_42004",
+      "hop": "2hop",
+      "question": "The Directory of Public Worship was approved by a parliament whose modern equivalent has been based where since 2004?",
+      "answer": "Scottish Parliament Building",
+      "goldChunkIds": [
+        "musique-478f0e4c3e8f7960",
+        "musique-e5161128f499ac87"
+      ],
+      "retrievedChunkIds": [
+        "musique-3b21884134805662",
+        "musique-7eb8fb180f9ce3b9",
+        "musique-ce23cf1cf59a170b",
+        "musique-592cf68afba3fb55",
+        "musique-04cbb748fbe07246",
+        "musique-0967c70d8b410150",
+        "musique-92f6e0c278c45190",
+        "musique-cf727cbc6b190b6c",
+        "musique-509358ae81a9e678",
+        "musique-4aa09c207d8d855e"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__159902_362941",
+      "hop": "2hop",
+      "question": "Where was the person featured on the Chester Arthur coin born?",
+      "answer": "Mount Laurel Township",
+      "goldChunkIds": [
+        "musique-00493a8baac0a64f",
+        "musique-6b17fa6c67ca7e92"
+      ],
+      "retrievedChunkIds": [
+        "musique-70dff4515527d258",
+        "musique-0546666bc743b3ea",
+        "musique-54ffa2cb5f6e5809",
+        "musique-d036f39371639586",
+        "musique-892e9f21fb76c0e0",
+        "musique-69bd3c6a8ee58bd6",
+        "musique-92d07fda5448f8cd",
+        "musique-a344aa4f0100eb70",
+        "musique-7c559973f5231294",
+        "musique-4d5ae9f3e8adcb23"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__42027_42004",
+      "hop": "2hop",
+      "question": "Since 2004, what is the location of the body to which, if a matter is not specifically reserved, it is devolved?",
+      "answer": "Scottish Parliament Building",
+      "goldChunkIds": [
+        "musique-e5161128f499ac87",
+        "musique-ff14e664fba7cb8c"
+      ],
+      "retrievedChunkIds": [
+        "musique-1f9cf83e5c75443f",
+        "musique-9f0bf95c045353a3",
+        "musique-bd9832f6da0c8756",
+        "musique-a27a8d0cf5046bf1",
+        "musique-dd959b57e2f081ab",
+        "musique-508c05ba23e085ae",
+        "musique-81ad484b1c035a8a",
+        "musique-f1515e9836f30d10",
+        "musique-91220293efc4b3bf",
+        "musique-e1a7abe72023c830"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__648648_173389",
+      "hop": "2hop",
+      "question": "The city which contains Broadhurst Park shares a border with what town?",
+      "answer": "Middleton",
+      "goldChunkIds": [
+        "musique-3fae935a80c60fb6",
+        "musique-d10ebb65f703d2c2"
+      ],
+      "retrievedChunkIds": [
+        "musique-3fae935a80c60fb6",
+        "musique-511443237600bde2",
+        "musique-96acaae668b37228",
+        "musique-45015b3f96cba437",
+        "musique-ab1ce33ef7af6478",
+        "musique-67f2f5f18f7abd11",
+        "musique-322d9dc8e16193c3",
+        "musique-9fa891ef33cc3aa5",
+        "musique-0b65a3fc5c739d1b",
+        "musique-3875409717f1bf74"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__477492_240386",
+      "hop": "2hop",
+      "question": "What is the record label of the Metalworks Studio founder?",
+      "answer": "TML Entertainment",
+      "goldChunkIds": [
+        "musique-29f12d042dae5ca8",
+        "musique-5a1957f408938ca4"
+      ],
+      "retrievedChunkIds": [
+        "musique-29f12d042dae5ca8",
+        "musique-c8e3b24eb2f68418",
+        "musique-5f9f1dfc6067a548",
+        "musique-b0feb72f8caaaaf2",
+        "musique-55e77ecb612af5f0",
+        "musique-abead43f6a9c7940",
+        "musique-53d27dad64bbb5da",
+        "musique-08e7a5a46ee3e19a",
+        "musique-010e050a7ecd04c5",
+        "musique-c2dd071bf2a831de"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__776377_857193",
+      "hop": "2hop",
+      "question": "What is the mouth of watercourse for the body of water where Bartram's Covered Bridge is located?",
+      "answer": "Delaware River",
+      "goldChunkIds": [
+        "musique-440e0d7a6de0dcad",
+        "musique-605a1ad900818aab"
+      ],
+      "retrievedChunkIds": [
+        "musique-2aa215c684ea42cd",
+        "musique-eebbf97c7158c33c",
+        "musique-994ac5d541c47da0",
+        "musique-c8166e1d8c3f2cd5",
+        "musique-64bdd67aff1b7141",
+        "musique-facbc0f697b75ce3",
+        "musique-13ced1e55816f200",
+        "musique-4afcd54cfe9dfaa3",
+        "musique-70dfd229067bfc30",
+        "musique-96282fa2ebc09898"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__29752_814677",
+      "hop": "2hop",
+      "question": "What is the ruler of the underworld in ancient Egypt a part of?",
+      "answer": "ancient Egyptian religion",
+      "goldChunkIds": [
+        "musique-2c16aefadeeaac22",
+        "musique-72f64bc9f107add6"
+      ],
+      "retrievedChunkIds": [
+        "musique-68a5198f9821e270",
+        "musique-3aec469a09ce8e1a",
+        "musique-633de7ff21099a97",
+        "musique-6815d9733d32aec2",
+        "musique-ef378a887ab42e4c",
+        "musique-68c4ca989a1fd96f",
+        "musique-aa50e94cbae7d526",
+        "musique-443e2cd13493fa45",
+        "musique-116abd8f7c98ba78",
+        "musique-a600a4b0e8dc0022"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__77601_814677",
+      "hop": "2hop",
+      "question": "What pantheon is the God of the underworld in ancient Egypt a part of?",
+      "answer": "ancient Egyptian religion",
+      "goldChunkIds": [
+        "musique-5910cec859eb0e7d",
+        "musique-72f64bc9f107add6"
+      ],
+      "retrievedChunkIds": [
+        "musique-34b67a646a4aa6d3",
+        "musique-5910cec859eb0e7d",
+        "musique-8c10fcf99047f769",
+        "musique-2c16aefadeeaac22",
+        "musique-72f64bc9f107add6",
+        "musique-f8abd3119888da12",
+        "musique-29b84109b3c105ff",
+        "musique-ea726f36dfdb78bd",
+        "musique-90a62677554458c1",
+        "musique-d455288fbdf35c34"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__497191_129669",
+      "hop": "2hop",
+      "question": "In which district was Alhandra born?",
+      "answer": "Lisbon District",
+      "goldChunkIds": [
+        "musique-9d5cfb7f9a8221d8",
+        "musique-ae07796a1c32b90e"
+      ],
+      "retrievedChunkIds": [
+        "musique-d6cc413f96241f89",
+        "musique-ffe890fcb04d9784",
+        "musique-2937d62d120c855b",
+        "musique-bed2401d9bfddf22",
+        "musique-b7363a9c9197be44",
+        "musique-79a11c6181a2f1db",
+        "musique-a0e9d4f851abd0dc",
+        "musique-ffe933f506fe67df",
+        "musique-f9b4a911174350a2",
+        "musique-ec99f0c562a6ef90"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__311694_129669",
+      "hop": "2hop",
+      "question": "In which state is Vera Barbosa's place of birth located?",
+      "answer": "Lisbon District",
+      "goldChunkIds": [
+        "musique-ae07796a1c32b90e",
+        "musique-e775a487c767d934"
+      ],
+      "retrievedChunkIds": [
+        "musique-e775a487c767d934",
+        "musique-ae07796a1c32b90e",
+        "musique-9d5cfb7f9a8221d8",
+        "musique-fd927ce00a33c68e",
+        "musique-1344f464803b7c08",
+        "musique-5b6470b6eb02d286",
+        "musique-14938138bab460dc",
+        "musique-7d6e022050db3e5f",
+        "musique-c54a2ebf599d629b",
+        "musique-f17dcf86e29a3d7b"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__819974_129669",
+      "hop": "2hop",
+      "question": "In which state is P\u00f3voa de Santa Iria's municipality located?",
+      "answer": "Lisbon District",
+      "goldChunkIds": [
+        "musique-ae07796a1c32b90e",
+        "musique-fd927ce00a33c68e"
+      ],
+      "retrievedChunkIds": [
+        "musique-fd927ce00a33c68e",
+        "musique-ae07796a1c32b90e",
+        "musique-9d5cfb7f9a8221d8",
+        "musique-e775a487c767d934",
+        "musique-1344f464803b7c08",
+        "musique-5b6470b6eb02d286",
+        "musique-14938138bab460dc",
+        "musique-7d6e022050db3e5f",
+        "musique-c54a2ebf599d629b",
+        "musique-f17dcf86e29a3d7b"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__199513_13732",
+      "hop": "2hop",
+      "question": "How old was Mary when engaged to the person from whom S\u00e3o Jos\u00e9 dos Campos takes it's name?",
+      "answer": "12\u201314 years old",
+      "goldChunkIds": [
+        "musique-178899b693156d52",
+        "musique-32fdb886daf2c23e"
+      ],
+      "retrievedChunkIds": [
+        "musique-1d8cec2ac58f4a18",
+        "musique-610876311b61e86e",
+        "musique-32fdb886daf2c23e",
+        "musique-233948bc1bb5bfeb",
+        "musique-017037b0cc00bd46",
+        "musique-11d058e260d7e80c",
+        "musique-f5e9debb6ea1fea1",
+        "musique-cbc6d4e108fc09cc",
+        "musique-b7fd119dba18ca84",
+        "musique-f94d5887dd51acb8"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__13731_801817",
+      "hop": "2hop",
+      "question": "Where was Mary's betrothed born?",
+      "answer": "Nazareth",
+      "goldChunkIds": [
+        "musique-06d994e34f25223e",
+        "musique-32fdb886daf2c23e"
+      ],
+      "retrievedChunkIds": [
+        "musique-1d8cec2ac58f4a18",
+        "musique-610876311b61e86e",
+        "musique-32fdb886daf2c23e",
+        "musique-233948bc1bb5bfeb",
+        "musique-017037b0cc00bd46",
+        "musique-11d058e260d7e80c",
+        "musique-f5e9debb6ea1fea1",
+        "musique-cbc6d4e108fc09cc",
+        "musique-b7fd119dba18ca84",
+        "musique-f94d5887dd51acb8"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__865961_159109",
+      "hop": "2hop",
+      "question": "Where is the country with ISO code ISO 3166-2:CV located?",
+      "answer": "central Atlantic Ocean",
+      "goldChunkIds": [
+        "musique-27b5f2c57387a6af",
+        "musique-99f2cfde348569e5"
+      ],
+      "retrievedChunkIds": [
+        "musique-a3bd39d68d286226",
+        "musique-14938138bab460dc",
+        "musique-7d6e022050db3e5f",
+        "musique-ae07796a1c32b90e",
+        "musique-c54a2ebf599d629b",
+        "musique-1344f464803b7c08",
+        "musique-f17dcf86e29a3d7b",
+        "musique-fd927ce00a33c68e",
+        "musique-5b6470b6eb02d286",
+        "musique-18680415261cfaf9"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__728887_159109",
+      "hop": "2hop",
+      "question": "Where is Assomada located?",
+      "answer": "central Atlantic Ocean",
+      "goldChunkIds": [
+        "musique-27b5f2c57387a6af",
+        "musique-a3bd39d68d286226"
+      ],
+      "retrievedChunkIds": [
+        "musique-1613284672cbc6df",
+        "musique-739f2789dc090bd7",
+        "musique-b4c3cf5faca5a846",
+        "musique-b7ef92a4d92e5e6a",
+        "musique-c29c17ce82c9e81c",
+        "musique-e9d6438f126eef0c",
+        "musique-b7363a9c9197be44",
+        "musique-c60dd9dea260ef69",
+        "musique-a5ad93a0da5230d7",
+        "musique-53cd02917decaa95"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__827995_159109",
+      "hop": "2hop",
+      "question": "Where is Am\u00edlcar Cabral International Airport?",
+      "answer": "central Atlantic Ocean",
+      "goldChunkIds": [
+        "musique-27b5f2c57387a6af",
+        "musique-cad6f41954900d28"
+      ],
+      "retrievedChunkIds": [
+        "musique-af20a077baffb011",
+        "musique-cad6f41954900d28",
+        "musique-cc16e8434f1fa29d",
+        "musique-54772025784722c8",
+        "musique-6a1203aa6ab62045",
+        "musique-f4ab3b0e98f1bbd5",
+        "musique-b526e85ed230756f",
+        "musique-b4c61de01d63f247",
+        "musique-a3d9343d74d1c0dd",
+        "musique-e1a7abe72023c830"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__159215_779396",
+      "hop": "2hop",
+      "question": "Where was the person who wrote about the rioting being a dividing factor in Birmingham educated?",
+      "answer": "University of Glasgow",
+      "goldChunkIds": [
+        "musique-7201c53f366d8d40",
+        "musique-9fe9fdee7664cad4"
+      ],
+      "retrievedChunkIds": [
+        "musique-8b0c8b11d59c07d0",
+        "musique-1002baadb0b8e2cf",
+        "musique-0b961b9d0d3056d4",
+        "musique-4fef355eb7584657",
+        "musique-6f49abc16cc2e208",
+        "musique-2795c055309891a7",
+        "musique-2a310736ff56f746",
+        "musique-f5e9debb6ea1fea1",
+        "musique-f2abb55532cdc61c",
+        "musique-108dc9836e9ea1b3"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__119423_779396",
+      "hop": "2hop",
+      "question": "Where was the designer of the Lap Engine educated?",
+      "answer": "University of Glasgow",
+      "goldChunkIds": [
+        "musique-141ade86897d9996",
+        "musique-7201c53f366d8d40"
+      ],
+      "retrievedChunkIds": [
+        "musique-141ade86897d9996",
+        "musique-a9063ca2d73d3d05",
+        "musique-1d8cec2ac58f4a18",
+        "musique-ba65e4a4d0fa5d1d",
+        "musique-ab1ce33ef7af6478",
+        "musique-fdaa15ebb4cfb642",
+        "musique-67f2f5f18f7abd11",
+        "musique-f6c68266c7c6a192",
+        "musique-1002baadb0b8e2cf",
+        "musique-56a90b8e9344c945"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__115515_779396",
+      "hop": "2hop",
+      "question": "Where was the creator of the Lap Engine educated?",
+      "answer": "University of Glasgow",
+      "goldChunkIds": [
+        "musique-141ade86897d9996",
+        "musique-7201c53f366d8d40"
+      ],
+      "retrievedChunkIds": [
+        "musique-141ade86897d9996",
+        "musique-a9063ca2d73d3d05",
+        "musique-1d8cec2ac58f4a18",
+        "musique-ba65e4a4d0fa5d1d",
+        "musique-ab1ce33ef7af6478",
+        "musique-fdaa15ebb4cfb642",
+        "musique-67f2f5f18f7abd11",
+        "musique-f6c68266c7c6a192",
+        "musique-1002baadb0b8e2cf",
+        "musique-56a90b8e9344c945"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__665660_135481",
+      "hop": "2hop",
+      "question": "The 1967 Federation Cup is an instance of this tournament which is named after what organization?",
+      "answer": "International Tennis Federation",
+      "goldChunkIds": [
+        "musique-1a04a288bdb47f7a",
+        "musique-b811dd8b85b1e6b1"
+      ],
+      "retrievedChunkIds": [
+        "musique-1a04a288bdb47f7a",
+        "musique-428ca2ef0e865d3c",
+        "musique-4be2c90e06a9ca41",
+        "musique-1db3ec3d385af6fc",
+        "musique-9f18d544b9f60caa",
+        "musique-f8b3f92ee380821c",
+        "musique-b1080e2372ecf36c",
+        "musique-9494dbc62a072559",
+        "musique-cd17e2c3d6d666a7",
+        "musique-53d4b255d18f2f24"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__201704_135481",
+      "hop": "2hop",
+      "question": "What is the competition that the 1965 Federation Cup is part of named after?",
+      "answer": "International Tennis Federation",
+      "goldChunkIds": [
+        "musique-120299abf18a7c56",
+        "musique-1a04a288bdb47f7a"
+      ],
+      "retrievedChunkIds": [
+        "musique-120299abf18a7c56",
+        "musique-04a96b9e8a2be002",
+        "musique-683c0ad742b34aa7",
+        "musique-9f7f08f7db166a37",
+        "musique-b17c97babc0bdfb2",
+        "musique-ebc877b1180785b5",
+        "musique-4d41b561b2ff83c0",
+        "musique-6fa67873cf05cb65",
+        "musique-0f67e6b349794bab",
+        "musique-ba57dfa3319d55b8"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__861157_135481",
+      "hop": "2hop",
+      "question": "What is the competition the 1972 Federation Cup is part of named after?",
+      "answer": "International Tennis Federation",
+      "goldChunkIds": [
+        "musique-1a04a288bdb47f7a",
+        "musique-dd03c4bb5b10cd4e"
+      ],
+      "retrievedChunkIds": [
+        "musique-1a04a288bdb47f7a",
+        "musique-428ca2ef0e865d3c",
+        "musique-4be2c90e06a9ca41",
+        "musique-1db3ec3d385af6fc",
+        "musique-9f18d544b9f60caa",
+        "musique-f8b3f92ee380821c",
+        "musique-b1080e2372ecf36c",
+        "musique-9494dbc62a072559",
+        "musique-cd17e2c3d6d666a7",
+        "musique-53d4b255d18f2f24"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__495316_660579",
+      "hop": "2hop",
+      "question": "What is the capital of the county which contains Hickory Grove Estates, Mississippi?",
+      "answer": "Starkville",
+      "goldChunkIds": [
+        "musique-58facee19900b220",
+        "musique-8bd5b5f59f689a3e"
+      ],
+      "retrievedChunkIds": [
+        "musique-8bd5b5f59f689a3e",
+        "musique-d9e5e629b2731a87",
+        "musique-58facee19900b220",
+        "musique-9f940729d74ded63",
+        "musique-5a0deb8e71f89c6b",
+        "musique-a1271e6ad0e0526c",
+        "musique-b7363a9c9197be44",
+        "musique-96de6916a62b4551",
+        "musique-ca836d0199569534",
+        "musique-62f668f3b5fd4136"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__478978_124498",
+      "hop": "2hop",
+      "question": "Who is the father of the performer of Je dis aime?",
+      "answer": "Louis Chedid",
+      "goldChunkIds": [
+        "musique-04405ac1fa4d46d5",
+        "musique-d720bb23009cae3b"
+      ],
+      "retrievedChunkIds": [
+        "musique-d720bb23009cae3b",
+        "musique-04405ac1fa4d46d5",
+        "musique-112ef8d711a642f7",
+        "musique-edb5242156f87d7a",
+        "musique-a8aedea626edbc63",
+        "musique-f821e1f612e155d9",
+        "musique-f2b8d16450c1ede5",
+        "musique-38042cce7b0d5f1b",
+        "musique-c2e7907dc947b017",
+        "musique-90dc83c451c4b856"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__543853_124498",
+      "hop": "2hop",
+      "question": "Who is the father of the Labo M performer?",
+      "answer": "Louis Chedid",
+      "goldChunkIds": [
+        "musique-04405ac1fa4d46d5",
+        "musique-edb5242156f87d7a"
+      ],
+      "retrievedChunkIds": [
+        "musique-edb5242156f87d7a",
+        "musique-a8aedea626edbc63",
+        "musique-04405ac1fa4d46d5",
+        "musique-d720bb23009cae3b",
+        "musique-112ef8d711a642f7",
+        "musique-a280212dd2e86964",
+        "musique-40cc8c47137080f3",
+        "musique-0279535fecaa0b9f",
+        "musique-af18bc6d7dded106",
+        "musique-a07e29f2eb172de4"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__335899_124498",
+      "hop": "2hop",
+      "question": "Who is the father of the performer of Qui de noux deux?",
+      "answer": "Louis Chedid",
+      "goldChunkIds": [
+        "musique-04405ac1fa4d46d5",
+        "musique-a8aedea626edbc63"
+      ],
+      "retrievedChunkIds": [
+        "musique-edb5242156f87d7a",
+        "musique-0546666bc743b3ea",
+        "musique-00efba3a119d19ef",
+        "musique-8d014ffb98f857a5",
+        "musique-074da0c6a1d08aa3",
+        "musique-f38c1925296b3b14",
+        "musique-f4c6cda940891be5",
+        "musique-d3b8dcbbd914bd37",
+        "musique-9e5939169c6e175d",
+        "musique-fb09c34eaa0c049c"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__517145_367341",
+      "hop": "2hop",
+      "question": "Who is the child of the cast member of Green Ice?",
+      "answer": "Tatum O'Neal",
+      "goldChunkIds": [
+        "musique-7cb07d1c58493c09",
+        "musique-949b0721c8636999"
+      ],
+      "retrievedChunkIds": [
+        "musique-7cb07d1c58493c09",
+        "musique-e28f45b07ebc8462",
+        "musique-62ec4c0cedce10f0",
+        "musique-71065fc8da4f7d6b",
+        "musique-6c9ad1255e333e4a",
+        "musique-0967c70d8b410150",
+        "musique-1ad8f1d9029700cb",
+        "musique-c54abef67e19ff3a",
+        "musique-b7363a9c9197be44",
+        "musique-018e3c8ff06f94bf"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__92051_827343",
+      "hop": "2hop",
+      "question": "Who is the sibling of the actress who played Susan Walker in Miracle on 34th street?",
+      "answer": "Lana Wood",
+      "goldChunkIds": [
+        "musique-b1f7b1894d1856ae",
+        "musique-c56b485f635700d4"
+      ],
+      "retrievedChunkIds": [
+        "musique-bcfb8c01d26f6477",
+        "musique-6529aafb5c04d06b",
+        "musique-c56b485f635700d4",
+        "musique-a1c968e3278aa0d0",
+        "musique-4cf98a95e5c77b98",
+        "musique-b1f7b1894d1856ae",
+        "musique-7407437ad46886ca",
+        "musique-22aff9fee6b5776a",
+        "musique-4d41b561b2ff83c0",
+        "musique-6fa67873cf05cb65"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__89764_827343",
+      "hop": "2hop",
+      "question": "Who is the sibling of the actress that played the little girl in Miracle on 34th street 1947?",
+      "answer": "Lana Wood",
+      "goldChunkIds": [
+        "musique-7407437ad46886ca",
+        "musique-c56b485f635700d4"
+      ],
+      "retrievedChunkIds": [
+        "musique-bcfb8c01d26f6477",
+        "musique-6529aafb5c04d06b",
+        "musique-4d41b561b2ff83c0",
+        "musique-6fa67873cf05cb65",
+        "musique-0f67e6b349794bab",
+        "musique-ba57dfa3319d55b8",
+        "musique-46929a8081629b2a",
+        "musique-e03ec1c7887de256",
+        "musique-d4f40970cbbeb58f",
+        "musique-5968b51386d5e35f"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__59048_827343",
+      "hop": "2hop",
+      "question": "Whose sister played Susie in miracle on 34th street?",
+      "answer": "Lana Wood",
+      "goldChunkIds": [
+        "musique-7407437ad46886ca",
+        "musique-c56b485f635700d4"
+      ],
+      "retrievedChunkIds": [
+        "musique-bcfb8c01d26f6477",
+        "musique-6529aafb5c04d06b",
+        "musique-4d41b561b2ff83c0",
+        "musique-6fa67873cf05cb65",
+        "musique-0f67e6b349794bab",
+        "musique-ba57dfa3319d55b8",
+        "musique-46929a8081629b2a",
+        "musique-e03ec1c7887de256",
+        "musique-d4f40970cbbeb58f",
+        "musique-5968b51386d5e35f"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__14121_15463",
+      "hop": "2hop",
+      "question": "What company did the company that initiated a successful price war among PC manufacturers in 1994 merge with in 2002?",
+      "answer": "Hewlett Packard",
+      "goldChunkIds": [
+        "musique-867d4d4a36ee4cad",
+        "musique-924fae9710d91460"
+      ],
+      "retrievedChunkIds": [
+        "musique-fa2c07ae387c184d",
+        "musique-0324df0e2c0e6735",
+        "musique-ffb7ed8dc39b10df",
+        "musique-4261759acadff6cb",
+        "musique-44e9a17399f00270",
+        "musique-211fbc6b3ae2a18b",
+        "musique-1685bc563cbe0403",
+        "musique-867d4d4a36ee4cad",
+        "musique-de97ad41bf9874bc",
+        "musique-24b1a0b7ef9ef702"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__817096_15463",
+      "hop": "2hop",
+      "question": "What company merged in 2002 with the CEMM developer?",
+      "answer": "Hewlett Packard",
+      "goldChunkIds": [
+        "musique-924fae9710d91460",
+        "musique-c8a2648029edd4b3"
+      ],
+      "retrievedChunkIds": [
+        "musique-725d29c9cf55a7eb",
+        "musique-b3e316b07b8cb2e1",
+        "musique-fbea0ecd755b0db0",
+        "musique-287888500ddc3996",
+        "musique-b0fac036f1b337c9",
+        "musique-4cf499c627751186",
+        "musique-6b20c98a6227a935",
+        "musique-dc8e2ddcbc32036e",
+        "musique-4880906d37259e13",
+        "musique-50501be29de696c3"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__14095_15463",
+      "hop": "2hop",
+      "question": "In 2002, what company merged with the top PC manufacturer from 1994?",
+      "answer": "Hewlett Packard",
+      "goldChunkIds": [
+        "musique-24b1a0b7ef9ef702",
+        "musique-924fae9710d91460"
+      ],
+      "retrievedChunkIds": [
+        "musique-fa2c07ae387c184d",
+        "musique-145de44cc1ec8a4d",
+        "musique-de3d028d393ebbda",
+        "musique-52285181c140ae15",
+        "musique-b7fee0d8404a5ff2",
+        "musique-1322c7000a114f44",
+        "musique-27c43904234a3e61",
+        "musique-ec3a63751ed42fc0",
+        "musique-2b43f2e637558a71",
+        "musique-79c2035773e516d7"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__485221_544917",
+      "hop": "2hop",
+      "question": "What body of water includes the terrain feature where Coffee Swamp is located?",
+      "answer": "Lake Superior",
+      "goldChunkIds": [
+        "musique-6b89387f4e0b7624",
+        "musique-a920aab5745687f4"
+      ],
+      "retrievedChunkIds": [
+        "musique-6b89387f4e0b7624",
+        "musique-a920aab5745687f4",
+        "musique-fddbb39e1b7ca870",
+        "musique-010e050a7ecd04c5",
+        "musique-0324df0e2c0e6735",
+        "musique-ffb7ed8dc39b10df",
+        "musique-4261759acadff6cb",
+        "musique-44e9a17399f00270",
+        "musique-211fbc6b3ae2a18b",
+        "musique-1685bc563cbe0403"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__198459_61845",
+      "hop": "2hop",
+      "question": "Who has played for both West Ham Ajax and the team that Adam Hammill is on?",
+      "answer": "Mido",
+      "goldChunkIds": [
+        "musique-40cc8c47137080f3",
+        "musique-76093366efcf39e7"
+      ],
+      "retrievedChunkIds": [
+        "musique-a1c44b1bf3d5f441",
+        "musique-67a0fdb3626019e6",
+        "musique-40cc8c47137080f3",
+        "musique-5cefbdd9d961a033",
+        "musique-ae4c26c68a928e6a",
+        "musique-8b0c8b11d59c07d0",
+        "musique-310da1ef03eac987",
+        "musique-ea352d08a05c075f",
+        "musique-86d107dc7055d0f4",
+        "musique-534e958ec76fb352"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__563476_61845",
+      "hop": "2hop",
+      "question": "Who has played for West Ham Ajax and the team that David Currie plays for?",
+      "answer": "Mido",
+      "goldChunkIds": [
+        "musique-40cc8c47137080f3",
+        "musique-7dbfce3749dab090"
+      ],
+      "retrievedChunkIds": [
+        "musique-89051af2a1684790",
+        "musique-837244be2c8aab91",
+        "musique-106e5013469041b7",
+        "musique-e7005c70a6b5d91c",
+        "musique-8fbbaf1becd83989",
+        "musique-8fbaca73c0123722",
+        "musique-440e0d7a6de0dcad",
+        "musique-918de5cfc5a89fcc",
+        "musique-f3b8e80efb24d665",
+        "musique-3e6d899264c6792a"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__622308_61845",
+      "hop": "2hop",
+      "question": "Who has played for West Ham Ajax and the team from the city where Malcolm Graham died?",
+      "answer": "Mido",
+      "goldChunkIds": [
+        "musique-40cc8c47137080f3",
+        "musique-c64577d2e688fb00"
+      ],
+      "retrievedChunkIds": [
+        "musique-a1c44b1bf3d5f441",
+        "musique-67a0fdb3626019e6",
+        "musique-40cc8c47137080f3",
+        "musique-5cefbdd9d961a033",
+        "musique-ae4c26c68a928e6a",
+        "musique-8b0c8b11d59c07d0",
+        "musique-310da1ef03eac987",
+        "musique-ea352d08a05c075f",
+        "musique-86d107dc7055d0f4",
+        "musique-534e958ec76fb352"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__135653_669373",
+      "hop": "2hop",
+      "question": "Who is the employer of the person Mach's principle was named after?",
+      "answer": "Charles University",
+      "goldChunkIds": [
+        "musique-1d22412dad681afc",
+        "musique-e3994685151a604c"
+      ],
+      "retrievedChunkIds": [
+        "musique-1bf043246f681dd5",
+        "musique-c34218a7514da1cd",
+        "musique-dd2139740f493df6",
+        "musique-b21d63a1fccd5ab8",
+        "musique-0446e763b9adf163",
+        "musique-681a2648186fa518",
+        "musique-ac463ce3abccfa53",
+        "musique-314243e7c216dffa",
+        "musique-2b1a1c1fa02b64cd",
+        "musique-4d41b561b2ff83c0"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__135652_669373",
+      "hop": "2hop",
+      "question": "Who is the employer of the physicist who Mach number is named after?",
+      "answer": "Charles University",
+      "goldChunkIds": [
+        "musique-1d22412dad681afc",
+        "musique-9d903dafd5102479"
+      ],
+      "retrievedChunkIds": [
+        "musique-06896f924bae91cc",
+        "musique-6f0617c246884f02",
+        "musique-3003b3b9172d7bae",
+        "musique-cebc2335cd499cfd",
+        "musique-867d4d4a36ee4cad",
+        "musique-24b1a0b7ef9ef702",
+        "musique-2ba7c2482ab2aa8f",
+        "musique-71ee218143b6ab90",
+        "musique-7eb8fb180f9ce3b9",
+        "musique-4d5ae9f3e8adcb23"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__135651_669373",
+      "hop": "2hop",
+      "question": "Which university employed the person that Mach bands are named after?",
+      "answer": "Charles University",
+      "goldChunkIds": [
+        "musique-1d22412dad681afc",
+        "musique-4f176625f1627139"
+      ],
+      "retrievedChunkIds": [
+        "musique-1bf043246f681dd5",
+        "musique-c34218a7514da1cd",
+        "musique-dd2139740f493df6",
+        "musique-b21d63a1fccd5ab8",
+        "musique-0446e763b9adf163",
+        "musique-681a2648186fa518",
+        "musique-ac463ce3abccfa53",
+        "musique-314243e7c216dffa",
+        "musique-2b1a1c1fa02b64cd",
+        "musique-4d41b561b2ff83c0"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__256336_714772",
+      "hop": "2hop",
+      "question": "Who is the spouse of a cast member from King of the Mountain?",
+      "answer": "Lisa Rinna",
+      "goldChunkIds": [
+        "musique-2be893ce9b04a1e5",
+        "musique-ec5f8c5795adf8c7"
+      ],
+      "retrievedChunkIds": [
+        "musique-0efd42a06e49e110",
+        "musique-0cb308a31b2a0ef9",
+        "musique-cebdf55dc2603c05",
+        "musique-ef49e776d5b11bae",
+        "musique-2cf64e23bfc721b3",
+        "musique-31f5f2e2a6dba74c",
+        "musique-bd1d5b5d3b4de913",
+        "musique-f43b48300459c6ac",
+        "musique-747487e89bc47b30",
+        "musique-4be2c90e06a9ca41"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__199513_801817",
+      "hop": "2hop",
+      "question": "What is the birthplace of the person after whom S\u00e3o Jos\u00e9 dos Campos was named?",
+      "answer": "Nazareth",
+      "goldChunkIds": [
+        "musique-06d994e34f25223e",
+        "musique-178899b693156d52"
+      ],
+      "retrievedChunkIds": [
+        "musique-178899b693156d52",
+        "musique-144254fda8e76204",
+        "musique-5a2c72808105e583",
+        "musique-12494ba12c70006e",
+        "musique-fa62e129f6bcaba7",
+        "musique-956899a6ab8c812e",
+        "musique-1fcefbe1b4ea181f",
+        "musique-ebcef5455effe614",
+        "musique-732c00f2490ba557",
+        "musique-e24aefcb6478bc94"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__391857_162018",
+      "hop": "2hop",
+      "question": "What year did the author of Prince Prigio die?",
+      "answer": "1912",
+      "goldChunkIds": [
+        "musique-1221c62692b7a7e4",
+        "musique-475df7b87cd20839"
+      ],
+      "retrievedChunkIds": [
+        "musique-475df7b87cd20839",
+        "musique-036609f7028fea7f",
+        "musique-5d9fd01662a2309b",
+        "musique-c2ce7833461966ce",
+        "musique-773a28a9206fc038",
+        "musique-8709c9e2de612f18",
+        "musique-0e17a36cca270204",
+        "musique-bc185490931ab47c",
+        "musique-a8886760874d0cde",
+        "musique-5a62e139696cf80e"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__645448_77615",
+      "hop": "2hop",
+      "question": "When did military instruction start at the place where Larry Alcala was educated?",
+      "answer": "1912",
+      "goldChunkIds": [
+        "musique-4cf499c627751186",
+        "musique-8cb309585604e9ca"
+      ],
+      "retrievedChunkIds": [
+        "musique-4edd51f505b4041f",
+        "musique-f17c72589fc8ded1",
+        "musique-03e5814cff4ac67b",
+        "musique-f5c625162cd857fe",
+        "musique-a56c25ada2d09abd",
+        "musique-fdaa15ebb4cfb642",
+        "musique-310da1ef03eac987",
+        "musique-5b4a9213d339141c",
+        "musique-2db7343ca3ddb3e3",
+        "musique-6cde66f48786f785"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__123104_77615",
+      "hop": "2hop",
+      "question": "When did the military instruction start in the university that Paulo Manalo attended?",
+      "answer": "1912",
+      "goldChunkIds": [
+        "musique-2e100deb84e0a812",
+        "musique-8cb309585604e9ca"
+      ],
+      "retrievedChunkIds": [
+        "musique-a8c4117c80da7deb",
+        "musique-0546666bc743b3ea",
+        "musique-00efba3a119d19ef",
+        "musique-8d014ffb98f857a5",
+        "musique-074da0c6a1d08aa3",
+        "musique-f38c1925296b3b14",
+        "musique-f4c6cda940891be5",
+        "musique-d3b8dcbbd914bd37",
+        "musique-9e5939169c6e175d",
+        "musique-fb09c34eaa0c049c"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__701525_342810",
+      "hop": "2hop",
+      "question": "What county shares a border with Cedar Springs?",
+      "answer": "Bell County",
+      "goldChunkIds": [
+        "musique-b2b57c3125a5119c",
+        "musique-f0829f5ddcc3e808"
+      ],
+      "retrievedChunkIds": [
+        "musique-f0829f5ddcc3e808",
+        "musique-f43b48300459c6ac",
+        "musique-747487e89bc47b30",
+        "musique-4be2c90e06a9ca41",
+        "musique-9d30a163e7be4d4e",
+        "musique-0e29db77e17a017f",
+        "musique-ebfd07a2b7833243",
+        "musique-eebbf97c7158c33c",
+        "musique-994ac5d541c47da0",
+        "musique-3ed3a22860c43256"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__668407_683671",
+      "hop": "2hop",
+      "question": "Who is the father of Empress Wang's husband?",
+      "answer": "Yang Xingmi",
+      "goldChunkIds": [
+        "musique-06ce8ee3d5392435",
+        "musique-41b006633aeb5aea"
+      ],
+      "retrievedChunkIds": [
+        "musique-06ce8ee3d5392435",
+        "musique-a7af0cb0189952f3",
+        "musique-41b006633aeb5aea",
+        "musique-360eff87c60be380",
+        "musique-ea76eef7f99aaac7",
+        "musique-cd3af8de59002cdf",
+        "musique-d0304a389223a2a3",
+        "musique-8d900e3ceb2a0d4f",
+        "musique-e1a7abe72023c830",
+        "musique-1b277d3643f13c7c"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__286093_361551",
+      "hop": "2hop",
+      "question": "In which county was James Finch born?",
+      "answer": "Bay County",
+      "goldChunkIds": [
+        "musique-23fec7a2442312cb",
+        "musique-91d5c7271d2146ef"
+      ],
+      "retrievedChunkIds": [
+        "musique-23fec7a2442312cb",
+        "musique-91d5c7271d2146ef",
+        "musique-f43b48300459c6ac",
+        "musique-747487e89bc47b30",
+        "musique-4be2c90e06a9ca41",
+        "musique-9d30a163e7be4d4e",
+        "musique-0e29db77e17a017f",
+        "musique-ebfd07a2b7833243",
+        "musique-eebbf97c7158c33c",
+        "musique-994ac5d541c47da0"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__124592_402641",
+      "hop": "2hop",
+      "question": "Who is the other child of Chian Hsiao-chang's father?",
+      "answer": "Chiang Hsiao-wu",
+      "goldChunkIds": [
+        "musique-42c8a0ceb5039a9a",
+        "musique-4b69ffe78e21e98b"
+      ],
+      "retrievedChunkIds": [
+        "musique-42c8a0ceb5039a9a",
+        "musique-e1a7abe72023c830",
+        "musique-2764adacc1a397f8",
+        "musique-4b69ffe78e21e98b",
+        "musique-461a8b6a5349c9a7",
+        "musique-d11a62f40427de5a",
+        "musique-cd17e2c3d6d666a7",
+        "musique-ccaaeb9c11a93e1b",
+        "musique-f43b48300459c6ac",
+        "musique-747487e89bc47b30"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__256553_617289",
+      "hop": "2hop",
+      "question": "Who is the uncle of Liu Bin?",
+      "answer": "Liu Yin",
+      "goldChunkIds": [
+        "musique-6992dc37905583ea",
+        "musique-ee35e8750a653d0a"
+      ],
+      "retrievedChunkIds": [
+        "musique-f4ab3b0e98f1bbd5",
+        "musique-cc16e8434f1fa29d",
+        "musique-54772025784722c8",
+        "musique-6a1203aa6ab62045",
+        "musique-b526e85ed230756f",
+        "musique-b4c61de01d63f247",
+        "musique-a3d9343d74d1c0dd",
+        "musique-e1a7abe72023c830",
+        "musique-b7363a9c9197be44",
+        "musique-29bd7dca704fe570"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__124412_402641",
+      "hop": "2hop",
+      "question": "Who is the child of Chiang Hsiao-wen's father?",
+      "answer": "Chiang Hsiao-wu",
+      "goldChunkIds": [
+        "musique-461a8b6a5349c9a7",
+        "musique-4b69ffe78e21e98b"
+      ],
+      "retrievedChunkIds": [
+        "musique-461a8b6a5349c9a7",
+        "musique-e1a7abe72023c830",
+        "musique-2764adacc1a397f8",
+        "musique-4b69ffe78e21e98b",
+        "musique-42c8a0ceb5039a9a",
+        "musique-d11a62f40427de5a",
+        "musique-cd17e2c3d6d666a7",
+        "musique-ccaaeb9c11a93e1b",
+        "musique-f43b48300459c6ac",
+        "musique-747487e89bc47b30"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__706637_93362",
+      "hop": "2hop",
+      "question": "What is the movie starring Preity Zinta, Madhuri Dixit and the spouse of Kajol?",
+      "answer": "Yeh Raaste Hain Pyaar Ke",
+      "goldChunkIds": [
+        "musique-a7b89440f71bfb9f",
+        "musique-cdc9e8e98e17cc4e"
+      ],
+      "retrievedChunkIds": [
+        "musique-7b1e5134fdd2e11e",
+        "musique-70d40d5336f14f64",
+        "musique-a7b89440f71bfb9f",
+        "musique-75cde40d8558e730",
+        "musique-c8061c42427bd0d3",
+        "musique-378256a3c2e708b0",
+        "musique-695f5ba73a0c1791",
+        "musique-790b5315cbffa3e9",
+        "musique-96e1eff9dd65ef10",
+        "musique-70dff4515527d258"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__780652_93362",
+      "hop": "2hop",
+      "question": "What film features Anil Devgan's sibling?",
+      "answer": "Yeh Raaste Hain Pyaar Ke",
+      "goldChunkIds": [
+        "musique-a7b89440f71bfb9f",
+        "musique-cdc9e8e98e17cc4e"
+      ],
+      "retrievedChunkIds": [
+        "musique-a7b89440f71bfb9f",
+        "musique-7b1e5134fdd2e11e",
+        "musique-70d40d5336f14f64",
+        "musique-75cde40d8558e730",
+        "musique-daa98e5667cee9e5",
+        "musique-cdc9e8e98e17cc4e",
+        "musique-baa1ace45bd584e9",
+        "musique-7a8e8a4490321f0a",
+        "musique-da07dd9d90e22e51",
+        "musique-fa847fb691ed4680"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__771727_93362",
+      "hop": "2hop",
+      "question": "What preity zinta and madhuri dixit movie had a cast member from U Me Aur Hum ?",
+      "answer": "Yeh Raaste Hain Pyaar Ke",
+      "goldChunkIds": [
+        "musique-70d40d5336f14f64",
+        "musique-cdc9e8e98e17cc4e"
+      ],
+      "retrievedChunkIds": [
+        "musique-ddde9e241277d110",
+        "musique-00efba3a119d19ef",
+        "musique-86a12260f5a9f893",
+        "musique-04a96b9e8a2be002",
+        "musique-92e42402c08dd3f9",
+        "musique-50ba76f3d9a20b20",
+        "musique-f9357db01ffb7cea",
+        "musique-7c38d4197fa7d34b",
+        "musique-469280fd69fba2f7",
+        "musique-e9b69a5485d5654e"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__499003_853511",
+      "hop": "2hop",
+      "question": "What is the record label for the band which performed Pythons?",
+      "answer": "Kanine Records",
+      "goldChunkIds": [
+        "musique-a60ecd306dc52a9f",
+        "musique-d586faf1cfdde65e"
+      ],
+      "retrievedChunkIds": [
+        "musique-0396ab15eb259704",
+        "musique-8b67c56060cb31f8",
+        "musique-5facc8ae8d60ec60",
+        "musique-db0faa2dad3ca726",
+        "musique-5ba3d7c161ab0fc1",
+        "musique-f43b48300459c6ac",
+        "musique-747487e89bc47b30",
+        "musique-4be2c90e06a9ca41",
+        "musique-9d30a163e7be4d4e",
+        "musique-0e29db77e17a017f"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__822965_165304",
+      "hop": "2hop",
+      "question": "Who is the child of the actor who is a cast member of Love in Pawn?",
+      "answer": "Kim Braden",
+      "goldChunkIds": [
+        "musique-8c6dabfa3a8359ac",
+        "musique-c87d3fc500de5a1b"
+      ],
+      "retrievedChunkIds": [
+        "musique-05a9176faf0e12f4",
+        "musique-e01166e5efa24d77",
+        "musique-4d41b561b2ff83c0",
+        "musique-6fa67873cf05cb65",
+        "musique-0f67e6b349794bab",
+        "musique-ba57dfa3319d55b8",
+        "musique-46929a8081629b2a",
+        "musique-e03ec1c7887de256",
+        "musique-d4f40970cbbeb58f",
+        "musique-5968b51386d5e35f"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__156085_436709",
+      "hop": "2hop",
+      "question": "Who is the creator of Mickey Mouse's spouse?",
+      "answer": "Walt Disney",
+      "goldChunkIds": [
+        "musique-5c48db6c1451c5b9",
+        "musique-ec73e7c0ab45e68c"
+      ],
+      "retrievedChunkIds": [
+        "musique-690a9fd014a33cf1",
+        "musique-1c567ac906ff6c0b",
+        "musique-13fff9724cfc5a4a",
+        "musique-b3cbf4f80f7f6584",
+        "musique-6bbfcd2ba334363c",
+        "musique-0f67e6b349794bab",
+        "musique-80659aa6614ccc3c",
+        "musique-b1fbe159925ab308",
+        "musique-f1e94dfda7878bad",
+        "musique-dbd04058d665a2e5"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__31585_61048",
+      "hop": "2hop",
+      "question": "Who was the US physicist who directed the project that developed the first atomic bomb at the same place where Feynman worked on Water Boiler?",
+      "answer": "Robert Oppenheimer",
+      "goldChunkIds": [
+        "musique-19a0b435c3d919cc",
+        "musique-4143eb4ec18c478f"
+      ],
+      "retrievedChunkIds": [
+        "musique-df5c86c07f8cdc5f",
+        "musique-58764bf1620cf62d",
+        "musique-f370f70bde6d4971",
+        "musique-4143eb4ec18c478f",
+        "musique-d04f8fe8741422bc",
+        "musique-f8ba53f4e7602315",
+        "musique-3047e6ae7bcbc165",
+        "musique-fb0c09145ec8c902",
+        "musique-91954100d0a745c1",
+        "musique-71697b483cc63bf7"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__94507_654855",
+      "hop": "2hop",
+      "question": "What political party does the person that Adversary in the House is based on a member of?",
+      "answer": "Socialist Party of America",
+      "goldChunkIds": [
+        "musique-0f1406fd01095bd2",
+        "musique-8b3d7a964238781a"
+      ],
+      "retrievedChunkIds": [
+        "musique-90bb45fe1f66a0a8",
+        "musique-f43b48300459c6ac",
+        "musique-747487e89bc47b30",
+        "musique-4be2c90e06a9ca41",
+        "musique-9d30a163e7be4d4e",
+        "musique-0e29db77e17a017f",
+        "musique-ebfd07a2b7833243",
+        "musique-eebbf97c7158c33c",
+        "musique-994ac5d541c47da0",
+        "musique-3ed3a22860c43256"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__82858_654855",
+      "hop": "2hop",
+      "question": "What political party was the socialist candidate part of who ran for president in 1912?",
+      "answer": "Socialist Party of America",
+      "goldChunkIds": [
+        "musique-8b3d7a964238781a",
+        "musique-f206403a2bc51eae"
+      ],
+      "retrievedChunkIds": [
+        "musique-e674bad32ed7ae1e",
+        "musique-13ba63dca8a9c09e",
+        "musique-3beb49b695a44e59",
+        "musique-a9063ca2d73d3d05",
+        "musique-1d8cec2ac58f4a18",
+        "musique-ba65e4a4d0fa5d1d",
+        "musique-ab1ce33ef7af6478",
+        "musique-fdaa15ebb4cfb642",
+        "musique-67f2f5f18f7abd11",
+        "musique-f6c68266c7c6a192"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__62823_654855",
+      "hop": "2hop",
+      "question": "What political party was the candidate who garnered a million votes during the 1920 election despite being in prison, a member of?",
+      "answer": "Socialist Party of America",
+      "goldChunkIds": [
+        "musique-8b3d7a964238781a",
+        "musique-dc6d630dd9d3da9d"
+      ],
+      "retrievedChunkIds": [
+        "musique-ebfd07a2b7833243",
+        "musique-5ba3d7c161ab0fc1",
+        "musique-10ce7fb28132f8dc",
+        "musique-f43b48300459c6ac",
+        "musique-747487e89bc47b30",
+        "musique-4be2c90e06a9ca41",
+        "musique-9d30a163e7be4d4e",
+        "musique-0e29db77e17a017f",
+        "musique-eebbf97c7158c33c",
+        "musique-994ac5d541c47da0"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__827755_156034",
+      "hop": "2hop",
+      "question": "What is the river that the Kettle Generating Station is located on a tributary of?",
+      "answer": "Hudson's Bay",
+      "goldChunkIds": [
+        "musique-c30e845dfe7a890b",
+        "musique-d7fb8a9a187ec94b"
+      ],
+      "retrievedChunkIds": [
+        "musique-dc0ede6c384e0b69",
+        "musique-949f1e5794736bbe",
+        "musique-f307f932ded1bdc5",
+        "musique-7aedabd31fa554dc",
+        "musique-7e4257b2052550ec",
+        "musique-d1ed714f48fe3aa8",
+        "musique-0f0033e2285a438b",
+        "musique-f35d9bb3bbeb0e5d",
+        "musique-57e0c435df09e46c",
+        "musique-910057e3ccc3a6dc"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__800166_156034",
+      "hop": "2hop",
+      "question": "What is the river where Long Spruce Generating Station is located a tributary of?",
+      "answer": "Hudson's Bay",
+      "goldChunkIds": [
+        "musique-c30e845dfe7a890b",
+        "musique-dbdeae06e016e7cc"
+      ],
+      "retrievedChunkIds": [
+        "musique-dbdeae06e016e7cc",
+        "musique-c30e845dfe7a890b",
+        "musique-d7fb8a9a187ec94b",
+        "musique-825947bd739a96fe",
+        "musique-ea726f36dfdb78bd",
+        "musique-db1d6e4084579654",
+        "musique-ee2eaab4d88fdb7c",
+        "musique-e6537dfbfeefa34b",
+        "musique-0546666bc743b3ea",
+        "musique-538863bd49d22551"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__742831_156034",
+      "hop": "2hop",
+      "question": "Of which river is the river Kichi Sipi Bridge crosses a tributary?",
+      "answer": "Hudson's Bay",
+      "goldChunkIds": [
+        "musique-825947bd739a96fe",
+        "musique-c30e845dfe7a890b"
+      ],
+      "retrievedChunkIds": [
+        "musique-3d550a66be3a7db1",
+        "musique-74b26c35dede09db",
+        "musique-29d0100d1e388527",
+        "musique-e66ebbbf79c6e15b",
+        "musique-32e18d3a865e9fef",
+        "musique-77acfb3931a6d755",
+        "musique-f8abd3119888da12",
+        "musique-c86786d7dd703c84",
+        "musique-fb8e99c298f31d0a",
+        "musique-e89edcd7c3a98cb6"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__50910_177869",
+      "hop": "2hop",
+      "question": "Who married the publisher of abolitionist newspaper The North Star?",
+      "answer": "Helen Pitts Douglass",
+      "goldChunkIds": [
+        "musique-75f695a5183c1f53",
+        "musique-a027f0629c4dafc3"
+      ],
+      "retrievedChunkIds": [
+        "musique-a027f0629c4dafc3",
+        "musique-1cc9596d708f6386",
+        "musique-20fd199b0279733c",
+        "musique-cdf994b84be03855",
+        "musique-4880906d37259e13",
+        "musique-75f695a5183c1f53",
+        "musique-e417cbdce15772d6",
+        "musique-3998f951739c8018",
+        "musique-7557f6d309af8e7f",
+        "musique-4079aa7815412ae4"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__82270_177869",
+      "hop": "2hop",
+      "question": "Who is the spouse of the first nominated African American presidential candidate?",
+      "answer": "Helen Pitts Douglass",
+      "goldChunkIds": [
+        "musique-75f695a5183c1f53",
+        "musique-e417cbdce15772d6"
+      ],
+      "retrievedChunkIds": [
+        "musique-ea984d3a6f441b6f",
+        "musique-899dc4c53e348025",
+        "musique-90ce40049e8ba931",
+        "musique-b87c9286b2d4da65",
+        "musique-0aac12885a2dce30",
+        "musique-19450d74aa9c7b98",
+        "musique-9862c0775c7d8180",
+        "musique-12da1bb3f4d4367c",
+        "musique-3f6f67610344abfd",
+        "musique-20e84e871fa83a0c"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__76314_177869",
+      "hop": "2hop",
+      "question": "Who was the spouse of a leading speaker against slavery and publisher of an antislavery newspaper?",
+      "answer": "Helen Pitts Douglass",
+      "goldChunkIds": [
+        "musique-75f695a5183c1f53",
+        "musique-a027f0629c4dafc3"
+      ],
+      "retrievedChunkIds": [
+        "musique-742b5fe2ecd1f36e",
+        "musique-b32705e16dfb90a5",
+        "musique-6b5c58196c7bbd72",
+        "musique-4e7903b48c0a4e0d",
+        "musique-60d7ec34be31e081",
+        "musique-2a18a188c0f7a579",
+        "musique-13566865e3dc9068",
+        "musique-f43b48300459c6ac",
+        "musique-747487e89bc47b30",
+        "musique-4be2c90e06a9ca41"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__401710_456439",
+      "hop": "2hop",
+      "question": "Who is the spouse of the producer of Dolores Claiborne?",
+      "answer": "Helen Mirren",
+      "goldChunkIds": [
+        "musique-cf618be2bd6a38eb",
+        "musique-f4ecbdd65f5bff13"
+      ],
+      "retrievedChunkIds": [
+        "musique-f4ecbdd65f5bff13",
+        "musique-465041101df9674d",
+        "musique-48b2eeaca5f91436",
+        "musique-cf618be2bd6a38eb",
+        "musique-53aec4a96adb2248",
+        "musique-7affdd83e3446133",
+        "musique-e2e7272d0fd668c0",
+        "musique-4515f9ef5e69ef00",
+        "musique-7607add7c4d957d5",
+        "musique-29d77546d47e5e79"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__613959_135844",
+      "hop": "2hop",
+      "question": "Who is the city that AvtoVAZ's headquarters is located in named after?",
+      "answer": "Palmiro Togliatti",
+      "goldChunkIds": [
+        "musique-3cbc37bd4d912de4",
+        "musique-dfafacc543a0e49a"
+      ],
+      "retrievedChunkIds": [
+        "musique-dfafacc543a0e49a",
+        "musique-d828cf1710005c84",
+        "musique-b684e095d08697d1",
+        "musique-8e3c0ca0b3cf64ab",
+        "musique-fbc1a9044dd10e2c",
+        "musique-870b2835b428616b",
+        "musique-dc9b6e23342df82d",
+        "musique-9319c856f8ca044c",
+        "musique-9eff38116cae485d",
+        "musique-aecf2205f6bea842"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__258940_135844",
+      "hop": "2hop",
+      "question": "Who is the city where Lesnoye Sanatorium is located named after?",
+      "answer": "Palmiro Togliatti",
+      "goldChunkIds": [
+        "musique-3cbc37bd4d912de4",
+        "musique-56dd2816a67ce2b4"
+      ],
+      "retrievedChunkIds": [
+        "musique-56dd2816a67ce2b4",
+        "musique-d828cf1710005c84",
+        "musique-b684e095d08697d1",
+        "musique-8e3c0ca0b3cf64ab",
+        "musique-fbc1a9044dd10e2c",
+        "musique-870b2835b428616b",
+        "musique-dc9b6e23342df82d",
+        "musique-9319c856f8ca044c",
+        "musique-9eff38116cae485d",
+        "musique-aecf2205f6bea842"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__747894_135844",
+      "hop": "2hop",
+      "question": "Whom is the birth place of Ravil Aryapov named after?",
+      "answer": "Palmiro Togliatti",
+      "goldChunkIds": [
+        "musique-3cbc37bd4d912de4",
+        "musique-f10f57228b568a5c"
+      ],
+      "retrievedChunkIds": [
+        "musique-f10f57228b568a5c",
+        "musique-24005b89b1593aca",
+        "musique-6e331e30dd617588",
+        "musique-dfafacc543a0e49a",
+        "musique-56dd2816a67ce2b4",
+        "musique-fddbb39e1b7ca870",
+        "musique-9494dbc62a072559",
+        "musique-912a2035ff4cf807",
+        "musique-d8a12f2f97de7e6d",
+        "musique-d7922b54ce582e67"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__16581_16525",
+      "hop": "2hop",
+      "question": "When did the person who first brought a postal service into Umayyad lands become caliph?",
+      "answer": "661",
+      "goldChunkIds": [
+        "musique-1509944e7968e34f",
+        "musique-a9cae46fae21f596"
+      ],
+      "retrievedChunkIds": [
+        "musique-a9cae46fae21f596",
+        "musique-e080921650e39f9b",
+        "musique-a9b68fe80a17cded",
+        "musique-18680415261cfaf9",
+        "musique-ccfc72f03a6667fd",
+        "musique-1b450214bc25325d",
+        "musique-4cc0e06fae747d41",
+        "musique-48496fabb1b7252e",
+        "musique-b817f02c611e9daf",
+        "musique-61eabec4563ac681"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__640262_122868",
+      "hop": "2hop",
+      "question": "What university did the author of 1967: The Last Good Year attend?",
+      "answer": "University of British Columbia",
+      "goldChunkIds": [
+        "musique-6aa6a39d075165dc",
+        "musique-7e4257b2052550ec"
+      ],
+      "retrievedChunkIds": [
+        "musique-98a30d388068cd1b",
+        "musique-0546666bc743b3ea",
+        "musique-54ffa2cb5f6e5809",
+        "musique-d036f39371639586",
+        "musique-892e9f21fb76c0e0",
+        "musique-69bd3c6a8ee58bd6",
+        "musique-70dff4515527d258",
+        "musique-92d07fda5448f8cd",
+        "musique-a344aa4f0100eb70",
+        "musique-7c559973f5231294"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__632234_122868",
+      "hop": "2hop",
+      "question": "Where did the author of The National Dream go to university?",
+      "answer": "University of British Columbia",
+      "goldChunkIds": [
+        "musique-446cc4d7b8998d2b",
+        "musique-7e4257b2052550ec"
+      ],
+      "retrievedChunkIds": [
+        "musique-9efa5a9f4cd34100",
+        "musique-ebcbb93a8121ef98",
+        "musique-566bbc56ae3e65d8",
+        "musique-40f9d81ac5bbb799",
+        "musique-00b5af81aa4e01bf",
+        "musique-15c1a59cad0f3fc6",
+        "musique-ac463ce3abccfa53",
+        "musique-a43a1efbbb60aeda",
+        "musique-dcd31de2e64b7e82",
+        "musique-86cc5ab61be6fa8b"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__849534_122868",
+      "hop": "2hop",
+      "question": "What university did the author of The Secret World of Og go to?",
+      "answer": "University of British Columbia",
+      "goldChunkIds": [
+        "musique-5cae29558cf0bd6a",
+        "musique-7e4257b2052550ec"
+      ],
+      "retrievedChunkIds": [
+        "musique-637d66c9037ca0ef",
+        "musique-d036f39371639586",
+        "musique-892e9f21fb76c0e0",
+        "musique-69b626c48ea38c8d",
+        "musique-8847787cac85ca57",
+        "musique-7f31fdf1d703572e",
+        "musique-0546666bc743b3ea",
+        "musique-54ffa2cb5f6e5809",
+        "musique-69bd3c6a8ee58bd6",
+        "musique-70dff4515527d258"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__83460_456238",
+      "hop": "2hop",
+      "question": "This is an instance of who was named commander in chief of texas forces by the new national government of texas National Forest?",
+      "answer": "United States National Forest",
+      "goldChunkIds": [
+        "musique-9ee15de58868fb3c",
+        "musique-efb4d539a68edc74"
+      ],
+      "retrievedChunkIds": [
+        "musique-ebc877b1180785b5",
+        "musique-93c0304a9a0fee37",
+        "musique-1266afd395e8f33f",
+        "musique-044c03cce2d40960",
+        "musique-5936ce16acf8afa4",
+        "musique-32e18d3a865e9fef",
+        "musique-98e4264e8dba22fb",
+        "musique-bdcc63605fda87a9",
+        "musique-f6a6a093db3061ca",
+        "musique-d37a2c26bcb34ac9"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__89991_58067",
+      "hop": "2hop",
+      "question": "Who was honored with the highest award in India before becoming president?",
+      "answer": "A.P.J. Abdul Kalam",
+      "goldChunkIds": [
+        "musique-713921a7ebb2961f",
+        "musique-baa1ace45bd584e9"
+      ],
+      "retrievedChunkIds": [
+        "musique-2db7343ca3ddb3e3",
+        "musique-a9063ca2d73d3d05",
+        "musique-1d8cec2ac58f4a18",
+        "musique-ba65e4a4d0fa5d1d",
+        "musique-ab1ce33ef7af6478",
+        "musique-fdaa15ebb4cfb642",
+        "musique-67f2f5f18f7abd11",
+        "musique-f6c68266c7c6a192",
+        "musique-1002baadb0b8e2cf",
+        "musique-56a90b8e9344c945"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__160223_58067",
+      "hop": "2hop",
+      "question": "Who was given India's highest civilian honor before he became President of India?",
+      "answer": "A.P.J. Abdul Kalam",
+      "goldChunkIds": [
+        "musique-9125fcf9f8507ab8",
+        "musique-baa1ace45bd584e9"
+      ],
+      "retrievedChunkIds": [
+        "musique-48b2eeaca5f91436",
+        "musique-465041101df9674d",
+        "musique-f4ecbdd65f5bff13",
+        "musique-4515f9ef5e69ef00",
+        "musique-7607add7c4d957d5",
+        "musique-e238f235092550c8",
+        "musique-47db45415ea53c99",
+        "musique-0d332700c7d1bde1",
+        "musique-b7363a9c9197be44",
+        "musique-ad8c472fc697f154"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__158010_58067",
+      "hop": "2hop",
+      "question": "Who was honoured with the highest award a citizen without military experience in India before becoming a president?",
+      "answer": "A.P.J. Abdul Kalam",
+      "goldChunkIds": [
+        "musique-baa1ace45bd584e9",
+        "musique-da07dd9d90e22e51"
+      ],
+      "retrievedChunkIds": [
+        "musique-2db7343ca3ddb3e3",
+        "musique-a9063ca2d73d3d05",
+        "musique-1d8cec2ac58f4a18",
+        "musique-ba65e4a4d0fa5d1d",
+        "musique-ab1ce33ef7af6478",
+        "musique-fdaa15ebb4cfb642",
+        "musique-67f2f5f18f7abd11",
+        "musique-f6c68266c7c6a192",
+        "musique-1002baadb0b8e2cf",
+        "musique-56a90b8e9344c945"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__439614_349102",
+      "hop": "2hop",
+      "question": "What type of animal is Xiao Liwu's mother?",
+      "answer": "panda",
+      "goldChunkIds": [
+        "musique-2fa02345ba403a50",
+        "musique-4d8e8baf7dd27d59"
+      ],
+      "retrievedChunkIds": [
+        "musique-9889f6516288b058",
+        "musique-2fa02345ba403a50",
+        "musique-4d8e8baf7dd27d59",
+        "musique-cc16e8434f1fa29d",
+        "musique-54772025784722c8",
+        "musique-6a1203aa6ab62045",
+        "musique-f4ab3b0e98f1bbd5",
+        "musique-b526e85ed230756f",
+        "musique-b4c61de01d63f247",
+        "musique-a3d9343d74d1c0dd"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__747758_58067",
+      "hop": "2hop",
+      "question": "Who was honored with the award Dhondo Keshav Karve received prior to becoming president of India?",
+      "answer": "A.P.J. Abdul Kalam",
+      "goldChunkIds": [
+        "musique-35cb6a58e2914579",
+        "musique-baa1ace45bd584e9"
+      ],
+      "retrievedChunkIds": [
+        "musique-3f717edf652562f0",
+        "musique-e655f8dc40f06052",
+        "musique-fbd6e327b81fb7cb",
+        "musique-da07dd9d90e22e51",
+        "musique-40f9d81ac5bbb799",
+        "musique-00b5af81aa4e01bf",
+        "musique-15c1a59cad0f3fc6",
+        "musique-ac463ce3abccfa53",
+        "musique-a43a1efbbb60aeda",
+        "musique-dcd31de2e64b7e82"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__77775_162341",
+      "hop": "2hop",
+      "question": "What recognition did the actor of Truman Capote from Capote receive?",
+      "answer": "nominated for an Academy Award for Best Supporting Actor",
+      "goldChunkIds": [
+        "musique-23295767518bd21e",
+        "musique-a16c55b618e74f8f"
+      ],
+      "retrievedChunkIds": [
+        "musique-2deb596678270ce0",
+        "musique-a9ac6a644f244875",
+        "musique-5f44e2e4cbb928c0",
+        "musique-a16c55b618e74f8f",
+        "musique-dcff8a3e6b53d39a",
+        "musique-a302c631c3cdfb40",
+        "musique-c204827cf505037e",
+        "musique-cf54b7f0b7011ac1",
+        "musique-579e400f53166f07",
+        "musique-94752601a81ad4e7"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__55966_162341",
+      "hop": "2hop",
+      "question": "What kind of recognition did the actor who played the game maker in hunger games receive?",
+      "answer": "nominated for an Academy Award for Best Supporting Actor",
+      "goldChunkIds": [
+        "musique-23295767518bd21e",
+        "musique-2d6168506ee648b2"
+      ],
+      "retrievedChunkIds": [
+        "musique-02402782afde2616",
+        "musique-bcfd333652913eee",
+        "musique-4d41b561b2ff83c0",
+        "musique-6fa67873cf05cb65",
+        "musique-0f67e6b349794bab",
+        "musique-ba57dfa3319d55b8",
+        "musique-46929a8081629b2a",
+        "musique-e03ec1c7887de256",
+        "musique-d4f40970cbbeb58f",
+        "musique-5968b51386d5e35f"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__43776_162341",
+      "hop": "2hop",
+      "question": "What other recognition did the Oscar winner for Best Actor in 2006 receive?",
+      "answer": "nominated for an Academy Award for Best Supporting Actor",
+      "goldChunkIds": [
+        "musique-23295767518bd21e",
+        "musique-7affdd83e3446133"
+      ],
+      "retrievedChunkIds": [
+        "musique-71803417be7a29ac",
+        "musique-2a31cf83a54a1002",
+        "musique-f039ed0f886df694",
+        "musique-cbb686e4d4c5e066",
+        "musique-f43b48300459c6ac",
+        "musique-747487e89bc47b30",
+        "musique-4be2c90e06a9ca41",
+        "musique-9d30a163e7be4d4e",
+        "musique-0e29db77e17a017f",
+        "musique-ebfd07a2b7833243"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__703493_162341",
+      "hop": "2hop",
+      "question": "What recognition did the Jack Goes Boating director receive?",
+      "answer": "nominated for an Academy Award for Best Supporting Actor",
+      "goldChunkIds": [
+        "musique-23295767518bd21e",
+        "musique-af3ebca8186e034a"
+      ],
+      "retrievedChunkIds": [
+        "musique-f6842230cc9e43f0",
+        "musique-ba57dfa3319d55b8",
+        "musique-4d41b561b2ff83c0",
+        "musique-6fa67873cf05cb65",
+        "musique-0f67e6b349794bab",
+        "musique-46929a8081629b2a",
+        "musique-e03ec1c7887de256",
+        "musique-d4f40970cbbeb58f",
+        "musique-5968b51386d5e35f",
+        "musique-b08d6d0f7d8c9e7e"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__153573_44085",
+      "hop": "2hop",
+      "question": "What was the show named after the character featured in the video game Mickey's Safari in Letterland?",
+      "answer": "The Mickey Mouse Club",
+      "goldChunkIds": [
+        "musique-6bbfcd2ba334363c",
+        "musique-dbd04058d665a2e5"
+      ],
+      "retrievedChunkIds": [
+        "musique-ef378a887ab42e4c",
+        "musique-5c48db6c1451c5b9",
+        "musique-7efb920d595c9240",
+        "musique-6bbfcd2ba334363c",
+        "musique-37f600120999bf6e",
+        "musique-59a75f5f0ebb386e",
+        "musique-690a9fd014a33cf1",
+        "musique-13fff9724cfc5a4a",
+        "musique-5737c4d42f984cbe",
+        "musique-9c791b41db94f233"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__153573_109006",
+      "hop": "2hop",
+      "question": "Who developed the eponymous character from the series that contains Mickey's Safari in Letterland?",
+      "answer": "Walt Disney",
+      "goldChunkIds": [
+        "musique-6bbfcd2ba334363c",
+        "musique-ef378a887ab42e4c"
+      ],
+      "retrievedChunkIds": [
+        "musique-ef378a887ab42e4c",
+        "musique-5c48db6c1451c5b9",
+        "musique-7efb920d595c9240",
+        "musique-6bbfcd2ba334363c",
+        "musique-37f600120999bf6e",
+        "musique-59a75f5f0ebb386e",
+        "musique-690a9fd014a33cf1",
+        "musique-13fff9724cfc5a4a",
+        "musique-5737c4d42f984cbe",
+        "musique-9c791b41db94f233"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__153573_45901",
+      "hop": "2hop",
+      "question": "Who did the original voice for the character whose series Mickey's safari in Letterland is from?",
+      "answer": "Walt Disney",
+      "goldChunkIds": [
+        "musique-6bbfcd2ba334363c",
+        "musique-f1e94dfda7878bad"
+      ],
+      "retrievedChunkIds": [
+        "musique-ef378a887ab42e4c",
+        "musique-5c48db6c1451c5b9",
+        "musique-7efb920d595c9240",
+        "musique-6bbfcd2ba334363c",
+        "musique-37f600120999bf6e",
+        "musique-59a75f5f0ebb386e",
+        "musique-690a9fd014a33cf1",
+        "musique-13fff9724cfc5a4a",
+        "musique-5737c4d42f984cbe",
+        "musique-9c791b41db94f233"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__551235_310309",
+      "hop": "2hop",
+      "question": "Who is the child of the creator of A Distinguished Member of the Humane Society?",
+      "answer": "Edwin Landseer Lutyens",
+      "goldChunkIds": [
+        "musique-443e2cd13493fa45",
+        "musique-8c27ad0a268d3ad8"
+      ],
+      "retrievedChunkIds": [
+        "musique-55371b95bf361db6",
+        "musique-d4628a135c647a1a",
+        "musique-b63139b7b25e7976",
+        "musique-a28012b36eabf312",
+        "musique-18c6b4b823fee4cc",
+        "musique-9b24c7b899126a25",
+        "musique-6be89e287bde8b77",
+        "musique-4052a3965b5ece6b",
+        "musique-0b65a3fc5c739d1b",
+        "musique-8234c6257fedf928"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__7046_44085",
+      "hop": "2hop",
+      "question": "What was the old show that was named after a character that Walt Disney created in 1928 called?",
+      "answer": "The Mickey Mouse Club",
+      "goldChunkIds": [
+        "musique-116abd8f7c98ba78",
+        "musique-dbd04058d665a2e5"
+      ],
+      "retrievedChunkIds": [
+        "musique-ab1ce33ef7af6478",
+        "musique-12eb15efcaffe91a",
+        "musique-b1fbe159925ab308",
+        "musique-5c48db6c1451c5b9",
+        "musique-1c567ac906ff6c0b",
+        "musique-68c4ca989a1fd96f",
+        "musique-116abd8f7c98ba78",
+        "musique-b06cba60e60a73f1",
+        "musique-33c3ba7314e1cf4b",
+        "musique-f43b48300459c6ac"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__488811_30078",
+      "hop": "2hop",
+      "question": "What military overran much of Erich Zakowski's place of birth?",
+      "answer": "Russian troops",
+      "goldChunkIds": [
+        "musique-112390da60173881",
+        "musique-a5181297a337792a"
+      ],
+      "retrievedChunkIds": [
+        "musique-a56ce452a213d8b3",
+        "musique-0324df0e2c0e6735",
+        "musique-ffb7ed8dc39b10df",
+        "musique-4261759acadff6cb",
+        "musique-44e9a17399f00270",
+        "musique-211fbc6b3ae2a18b",
+        "musique-1685bc563cbe0403",
+        "musique-867d4d4a36ee4cad",
+        "musique-de97ad41bf9874bc",
+        "musique-24b1a0b7ef9ef702"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__150866_11402",
+      "hop": "2hop",
+      "question": "According to the agency that published U.S. and World Population Clock, what is the total area in square miles?",
+      "answer": "17.037 square miles",
+      "goldChunkIds": [
+        "musique-340f0ffa767d8682",
+        "musique-9f2169c6393b2ce9"
+      ],
+      "retrievedChunkIds": [
+        "musique-f8c5a736d3a7460a",
+        "musique-3c6aa7faabc747b9",
+        "musique-cb2f1133e52fd301",
+        "musique-6f444069b41259d2",
+        "musique-6730535fc9b56120",
+        "musique-d37a8a2eb5f036f0",
+        "musique-58332d1e9a825013",
+        "musique-e50bc8bb4fad94a8",
+        "musique-8634d70d9047fc87",
+        "musique-22d06d8393dc8c44"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__488811_30113",
+      "hop": "2hop",
+      "question": "What else happened in the northern part of Erich Zakowski's birthplace in the now Russian area?",
+      "answer": "names were replaced by new Russian names",
+      "goldChunkIds": [
+        "musique-112390da60173881",
+        "musique-e6d78739b3e1db0c"
+      ],
+      "retrievedChunkIds": [
+        "musique-112390da60173881",
+        "musique-18cbac6423bfe945",
+        "musique-7e2b73e3458034c9",
+        "musique-9fa891ef33cc3aa5",
+        "musique-2b53631367d30639",
+        "musique-6d3ac5ae69d86cb0",
+        "musique-5d5c5fb67bcb28a7",
+        "musique-dffbf3bb096cda88",
+        "musique-55de811c2c38dc19",
+        "musique-78bf9d0ad9b8bfc2"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__257831_123283",
+      "hop": "2hop",
+      "question": "Where did the producer of Julius Caesar study or work?",
+      "answer": "Clifton College",
+      "goldChunkIds": [
+        "musique-441336d0cb8f45e9",
+        "musique-7c2ff3f4c632b1db"
+      ],
+      "retrievedChunkIds": [
+        "musique-5a0deb8e71f89c6b",
+        "musique-f43b48300459c6ac",
+        "musique-747487e89bc47b30",
+        "musique-4be2c90e06a9ca41",
+        "musique-9d30a163e7be4d4e",
+        "musique-0e29db77e17a017f",
+        "musique-ebfd07a2b7833243",
+        "musique-eebbf97c7158c33c",
+        "musique-994ac5d541c47da0",
+        "musique-3ed3a22860c43256"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__40270_11402",
+      "hop": "2hop",
+      "question": "According to the agency that considers if Los Angeles County is to be a separate metropolitan area, what is the total area in square miles?",
+      "answer": "17.037 square miles",
+      "goldChunkIds": [
+        "musique-340f0ffa767d8682",
+        "musique-605439ebc1653a11"
+      ],
+      "retrievedChunkIds": [
+        "musique-2488c7b2196294c0",
+        "musique-ca48b389fdf280dd",
+        "musique-a334a2e9a2c0766b",
+        "musique-b3195de1d69d313d",
+        "musique-2e560fa62217c775",
+        "musique-7ac750306495c64e",
+        "musique-f43b48300459c6ac",
+        "musique-747487e89bc47b30",
+        "musique-4be2c90e06a9ca41",
+        "musique-9d30a163e7be4d4e"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__847433_11402",
+      "hop": "2hop",
+      "question": "According to the organization that creates census county division, what is the total area in square miles?",
+      "answer": "17.037 square miles",
+      "goldChunkIds": [
+        "musique-340f0ffa767d8682",
+        "musique-61a044babe6e04db"
+      ],
+      "retrievedChunkIds": [
+        "musique-594458b5a986e62f",
+        "musique-1e5aa279c4168c12",
+        "musique-f43b48300459c6ac",
+        "musique-747487e89bc47b30",
+        "musique-4be2c90e06a9ca41",
+        "musique-9d30a163e7be4d4e",
+        "musique-0e29db77e17a017f",
+        "musique-ebfd07a2b7833243",
+        "musique-eebbf97c7158c33c",
+        "musique-994ac5d541c47da0"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__208602_11402",
+      "hop": "2hop",
+      "question": "According to the developer of Topologically Integrated Geographic Encoding and Referencing, what is the total area of Atlantic City in square miles?",
+      "answer": "17.037 square miles",
+      "goldChunkIds": [
+        "musique-340f0ffa767d8682",
+        "musique-8e62ee48e29a4dc1"
+      ],
+      "retrievedChunkIds": [
+        "musique-5a2c72808105e583",
+        "musique-f402cc031ea6c30d",
+        "musique-9d735726f926d26c",
+        "musique-15a2f186cbfd5765",
+        "musique-144254fda8e76204",
+        "musique-fb36f986ad897f39",
+        "musique-12494ba12c70006e",
+        "musique-a61168d03a2cfcce",
+        "musique-2c7273bbda94d3fd",
+        "musique-fa62e129f6bcaba7"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__567471_123283",
+      "hop": "2hop",
+      "question": "Where did the producer of On Dangerous Ground study or work?",
+      "answer": "Clifton College",
+      "goldChunkIds": [
+        "musique-7c2ff3f4c632b1db",
+        "musique-dc8e2ddcbc32036e"
+      ],
+      "retrievedChunkIds": [
+        "musique-dc8e2ddcbc32036e",
+        "musique-5f429beb1a53323e",
+        "musique-cb922fe2618deb7b",
+        "musique-7c2ff3f4c632b1db",
+        "musique-441336d0cb8f45e9",
+        "musique-8e63ada775f735a9",
+        "musique-287888500ddc3996",
+        "musique-b0fac036f1b337c9",
+        "musique-4cf499c627751186",
+        "musique-6b20c98a6227a935"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__574496_123283",
+      "hop": "2hop",
+      "question": "Where did the founder of the Acting Company study?",
+      "answer": "Clifton College",
+      "goldChunkIds": [
+        "musique-7c2ff3f4c632b1db",
+        "musique-c2dfb468b01a3732"
+      ],
+      "retrievedChunkIds": [
+        "musique-c2dfb468b01a3732",
+        "musique-4dfae01f6f0beac1",
+        "musique-4d41b561b2ff83c0",
+        "musique-6fa67873cf05cb65",
+        "musique-0f67e6b349794bab",
+        "musique-ba57dfa3319d55b8",
+        "musique-46929a8081629b2a",
+        "musique-e03ec1c7887de256",
+        "musique-d4f40970cbbeb58f",
+        "musique-5968b51386d5e35f"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__8347_8311",
+      "hop": "2hop",
+      "question": "When did the crowning of the person under whom the Chapter House was built happen?",
+      "answer": "1216",
+      "goldChunkIds": [
+        "musique-0c3c2579cebeaf34",
+        "musique-8729fb3df0534bc0"
+      ],
+      "retrievedChunkIds": [
+        "musique-8729fb3df0534bc0",
+        "musique-322d9dc8e16193c3",
+        "musique-0c3c2579cebeaf34",
+        "musique-f9a089702db2d588",
+        "musique-f3246c39f51ca159",
+        "musique-1f2c47a183ad4c0a",
+        "musique-a9063ca2d73d3d05",
+        "musique-1d8cec2ac58f4a18",
+        "musique-ba65e4a4d0fa5d1d",
+        "musique-ab1ce33ef7af6478"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__71034_343058",
+      "hop": "2hop",
+      "question": "Who is the spouse of the person who sang holding out for a hero in shrek 2?",
+      "answer": "Adrian Edmondson",
+      "goldChunkIds": [
+        "musique-a71cae2d6bfa105d",
+        "musique-d6397875255e8fb7"
+      ],
+      "retrievedChunkIds": [
+        "musique-8da80395c94447c1",
+        "musique-12da1bb3f4d4367c",
+        "musique-912a2035ff4cf807",
+        "musique-4d41b561b2ff83c0",
+        "musique-c4bef5640775ae67",
+        "musique-29d0100d1e388527",
+        "musique-343bd947a1c9f314",
+        "musique-5cae29558cf0bd6a",
+        "musique-6bcc7dd3b293e146",
+        "musique-0aac12885a2dce30"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__109131_343058",
+      "hop": "2hop",
+      "question": "Who is the spouse of the creator of Absolutely Fabulous?",
+      "answer": "Adrian Edmondson",
+      "goldChunkIds": [
+        "musique-3024e7c314d3d0d2",
+        "musique-d6397875255e8fb7"
+      ],
+      "retrievedChunkIds": [
+        "musique-3024e7c314d3d0d2",
+        "musique-a9063ca2d73d3d05",
+        "musique-ddc5c06f016535d0",
+        "musique-a28012b36eabf312",
+        "musique-fe17961954ed0067",
+        "musique-320dfefd03e501c0",
+        "musique-fc83949f3505b754",
+        "musique-d1881c4f3233ecdf",
+        "musique-6899c84c27887e3e",
+        "musique-22aff9fee6b5776a"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__56851_343058",
+      "hop": "2hop",
+      "question": "Who is the spouse of the actress who played the fairy god mother in Shrek 2?",
+      "answer": "Adrian Edmondson",
+      "goldChunkIds": [
+        "musique-a3c2a6992c99d4c2",
+        "musique-d6397875255e8fb7"
+      ],
+      "retrievedChunkIds": [
+        "musique-923416e165c237fa",
+        "musique-afd4f2edfd9df83b",
+        "musique-a71cae2d6bfa105d",
+        "musique-3aca0f3e8129bf59",
+        "musique-f43b48300459c6ac",
+        "musique-747487e89bc47b30",
+        "musique-4be2c90e06a9ca41",
+        "musique-9d30a163e7be4d4e",
+        "musique-0e29db77e17a017f",
+        "musique-ebfd07a2b7833243"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__14092_8311",
+      "hop": "2hop",
+      "question": "When was John's eldest son crowned?",
+      "answer": "1216",
+      "goldChunkIds": [
+        "musique-0c3c2579cebeaf34",
+        "musique-f9a089702db2d588"
+      ],
+      "retrievedChunkIds": [
+        "musique-2d824684e9582422",
+        "musique-5a16366af5ef6ecc",
+        "musique-6b3e9fc9ca5a79a6",
+        "musique-1d22412dad681afc",
+        "musique-1bf043246f681dd5",
+        "musique-b8c41c8f71d61ca5",
+        "musique-10ce7fb28132f8dc",
+        "musique-2a310736ff56f746",
+        "musique-f370f70bde6d4971",
+        "musique-f6dc646f13a2b5ea"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__422295_8311",
+      "hop": "2hop",
+      "question": "When was the sibling of Alice de Lusignan, Countess of Surrey crowned?",
+      "answer": "1216",
+      "goldChunkIds": [
+        "musique-0c3c2579cebeaf34",
+        "musique-5e5913fff6e3ad9c"
+      ],
+      "retrievedChunkIds": [
+        "musique-5e5913fff6e3ad9c",
+        "musique-a9063ca2d73d3d05",
+        "musique-edb15dd66f654e65",
+        "musique-f77fcb9fe2ec1b2a",
+        "musique-df265f550b27c61a",
+        "musique-522e7025335a06b2",
+        "musique-e9885be230172e59",
+        "musique-e28f45b07ebc8462",
+        "musique-62ec4c0cedce10f0",
+        "musique-71065fc8da4f7d6b"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__176712_8311",
+      "hop": "2hop",
+      "question": "What year was the father of Katherine of England crowned?",
+      "answer": "1216",
+      "goldChunkIds": [
+        "musique-0c3c2579cebeaf34",
+        "musique-f3246c39f51ca159"
+      ],
+      "retrievedChunkIds": [
+        "musique-693744f80d4df049",
+        "musique-997c80acb70fd1aa",
+        "musique-5e462afca18e4ddd",
+        "musique-bf1882853d028430",
+        "musique-421200fc3d6eb1ae",
+        "musique-45b9600a71a7e793",
+        "musique-3c596289098dc46e",
+        "musique-56a90b8e9344c945",
+        "musique-3afe38896867a592",
+        "musique-c079c27126f98f60"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__159741_161674",
+      "hop": "2hop",
+      "question": "What month did the person who retained trust in Longchamp go away to the Holy Land?",
+      "answer": "October",
+      "goldChunkIds": [
+        "musique-3b7e1e7117c9e98f",
+        "musique-8f94481fc6ecf8a2"
+      ],
+      "retrievedChunkIds": [
+        "musique-7aa7ace37f30bd1f",
+        "musique-3b7e1e7117c9e98f",
+        "musique-322d9dc8e16193c3",
+        "musique-bffb35d095c6d204",
+        "musique-f9a089702db2d588",
+        "musique-8f94481fc6ecf8a2",
+        "musique-fe3e0153106d1a2a",
+        "musique-077827f5b9e850ba",
+        "musique-a5fa208e76e65406",
+        "musique-6a351e082259608e"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__159741_40169",
+      "hop": "2hop",
+      "question": "When did a storm disperse the fleet led by the English king who trusted William de Longchamp?",
+      "answer": "1191",
+      "goldChunkIds": [
+        "musique-077827f5b9e850ba",
+        "musique-3b7e1e7117c9e98f"
+      ],
+      "retrievedChunkIds": [
+        "musique-f926a7b5aa27d463",
+        "musique-511443237600bde2",
+        "musique-96acaae668b37228",
+        "musique-45015b3f96cba437",
+        "musique-ab1ce33ef7af6478",
+        "musique-67f2f5f18f7abd11",
+        "musique-322d9dc8e16193c3",
+        "musique-9fa891ef33cc3aa5",
+        "musique-0b65a3fc5c739d1b",
+        "musique-3875409717f1bf74"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__88906_55840",
+      "hop": "2hop",
+      "question": "In the King's Speech, who played the person who was the King of England in 1950?",
+      "answer": "Colin Firth",
+      "goldChunkIds": [
+        "musique-55df671c5310fcd4",
+        "musique-af90aae6dd761d72"
+      ],
+      "retrievedChunkIds": [
+        "musique-029cfda5ce7430ab",
+        "musique-7dec5fab63d2dabb",
+        "musique-93cce3428f7f9c18",
+        "musique-b3e316b07b8cb2e1",
+        "musique-c66d47cdfabb4577",
+        "musique-f2b8d16450c1ede5",
+        "musique-a1d9091421dfa775",
+        "musique-d50afbebe88537b6",
+        "musique-49e9d8d91192a742",
+        "musique-23295767518bd21e"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__71755_463572",
+      "hop": "2hop",
+      "question": "What is the record label for the singer who originally sang You Belong To Me.",
+      "answer": "MGM Records",
+      "goldChunkIds": [
+        "musique-43fa6d6382d91f9c",
+        "musique-52eee9e4848ba70d"
+      ],
+      "retrievedChunkIds": [
+        "musique-5968b51386d5e35f",
+        "musique-6c1c301ce6f9161c",
+        "musique-d42bcdc6bf94a869",
+        "musique-b65608f89f5625f3",
+        "musique-4d41b561b2ff83c0",
+        "musique-6fa67873cf05cb65",
+        "musique-0f67e6b349794bab",
+        "musique-ba57dfa3319d55b8",
+        "musique-46929a8081629b2a",
+        "musique-e03ec1c7887de256"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__67956_463572",
+      "hop": "2hop",
+      "question": "What record label does the artist who sang you belong to me belong to?",
+      "answer": "MGM Records",
+      "goldChunkIds": [
+        "musique-43fa6d6382d91f9c",
+        "musique-d04409e3db5e2013"
+      ],
+      "retrievedChunkIds": [
+        "musique-5968b51386d5e35f",
+        "musique-6c1c301ce6f9161c",
+        "musique-d42bcdc6bf94a869",
+        "musique-b65608f89f5625f3",
+        "musique-4d41b561b2ff83c0",
+        "musique-6fa67873cf05cb65",
+        "musique-0f67e6b349794bab",
+        "musique-ba57dfa3319d55b8",
+        "musique-46929a8081629b2a",
+        "musique-e03ec1c7887de256"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__398344_85513",
+      "hop": "2hop",
+      "question": "When is the next episode of the series that Steven the Sword Fighter is a part of being released?",
+      "answer": "TBD",
+      "goldChunkIds": [
+        "musique-9ee927f0649e0b6b",
+        "musique-a2b160d9a317a33e"
+      ],
+      "retrievedChunkIds": [
+        "musique-d744ccdf6df11cdd",
+        "musique-21c1c1965e13045d",
+        "musique-c2f1939c69490572",
+        "musique-02d7b566df949615",
+        "musique-65e51b13d1727e39",
+        "musique-c0f25f012cb611b4",
+        "musique-3351ed9902176e1a",
+        "musique-00efba3a119d19ef",
+        "musique-96ebd3bea8f69778",
+        "musique-64810905a7d9ca9a"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__42578_55840",
+      "hop": "2hop",
+      "question": "Who played the monarch at the end of WW2 in The King's Speech?",
+      "answer": "Colin Firth",
+      "goldChunkIds": [
+        "musique-82188b6de10c0a6c",
+        "musique-af90aae6dd761d72"
+      ],
+      "retrievedChunkIds": [
+        "musique-029cfda5ce7430ab",
+        "musique-7dec5fab63d2dabb",
+        "musique-93cce3428f7f9c18",
+        "musique-b3e316b07b8cb2e1",
+        "musique-c66d47cdfabb4577",
+        "musique-f2b8d16450c1ede5",
+        "musique-a1d9091421dfa775",
+        "musique-d50afbebe88537b6",
+        "musique-49e9d8d91192a742",
+        "musique-23295767518bd21e"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__28203_55840",
+      "hop": "2hop",
+      "question": "Who played king whose regal Name did Albert Adopt in the king's speech?",
+      "answer": "Colin Firth",
+      "goldChunkIds": [
+        "musique-4d69b40fe96212aa",
+        "musique-af90aae6dd761d72"
+      ],
+      "retrievedChunkIds": [
+        "musique-d5f55b7cb52a7dcf",
+        "musique-a600a4b0e8dc0022",
+        "musique-f43b48300459c6ac",
+        "musique-747487e89bc47b30",
+        "musique-4be2c90e06a9ca41",
+        "musique-9d30a163e7be4d4e",
+        "musique-0e29db77e17a017f",
+        "musique-ebfd07a2b7833243",
+        "musique-eebbf97c7158c33c",
+        "musique-994ac5d541c47da0"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__64323_55840",
+      "hop": "2hop",
+      "question": "Who played the king that was king of england in 1951 in the king's speech?",
+      "answer": "Colin Firth",
+      "goldChunkIds": [
+        "musique-82188b6de10c0a6c",
+        "musique-af90aae6dd761d72"
+      ],
+      "retrievedChunkIds": [
+        "musique-029cfda5ce7430ab",
+        "musique-7dec5fab63d2dabb",
+        "musique-93cce3428f7f9c18",
+        "musique-b3e316b07b8cb2e1",
+        "musique-c66d47cdfabb4577",
+        "musique-f2b8d16450c1ede5",
+        "musique-a1d9091421dfa775",
+        "musique-d50afbebe88537b6",
+        "musique-49e9d8d91192a742",
+        "musique-23295767518bd21e"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__85713_84469",
+      "hop": "2hop",
+      "question": "In A League of Their Own, who played the husband of the actress who played Thelma in Thelma and Louise?",
+      "answer": "Bill Pullman",
+      "goldChunkIds": [
+        "musique-b7b3954b0b550bab",
+        "musique-e2e7272d0fd668c0"
+      ],
+      "retrievedChunkIds": [
+        "musique-52b44edda07864e2",
+        "musique-b7b3954b0b550bab",
+        "musique-c66d47cdfabb4577",
+        "musique-cf308b96f9f28a81",
+        "musique-6144e53dfba40a2c",
+        "musique-75981f4911a86478",
+        "musique-e8e584e5307ab3d1",
+        "musique-b3e316b07b8cb2e1",
+        "musique-c933ff3a076380b9",
+        "musique-33c3ba7314e1cf4b"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__79875_84469",
+      "hop": "2hop",
+      "question": "In the movie A League of their Own, who played the husband of the person who also played Thelma in the movie Thelma and Louise?",
+      "answer": "Bill Pullman",
+      "goldChunkIds": [
+        "musique-cf308b96f9f28a81",
+        "musique-e2e7272d0fd668c0"
+      ],
+      "retrievedChunkIds": [
+        "musique-52b44edda07864e2",
+        "musique-b7b3954b0b550bab",
+        "musique-c66d47cdfabb4577",
+        "musique-cf308b96f9f28a81",
+        "musique-6144e53dfba40a2c",
+        "musique-75981f4911a86478",
+        "musique-b3e316b07b8cb2e1",
+        "musique-33c3ba7314e1cf4b",
+        "musique-7dec5fab63d2dabb",
+        "musique-93cce3428f7f9c18"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__85713_72187",
+      "hop": "2hop",
+      "question": "The actor who played Thelma in \"Thelma and Louise\" also played which character in \"A League of Their Own\"?",
+      "answer": "Dottie Hinson",
+      "goldChunkIds": [
+        "musique-b7b3954b0b550bab",
+        "musique-e8e584e5307ab3d1"
+      ],
+      "retrievedChunkIds": [
+        "musique-52b44edda07864e2",
+        "musique-b7b3954b0b550bab",
+        "musique-c66d47cdfabb4577",
+        "musique-cf308b96f9f28a81",
+        "musique-6144e53dfba40a2c",
+        "musique-75981f4911a86478",
+        "musique-e8e584e5307ab3d1",
+        "musique-b3e316b07b8cb2e1",
+        "musique-af3ebca8186e034a",
+        "musique-33c3ba7314e1cf4b"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__204146_850295",
+      "hop": "2hop",
+      "question": "Who is the sibling of the author of Kapalkundala?",
+      "answer": "Sanjib Chandra",
+      "goldChunkIds": [
+        "musique-b66cb540f8ccbc81",
+        "musique-d5bf7d918193a488"
+      ],
+      "retrievedChunkIds": [
+        "musique-b66cb540f8ccbc81",
+        "musique-40f9d81ac5bbb799",
+        "musique-00b5af81aa4e01bf",
+        "musique-15c1a59cad0f3fc6",
+        "musique-ac463ce3abccfa53",
+        "musique-a43a1efbbb60aeda",
+        "musique-dcd31de2e64b7e82",
+        "musique-86cc5ab61be6fa8b",
+        "musique-e4fcd04aaf1dd573",
+        "musique-75cde40d8558e730"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2hop__28287_89399",
+      "hop": "2hop",
+      "question": "Who is the voice of the character in Spongebob Squarepants with the same name as the creature that annelid larvae live like?",
+      "answer": "Mr. Lawrence",
+      "goldChunkIds": [
+        "musique-0f8bda7545f0e38f",
+        "musique-8fd9f00d7436c1c5"
+      ],
+      "retrievedChunkIds": [
+        "musique-2b1a1c1fa02b64cd",
+        "musique-4d41b561b2ff83c0",
+        "musique-6fa67873cf05cb65",
+        "musique-0f67e6b349794bab",
+        "musique-ba57dfa3319d55b8",
+        "musique-46929a8081629b2a",
+        "musique-e03ec1c7887de256",
+        "musique-d4f40970cbbeb58f",
+        "musique-5968b51386d5e35f",
+        "musique-b08d6d0f7d8c9e7e"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__84103_345851",
+      "hop": "2hop",
+      "question": "The actor who plays the girl in Spiderman Homecoming is signed to which record label?",
+      "answer": "Hollywood Records",
+      "goldChunkIds": [
+        "musique-74010d1d504d96ed",
+        "musique-849b90045cb4cb31"
+      ],
+      "retrievedChunkIds": [
+        "musique-5968b51386d5e35f",
+        "musique-6c1c301ce6f9161c",
+        "musique-4d41b561b2ff83c0",
+        "musique-6fa67873cf05cb65",
+        "musique-0f67e6b349794bab",
+        "musique-ba57dfa3319d55b8",
+        "musique-46929a8081629b2a",
+        "musique-e03ec1c7887de256",
+        "musique-d4f40970cbbeb58f",
+        "musique-b08d6d0f7d8c9e7e"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__142621_225454",
+      "hop": "2hop",
+      "question": "What is the record label of the co-writer and recording artist of Permission to Fly?",
+      "answer": "Hollywood Records",
+      "goldChunkIds": [
+        "musique-03e7ec4b52c429a1",
+        "musique-0f7f23af0e665350"
+      ],
+      "retrievedChunkIds": [
+        "musique-5968b51386d5e35f",
+        "musique-6c1c301ce6f9161c",
+        "musique-4d41b561b2ff83c0",
+        "musique-6fa67873cf05cb65",
+        "musique-0f67e6b349794bab",
+        "musique-ba57dfa3319d55b8",
+        "musique-46929a8081629b2a",
+        "musique-e03ec1c7887de256",
+        "musique-d4f40970cbbeb58f",
+        "musique-b08d6d0f7d8c9e7e"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "2hop__86689_728109",
+      "hop": "2hop",
+      "question": "What team drafted the winner of the NBA scoring title this year?",
+      "answer": "Oklahoma City Thunder",
+      "goldChunkIds": [
+        "musique-aa6aa347de230695",
+        "musique-bcc86c1842ed929d"
+      ],
+      "retrievedChunkIds": [
+        "musique-f5a8d6fc9939e5ae",
+        "musique-db6fd82f297ea64b",
+        "musique-e08772e0f01d5e73",
+        "musique-c7896323bc3ee89b",
+        "musique-b6929377f3d4c5d9",
+        "musique-ea7f999b75f85d4a",
+        "musique-ac09bc0371c39df6",
+        "musique-69e9f2cff6aee86d",
+        "musique-89a54fd5fc93b9bf",
+        "musique-e62daa88491dae87"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    }
+  ],
+  "skipped": [
+    {
+      "id": "2hop__488811_30110",
+      "question": "What happened to the Curonians who lived in the area where Erich Zakowski was born?",
+      "error": "ollama embed 500: {\"error\":\"failed to encode response: json: unsupported value: NaN\"} | batch=1 maxlen=85 sample=['What happened to the Curonians who lived in the area where Erich Zakowski was bo']"
+    },
+    {
+      "id": "2hop__79875_72187",
+      "question": "What character in A League of their Own was played by the actress who played Thelma in the movie Thelma and Louise?",
+      "error": "ollama embed 500: {\"error\":\"failed to encode response: json: unsupported value: NaN\"} | batch=1 maxlen=117 sample=['What character in A League of their Own was played by the actress who played The']"
+    }
+  ]
+}
