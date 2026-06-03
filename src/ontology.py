@@ -16,6 +16,22 @@ ENTITIES = {
     'Date':                  'Absolute dates and date ranges.',
 }
 
+# General-knowledge ontology for English-language corpora (e.g., MuSiQue / Wikipedia).
+ENTITIES_EN = {
+    'Person':       'Individual people, real or fictional.',
+    'Organization': 'Companies, institutions, bands, teams, agencies, governments.',
+    'Location':     'Countries, cities, regions, geographic features, landmarks.',
+    'Work':         'Films, books, songs, albums, paintings, plays, video games.',
+    'Event':        'Battles, wars, conferences, ceremonies, scheduled events.',
+    'Date':         'Specific dates, years, decades, or date ranges.',
+    'Nationality':  'National, ethnic, or cultural affiliations.',
+    'Occupation':   'Jobs, professions, roles, titles.',
+    'Award':        'Prizes, honors, decorations, recognitions.',
+    'Language':     'Spoken or written languages.',
+}
+
+ENTITIES_BY_LANG = {'ar': ENTITIES, 'en': ENTITIES_EN}
+
 RELATIONSHIPS = {
     'ISSUED_BY':      (['License', 'Document'],         ['RegulatoryBody', 'Person']),
     'GOVERNS':        (['Law', 'Article'],              ['BankingInstitution']),
