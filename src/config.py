@@ -7,6 +7,7 @@ load_dotenv()
 NEO4J_URI = os.environ['NEO4J_URI']
 NEO4J_USER = os.environ['NEO4J_USER']
 NEO4J_PASSWORD = os.environ['NEO4J_PASSWORD']
+NEO4J_DB = os.environ.get('NEO4J_DB', 'neo4j')
 
 # Ollama / llama-server endpoints
 OLLAMA_URL = os.environ.get('OLLAMA_URL', 'http://localhost:11434/v1/chat/completions')

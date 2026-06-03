@@ -4,7 +4,7 @@ from embedding import embedQuery, embedTexts
 from docAccess import allowedDocs
 from ontology import RELATIONSHIP_DESCRIPTIONS
 from config import (
-    NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD,
+    NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, NEO4J_DB,
     RRF_K, OVERFETCH, PATH_DEPTH, SEED_K, PATH_LIMIT,
     REL_TYPE_TOP, REL_TYPE_FLOOR, ENTITY_WEIGHT,
 )
@@ -193,7 +193,7 @@ def vectorSearch(query, k, allowed):
     emb = embedQuery(query)
     print(f"[DEBUG] vectorSearch: embedding computed, dim={len(emb)}")
     with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
-        with driver.session() as session:
+        with driver.session(database=NEO4J_DB) as session:
             results = session.execute_read(vectorQuery, emb, k, allowed)
     print(f"[retriever] vectorSearch returned {len(results)} chunks", flush=True)
     for r in results:
@@ -207,7 +207,7 @@ def hybridSearch(query, k, allowed):
     emb = embedQuery(query)
     print(f"[DEBUG] hybridSearch: embedding computed, dim={len(emb)}")
     with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
-        with driver.session() as session:
+        with driver.session(database=NEO4J_DB) as session:
             v = session.execute_read(vectorQuery, emb, k * 2, allowed)
             f = session.execute_read(fulltextQuery, query, k * 2, allowed)
     print(f"[DEBUG] hybridSearch: vector={len(v)}, fulltext={len(f)}")
@@ -221,7 +221,7 @@ def graphSearch(query, k, allowed):
     relTypes = selectRelevantRelTypes(queryEmb)
 
     with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
-        with driver.session() as session:
+        with driver.session(database=NEO4J_DB) as session:
             seeds = session.execute_read(seedEntities, queryEmb, SEED_K, allowed)
             if not seeds:
                 print("[DEBUG] graphSearch: no seed entities found, returning []")

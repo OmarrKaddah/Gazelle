@@ -36,6 +36,7 @@ def trainCrf(X_train, y_train):
         c2=0.1,
         max_iterations=200,
         all_possible_transitions=True,
+        verbose=True,
     )
     crf.fit(X_train, y_train)
     print(f"[trainCrf] done — {len(crf.classes_)} classes: {crf.classes_}")
