@@ -4,7 +4,7 @@ import os
 import uuid
 
 import httpx
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
@@ -12,7 +12,7 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from neo4j import GraphDatabase
 from retriever import retrieve
-from auth import bearer, getCurrentUser, login, logout, userFromToken
+from auth import bearer, getCurrentUser, login, logout, requireAdmin, userFromToken
 from docAccess import LEVELS
 from db.session import asyncSessionFactory, getDbSession
 from db.repositories.chatRepo import (
@@ -256,6 +256,44 @@ async def meEndpoint(user=Depends(getCurrentUser)):
 @app.post("/api/retrieve")
 def retrieveEndpoint(req: ChatRequest, user=Depends(getCurrentUser)):
     return {"chunks": retrieve(req.query, mode=req.mode, k=req.k, clearance=user['clearance'])}
+
+
+@app.post("/api/admin/documents/publish")
+async def publishDocumentsEndpoint(
+    files: list[UploadFile] = File(...),
+    user=Depends(requireAdmin),
+    session: AsyncSession = Depends(getDbSession),
+):
+    payloads = [(f.filename, await f.read()) for f in files]
+    # Lazy import: ingest pulls in heavy OCR/NER/ML models. Importing it here
+    # (not at module top) keeps them out of API startup so the server boots
+    # light; they load on the first publish instead.
+    from ingest import ingestUploads
+    # Ingestion is blocking (OCR + LLM + Neo4j); run it off the event loop.
+    result = await asyncio.to_thread(ingestUploads, payloads)
+    await logAudit(
+        session, uuid.UUID(user["id"]), "documents.publish", "document",
+        ",".join(name for name, _ in payloads),
+    )
+    await session.commit()
+    return {"ok": True, **result}
+
+
+@app.post("/api/admin/documents/publish")
+async def publishDocumentsEndpoint(
+    files: list[UploadFile] = File(...),
+    user=Depends(requireAdmin),
+    session: AsyncSession = Depends(getDbSession),
+):
+    payloads = [(f.filename, await f.read()) for f in files]
+    # Pipeline is blocking (OCR / LLM / Neo4j) — run it off the event loop.
+    result = await asyncio.to_thread(ingestUploads, payloads)
+    await logAudit(
+        session, uuid.UUID(user["id"]), "documents.publish", "document",
+        ",".join(name for name, _ in payloads),
+    )
+    await session.commit()
+    return {"ok": True, **result}
 
 
 def queryGraph(tx, search, entityType, limit):

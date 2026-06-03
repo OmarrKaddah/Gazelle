@@ -129,6 +129,77 @@ To keep the repository clean, the following are excluded via
   `bootstrap.py`, `inspect_memory.py`, PowerShell convenience scripts
 
 
+---
+
+## Admin Document Publishing
+
+A role-gated admin interface for uploading new source documents and ingesting
+them into the **live** knowledge graph **incrementally** — new documents,
+entities, and relationships are added without deleting or rebuilding the
+existing graph.
+
+### Frontend (Admin console)
+
+- Users with the `Admin` role are redirected to a dedicated **Admin Console**
+  on login; everyone else lands on the normal chat app. Role logic is
+  centralized in `frontend/src/lib/roles.js` and enforced by
+  `frontend/src/components/RequireRole.jsx`.
+- `frontend/src/components/AdminPage.jsx` — drag-and-drop upload UI, selected
+  file list, and a **Publish** button wired to the real backend with per-file
+  success/error reporting. A **Chat with Gazelle** button switches to the chat
+  UI; the sidebar gains an **Admin Console** item to return.
+- `frontend/src/api/admin.js` — multipart upload to the publish endpoint.
+- Modified: `App.jsx` (top-level area routing + admin login redirect),
+  `Sidebar.jsx` (admin-only nav item), `Icons.jsx` (upload / file icons).
+
+### Backend (publish endpoint + incremental ingestion)
+
+- `POST /api/admin/documents/publish` (`src/chatApi.py`) — multipart upload,
+  protected by the new `requireAdmin` dependency in `src/auth.py`
+  (**server-side** role enforcement, not just the UI). Saves files to
+  `Documents/`, runs ingestion off the event loop, and writes an audit log.
+- `src/ingest.py` — the incremental orchestrator. Runs the existing pipeline
+  stages per uploaded document and writes to Neo4j with the **MERGE-based**
+  writer (`kgWriter.writeDoc`) — **no `clearDb`**, so existing graph data is
+  preserved. Existing entity nodes are reused; relationships and aliases are
+  de-duplicated. The global entity-embed and `deduplicate()` passes run once at
+  the end so new entities link into the existing graph.
+- `src/docConvert.py` — no-OCR readers: digital PDFs are read via their text
+  layer (`pypdf`), Word via paragraph/table extraction. Only images and scanned
+  PDFs (no text layer) fall back to the OCR vision model. Every path produces
+  the same `output/{doc}.json` sidecar the parser consumes.
+
+### Supported upload types
+
+| Type            | Ingestion path              | Needs vision model? |
+| --------------- | --------------------------- | ------------------- |
+| Digital PDF     | text layer via `pypdf`      | no                  |
+| Scanned PDF     | OCR fallback                | yes                 |
+| Word (`.docx`)  | paragraph / table extract   | no                  |
+| Images (`.png`, `.jpg`, …) | OCR              | yes                 |
+| Text (`.md`, `.txt`)       | passthrough      | no                  |
+
+### Deployment helpers
+
+- `runners/createDb.py` — creates the PostgreSQL `gazelle` database from
+  `DATABASE_URL` (no `psql` required).
+- `runners/pullModels.py` — pulls every Ollama model the pipeline uses, read
+  from `.env` so it stays in sync with the app.
+- `docs/BANK_SETUP.md` — full server deployment checklist.
+
+### Relevant `.env` settings
+
+```
+OLLAMA_VISION_MODEL   # OCR of scanned PDFs / images (e.g. qwen3-vl:8b-instruct-q4_K_M)
+OLLAMA_EXTRACT_MODEL  # relationship extraction (defaults to OLLAMA_TEXT_MODEL)
+OLLAMA_TIMEOUT        # per-request timeout in seconds for local models (default 600)
+NER_STRATEGY          # llm | gliner | hybrid
+CHUNKER_TYPE          # default (no model) | semantic (downloads BGE-M3 from HF)
+```
+
+
+---
+
 ## Tech stack
 
 - **OCR**: Qwen3-VL via Ollama (or llama-server)

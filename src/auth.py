@@ -59,3 +59,9 @@ async def getCurrentUser(
     if not user:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
     return user
+
+
+async def requireAdmin(user=Depends(getCurrentUser)):
+    if user["role"] != "Admin":
+        raise HTTPException(status_code=403, detail="Admin role required")
+    return user

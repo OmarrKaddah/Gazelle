@@ -99,6 +99,21 @@ export const XIcon = (p) => (
   </svg>
 );
 
+export const UploadIcon = (p) => (
+  <svg {...baseProps} {...p}>
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <path d="M12 16V4" />
+    <path d="M7 9l5-5 5 5" />
+  </svg>
+);
+
+export const FileIcon = (p) => (
+  <svg {...baseProps} {...p}>
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+    <path d="M14 2v6h6" />
+  </svg>
+);
+
 export const LogoMark = ({ className = '', ...p }) => (
   <div
     className={`overflow-hidden rounded-full bg-white ring-1 ring-cream-border flex items-center justify-center ${className}`}

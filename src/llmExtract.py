@@ -12,6 +12,7 @@ load_dotenv()
 
 OLLAMA_URL = os.getenv('OLLAMA_URL', 'http://localhost:11434/v1/chat/completions')
 OLLAMA_TEXT_MODEL = os.getenv('OLLAMA_TEXT_MODEL', 'qwen2.5:72b-instruct-q4_K_M')
+OLLAMA_EXTRACT_MODEL = os.getenv('OLLAMA_EXTRACT_MODEL', OLLAMA_TEXT_MODEL)
 PARALLEL_CHUNKS = int(os.getenv('OLLAMA_NUM_PARALLEL', '4'))
 
 
