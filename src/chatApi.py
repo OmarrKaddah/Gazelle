@@ -438,6 +438,7 @@ async def createChatEndpoint(
     row = await createChat(session, uuid.UUID(user["id"]), req.title or "New conversation")
     await logAudit(session, uuid.UUID(user["id"]), "chat.create", "chat", str(row.id))
     await session.commit()
+    await session.refresh(row)
     messages = await listMessages(session, row.id, 200, 0)
     return {"chat": {**serializeChat(row), "messages": [serializeMessage(msg) for msg in messages]}}
 
@@ -470,6 +471,7 @@ async def updateChatEndpoint(
     row.title = req.title
     await logAudit(session, uuid.UUID(user["id"]), "chat.update", "chat", str(row.id))
     await session.commit()
+    await session.refresh(row)
     return {"chat": serializeChat(row)}
 
 
@@ -511,6 +513,7 @@ async def putChatMemoryEndpoint(
     memory = await upsertChatMemory(session, row.id, req.summary, req.extractedEntities, req.metadata)
     await logAudit(session, uuid.UUID(user["id"]), "chat.memory.upsert", "chat", chatId)
     await session.commit()
+    await session.refresh(memory)
     return {"memory": serializeChatMemory(memory)}
 
 
@@ -540,6 +543,7 @@ async def putUserMemoryEndpoint(
     )
     await logAudit(session, uuid.UUID(user["id"]), "user.memory.upsert", "user", user["id"])
     await session.commit()
+    await session.refresh(row)
     return {"memory": serializeUserMemory(row)}
 
 

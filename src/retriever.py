@@ -1,5 +1,6 @@
 import numpy as np
 from neo4j import GraphDatabase
+from neo4j.exceptions import ClientError
 from embedding import embedQuery, embedTexts
 from docAccess import allowedDocs
 from ontology import RELATIONSHIP_DESCRIPTIONS
