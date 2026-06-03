@@ -43,14 +43,31 @@ def buildAnnotation(chunkMeta, entities):
     }
 
 
-if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print("usage: python extractionsToCorrections.py <docName> [docName2 ...]")
-        print("  reads:  extractions/{docName}_entities.json + chunks/{docName}.json")
-        print("  writes: annotations/corrected.json")
-        sys.exit(1)
+def discoverDocNames():
+    entityFiles = sorted(Path('extractions').glob('*_entities.json'))
+    docNames = []
+    for f in entityFiles:
+        if f.is_file():
+            docName = f.stem.replace('_entities', '')
+            chunkFile = Path(f'chunks/{docName}.json')
+            if chunkFile.exists():
+                docNames.append(docName)
+            else:
+                print(f"[extractionsToCorrections] skipping {f.name} — no matching chunks/{docName}.json")
+    return docNames
 
-    docNames = sys.argv[1:]
+
+if __name__ == '__main__':
+    if len(sys.argv) >= 2:
+        docNames = sys.argv[1:]
+    else:
+        print("[extractionsToCorrections] no args — scanning extractions/ folder")
+        docNames = discoverDocNames()
+        if not docNames:
+            print("[extractionsToCorrections] no matching extraction+chunk pairs found")
+            sys.exit(1)
+        print(f"[extractionsToCorrections] found: {docNames}")
+
     allAnnotations = []
 
     for docName in docNames:
