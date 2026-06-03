@@ -14,7 +14,7 @@ from neo4j import GraphDatabase
 from retriever import retrieve
 from auth import bearer, getCurrentUser, login, logout, userFromToken
 from docAccess import LEVELS
-from db.session import asyncSessionFactory, getDbSession
+from db.session import asyncSessionFactory, getDbSession, initDb
 from db.repositories.chatRepo import (
     createChat, listChats, getChatById, deleteChat, createMessage, listMessages,
 )
@@ -39,6 +39,13 @@ PROVIDERS = {
 
 
 app = FastAPI(title="Gazelle API")
+
+
+@app.on_event("startup")
+async def onStartup():
+    await initDb()
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

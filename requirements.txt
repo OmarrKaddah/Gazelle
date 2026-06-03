@@ -27,8 +27,7 @@ uvicorn
 FlagEmbedding
 gliner
 sqlalchemy>=2.0.36
-asyncpg>=0.30.0
-alembic>=1.14.0
+aiosqlite>=0.20.0
 bcrypt>=4.2.0
 httpx>=0.28.0
 streamlit>=1.32.0
@@ -43,8 +42,7 @@ pypdfium2>=4.30.0
 langchain_experimental
 
 sqlalchemy>=2.0.36
-asyncpg>=0.30.0
-alembic>=1.14.0
+aiosqlite>=0.20.0
 bcrypt>=4.2.0
 httpx>=0.28.0
 streamlit>=1.37.0
