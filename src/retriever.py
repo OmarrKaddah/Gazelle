@@ -1,7 +1,6 @@
 import numpy as np
 from neo4j import GraphDatabase
 from embedding import embedQuery, embedTexts
-from docAccess import allowedDocs
 from ontology import RELATIONSHIP_DESCRIPTIONS
 from config import (
     NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD,
@@ -26,12 +25,11 @@ def cosineSim(a, b):
     return float(a @ b / (na * nb))
 
 
-def vectorQuery(tx, queryEmbedding, k, allowed):
-    print(f"[DEBUG] vectorQuery: k={k}, kPool={k * OVERFETCH}, allowed={allowed}")
+def vectorQuery(tx, queryEmbedding, k):
+    print(f"[DEBUG] vectorQuery: k={k}, kPool={k * OVERFETCH}")
     res = tx.run(
         """
         CALL db.index.vector.queryNodes('chunk_embedding', $kPool, $emb) YIELD node, score
-        WITH node, score WHERE node.docName IN $allowed
         WITH node, score ORDER BY score DESC LIMIT $k
         RETURN node.chunkId AS chunkId, node.text AS text, node.sectionPath AS sectionPath,
                node.pages AS pages, node.docName AS docName, score
@@ -39,7 +37,6 @@ def vectorQuery(tx, queryEmbedding, k, allowed):
         emb=queryEmbedding,
         kPool=k * OVERFETCH,
         k=k,
-        allowed=allowed,
     )
     rows = [dict(r) for r in res]
     print(f"[DEBUG] vectorQuery: returned {len(rows)} rows")
@@ -48,19 +45,17 @@ def vectorQuery(tx, queryEmbedding, k, allowed):
     return rows
 
 
-def fulltextQuery(tx, query, k, allowed):
-    print(f"[DEBUG] fulltextQuery: query={query!r}, k={k}, allowed={allowed}")
+def fulltextQuery(tx, query, k):
+    print(f"[DEBUG] fulltextQuery: query={query!r}, k={k}")
     res = tx.run(
         """
         CALL db.index.fulltext.queryNodes('chunk_text', $searchText) YIELD node, score
-        WITH node, score WHERE node.docName IN $allowed
-        ORDER BY score DESC LIMIT $k
+        WITH node, score ORDER BY score DESC LIMIT $k
         RETURN node.chunkId AS chunkId, node.text AS text, node.sectionPath AS sectionPath,
                node.pages AS pages, node.docName AS docName, score
         """,
         searchText=query,
         k=k,
-        allowed=allowed,
     )
     rows = [dict(r) for r in res]
     print(f"[DEBUG] fulltextQuery: returned {len(rows)} rows")
@@ -93,14 +88,11 @@ def selectRelevantRelTypes(queryEmb):
     return result
 
 
-def seedEntities(tx, queryEmb, k, allowed):
-    print(f"[DEBUG] seedEntities: k={k}, kPool={k * OVERFETCH}, allowed={allowed}")
+def seedEntities(tx, queryEmb, k):
+    print(f"[DEBUG] seedEntities: k={k}, kPool={k * OVERFETCH}")
     res = tx.run(
         """
         CALL db.index.vector.queryNodes('entity_embedding', $kPool, $emb) YIELD node, score
-        WHERE EXISTS {
-            MATCH (node)-[:MENTIONED_IN]->(c:Chunk) WHERE c.docName IN $allowed
-        }
         RETURN node.canonicalId AS id, node.canonicalName AS name, score
         ORDER BY score DESC
         LIMIT $k
@@ -108,7 +100,6 @@ def seedEntities(tx, queryEmb, k, allowed):
         emb=queryEmb,
         kPool=k * OVERFETCH,
         k=k,
-        allowed=allowed,
     )
     rows = [dict(r) for r in res]
     print(f"[DEBUG] seedEntities: returned {len(rows)} seeds")
@@ -154,16 +145,15 @@ def fetchEntityEmbeddings(tx, entityIds):
     return result
 
 
-def fetchChunks(tx, chunkIds, allowed):
-    print(f"[DEBUG] fetchChunks: fetching {len(chunkIds)} chunks, allowed={allowed}")
+def fetchChunks(tx, chunkIds):
+    print(f"[DEBUG] fetchChunks: fetching {len(chunkIds)} chunks")
     res = tx.run(
         """
-        MATCH (c:Chunk) WHERE c.chunkId IN $ids AND c.docName IN $allowed
+        MATCH (c:Chunk) WHERE c.chunkId IN $ids
         RETURN c.chunkId AS chunkId, c.text AS text, c.sectionPath AS sectionPath,
                c.pages AS pages, c.docName AS docName
         """,
         ids=list(chunkIds),
-        allowed=allowed,
     )
     result = {r['chunkId']: dict(r) for r in res}
     print(f"[DEBUG] fetchChunks: returned {len(result)}/{len(chunkIds)} chunks")
@@ -188,13 +178,13 @@ def collectPathChunkIds(path):
     return chunkIds
 
 
-def vectorSearch(query, k, allowed):
-    print(f"[DEBUG] vectorSearch: query={query!r}, k={k}, allowed={allowed}")
+def vectorSearch(query, k):
+    print(f"[DEBUG] vectorSearch: query={query!r}, k={k}")
     emb = embedQuery(query)
     print(f"[DEBUG] vectorSearch: embedding computed, dim={len(emb)}")
     with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
         with driver.session() as session:
-            results = session.execute_read(vectorQuery, emb, k, allowed)
+            results = session.execute_read(vectorQuery, emb, k)
     print(f"[retriever] vectorSearch returned {len(results)} chunks", flush=True)
     for r in results:
         r['source'] = 'vector'
@@ -202,27 +192,27 @@ def vectorSearch(query, k, allowed):
     return results
 
 
-def hybridSearch(query, k, allowed):
-    print(f"[DEBUG] hybridSearch: query={query!r}, k={k}, allowed={allowed}")
+def hybridSearch(query, k):
+    print(f"[DEBUG] hybridSearch: query={query!r}, k={k}")
     emb = embedQuery(query)
     print(f"[DEBUG] hybridSearch: embedding computed, dim={len(emb)}")
     with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
         with driver.session() as session:
-            v = session.execute_read(vectorQuery, emb, k * 2, allowed)
-            f = session.execute_read(fulltextQuery, query, k * 2, allowed)
+            v = session.execute_read(vectorQuery, emb, k * 2)
+            f = session.execute_read(fulltextQuery, query, k * 2)
     print(f"[DEBUG] hybridSearch: vector={len(v)}, fulltext={len(f)}")
     return rrfFuse([v, f], topK=k)
 
 
-def graphSearch(query, k, allowed):
-    print(f"[DEBUG] graphSearch: query={query!r}, k={k}, allowed={allowed}")
+def graphSearch(query, k):
+    print(f"[DEBUG] graphSearch: query={query!r}, k={k}")
     queryEmb = embedQuery(query)
     print(f"[DEBUG] graphSearch: embedding computed, dim={len(queryEmb)}")
     relTypes = selectRelevantRelTypes(queryEmb)
 
     with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
         with driver.session() as session:
-            seeds = session.execute_read(seedEntities, queryEmb, SEED_K, allowed)
+            seeds = session.execute_read(seedEntities, queryEmb, SEED_K)
             if not seeds:
                 print("[DEBUG] graphSearch: no seed entities found, returning []")
                 return []
@@ -248,7 +238,7 @@ def graphSearch(query, k, allowed):
             if not chunkIdsAll:
                 print("[DEBUG] graphSearch: no chunk IDs from paths, returning []")
                 return []
-            chunkMap = session.execute_read(fetchChunks, chunkIdsAll, allowed)
+            chunkMap = session.execute_read(fetchChunks, chunkIdsAll)
 
     chunkScores = {}
     chunkPaths = {}
@@ -279,16 +269,11 @@ def graphSearch(query, k, allowed):
 
 def retrieve(query, mode='vector', k=5, clearance='public'):
     print(f"[DEBUG] retrieve: query={query!r}, mode={mode}, k={k}, clearance={clearance}")
-    allowed = allowedDocs(clearance)
-    print(f"[DEBUG] retrieve: allowed docs={allowed}")
-    if not allowed:
-        print("[DEBUG] retrieve: no allowed docs, returning []")
-        return []
     if mode == 'vector':
-        return vectorSearch(query, k, allowed)
+        return vectorSearch(query, k)
     if mode == 'hybrid':
-        return hybridSearch(query, k, allowed)
+        return hybridSearch(query, k)
     if mode == 'graph':
-        return graphSearch(query, k, allowed)
+        return graphSearch(query, k)
     print(f"[DEBUG] retrieve: unknown mode {mode!r}, returning []")
     return []

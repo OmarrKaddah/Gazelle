@@ -36,5 +36,10 @@ def allowedDocs(userClearance):
     ]
 
 
+def allowedLevels(userClearance):
+    threshold = levelRank(userClearance)
+    return [lvl for lvl in LEVELS if levelRank(lvl) <= threshold]
+
+
 def canSeeDoc(docName, userClearance):
     return levelRank(docLevel(docName)) <= levelRank(userClearance)
