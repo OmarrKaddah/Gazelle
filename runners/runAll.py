@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from config import CHUNKER_TYPE
+from config import CHUNKER_TYPE, NER_STRATEGY
 from parser import parseDoc, dumpParsed
 
 if CHUNKER_TYPE == 'semantic':
@@ -15,8 +15,7 @@ if CHUNKER_TYPE == 'semantic':
 else:
     from chunker import chunkDoc, dumpChunks
 
-# Choose NER strategy: 'gliner', 'llm', or 'hybrid'
-NER_STRATEGY = os.getenv('NER_STRATEGY', 'hybrid').lower()
+# Choose NER strategy ('gliner' | 'llm') from config
 if NER_STRATEGY == 'llm':
     from llmNER import extractEntities, dumpEntities
 else:
@@ -123,8 +122,7 @@ def main():
     ap = argparse.ArgumentParser(
         description='Run full pipeline for one or more source files',
         epilog=f"""
-NER Strategy (from .env NER_STRATEGY):
-  - hybrid: GLiNER for entities + LLM for relationships (recommended) [current: {NER_STRATEGY}]
+NER Strategy (from .env NER_STRATEGY) [current: {NER_STRATEGY}]:
   - gliner: Fast GLiNER-only entity extraction (baseline)
   - llm: LLM-based entity extraction (slower but more accurate, uses Ollama)
 

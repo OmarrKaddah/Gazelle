@@ -32,6 +32,9 @@ PARALLEL_CHUNKS = int(os.environ.get('PARALLEL_CHUNKS', '4'))
 # Chunking
 CHUNKER_TYPE = os.environ.get('CHUNKER_TYPE', 'semantic').lower() # valid values: "default" (src/chunker.py) or "semantic" (src/semantic_chunker.py)
 
+# Entity extraction (NER)
+NER_STRATEGY = os.environ.get('NER_STRATEGY', 'gliner').lower() # valid values: "gliner" (src/glinerExtract.py) or "llm" (src/llmNER.py)
+
 # Chat API
 OLLAMA_CHAT_MODEL = os.environ.get('OLLAMA_CHAT_MODEL', 'llama3.1:8b')
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"

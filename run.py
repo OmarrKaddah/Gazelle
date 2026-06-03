@@ -12,12 +12,10 @@ from chunker import chunkDoc, dumpChunks
 from embedding import embedDoc
 from dotenv import load_dotenv
 load_dotenv()
-import os
 
-from config import CHUNKER_TYPE
+from config import CHUNKER_TYPE, NER_STRATEGY
 
-# Choose NER strategy (gliner | llm | hybrid). Mirrors runners/runAll.py
-NER_STRATEGY = os.getenv('NER_STRATEGY', 'hybrid').lower()
+# Choose NER strategy (gliner | llm) from config. Mirrors runners/runAll.py
 if NER_STRATEGY == 'llm':
     from llmNER import extractEntities as extractEntitiesNER, dumpEntities as dumpEntitiesNER
 else:
@@ -152,7 +150,7 @@ if __name__ == '__main__':
     runParser()
     runChunker()
     runEmbed()
-    runGliner()
+    runEntities()
     runLlm()
     runKg()
     runEntityEmbed()
