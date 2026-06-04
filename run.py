@@ -51,7 +51,8 @@ def runOcr():
 
 def runParser():
     print("\n=== Parser ===")
-    for source in sorted(Path("Doc_Out").glob("*.md")):
+    sources = sorted(Path("Doc_Out").glob("*.md")) + sorted(Path("Documents").glob("*.docx"))
+    for source in sources:
         docName = source.stem.lower()
         out = Path(f"parsed/{docName}.json")
         if out.exists():
@@ -155,7 +156,7 @@ if __name__ == '__main__':
     runChunker()
     runEmbed()
     print("\n=== DONE CHUNKER & EMBED ===")
-    runGliner()
+    runEntities()
     runLlm()
     runKg()
     runEntityEmbed()
