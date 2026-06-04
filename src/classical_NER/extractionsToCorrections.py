@@ -87,7 +87,10 @@ if __name__ == '__main__':
         print(f"  {len(chunkMap)} chunks, {total_spans} entity spans")
 
     Path('annotations').mkdir(exist_ok=True)
-    Path('annotations/corrected.json').write_text(
-        json.dumps(allAnnotations, ensure_ascii=False, indent=2), encoding='utf-8'
-    )
-    print(f"[extractionsToCorrections] wrote annotations/corrected.json ({len(allAnnotations)} tasks)")
+    outPath = Path('annotations/corrected.json')
+    existing = json.loads(outPath.read_text(encoding='utf-8')) if outPath.exists() else []
+    existingIds = {(t['meta']['chunkId']) for t in existing if t.get('meta', {}).get('chunkId')}
+    newTasks = [t for t in allAnnotations if t.get('meta', {}).get('chunkId') not in existingIds]
+    merged = existing + newTasks
+    outPath.write_text(json.dumps(merged, ensure_ascii=False, indent=2), encoding='utf-8')
+    print(f"[extractionsToCorrections] merged: {len(existing)} existing + {len(newTasks)} new = {len(merged)} total tasks")

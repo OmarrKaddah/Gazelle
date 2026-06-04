@@ -1,5 +1,6 @@
 import json
 import re
+import sys
 from pathlib import Path
 from camel_tools.disambig.mle import MLEDisambiguator
 from camel_tools.tagger.default import DefaultTagger
@@ -11,9 +12,7 @@ _tagger = DefaultTagger(MLEDisambiguator.pretrained('calima-msa-r13'), 'pos')
 print("[featureExtract] tagger ready")
 
 
-def loadAnnotations():
-    path = BASE_DIR / 'annotations' / 'corrected.json'
-    print(f"[loadAnnotations] reading {path}")
+def parseAnnotationFile(path):
     raw = json.loads(path.read_text(encoding='utf-8'))
     out = []
     for task in raw:
@@ -30,14 +29,38 @@ def loadAnnotations():
             if ann.get('type') == 'labels'
         ]
         out.append({'text': text, 'spans': spans, 'meta': task.get('meta', {})})
-    total_spans = sum(len(a['spans']) for a in out)
-    print(f"[loadAnnotations] {len(out)} tasks, {total_spans} labeled spans")
     return out
+
+
+def loadAnnotations(includeWikiann=False, includeAnercorp=False):
+    annDir = BASE_DIR.parent.parent / 'annotations'
+
+    bankPath = annDir / 'corrected.json'
+    print(f"[loadAnnotations] bank: {bankPath}")
+    tasks = parseAnnotationFile(bankPath)
+    print(f"  {len(tasks)} tasks, {sum(len(a['spans']) for a in tasks)} spans")
+
+    if includeWikiann:
+        wikiPath = annDir / 'wikiann_base.json'
+        print(f"[loadAnnotations] wikiann: {wikiPath}")
+        wikiTasks = parseAnnotationFile(wikiPath)
+        print(f"  {len(wikiTasks)} tasks, {sum(len(a['spans']) for a in wikiTasks)} spans")
+        tasks = wikiTasks + tasks
+
+    if includeAnercorp:
+        anerPath = annDir / 'anercorp_base.json'
+        print(f"[loadAnnotations] anercorp: {anerPath}")
+        anerTasks = parseAnnotationFile(anerPath)
+        print(f"  {len(anerTasks)} tasks, {sum(len(a['spans']) for a in anerTasks)} spans")
+        tasks = anerTasks + tasks
+
+    print(f"[loadAnnotations] total: {len(tasks)} tasks")
+    return tasks
 
 
 # TODO: This is a basic gazetteer loader — expand trigger sets after reviewing bank documents
 def loadGazetteer():
-    path = BASE_DIR / 'gazetteer' / 'gazetteer.json'
+    path = BASE_DIR.parent.parent / 'gazetteer' / 'gazetteer.json'
     print(f"[loadGazetteer] reading {path}")
     raw = json.loads(path.read_text(encoding='utf-8'))
     gazSets = {etype: set(forms) for etype, forms in raw.items()}
@@ -69,7 +92,7 @@ def bioAlign(tokens, spans):
         first = True
         for i, tok in enumerate(tokens):
             if tok['start'] >= span['start'] and tok['end'] <= span['end']:
-                labels[i] = ('B-' if first else 'I-') + span['type']
+                labels[i] = 'B' if first else 'I'
                 first = False
     return labels
 
@@ -194,13 +217,20 @@ def dumpTraining(sequences):
 
 
 if __name__ == '__main__':
+    includeWikiann   = '--wikiann'   in sys.argv
+    includeAnercorp  = '--anercorp'  in sys.argv
+
+    sources = ['bank']
+    if includeWikiann:  sources.append('wikiann')
+    if includeAnercorp: sources.append('anercorp')
+
     print("=" * 50)
     print("STEP 1 — load gazetteer")
     _, orgTriggers, moneyTriggers, monthNames = loadGazetteer()
 
     print("=" * 50)
-    print("STEP 2 — load annotations")
-    annotations = loadAnnotations()
+    print(f"STEP 2 — load annotations ({' + '.join(sources)})")
+    annotations = loadAnnotations(includeWikiann, includeAnercorp)
 
     print("=" * 50)
     print("STEP 3 — extract features")

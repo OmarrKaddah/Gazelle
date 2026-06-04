@@ -118,11 +118,11 @@ if __name__ == '__main__':
     print(f"[convertWikiann] wrote chunks/{docName}.json ({len(chunks)} chunks)")
 
     Path('annotations').mkdir(exist_ok=True)
-    Path('annotations/corrected.json').write_text(
+    Path('annotations/wikiann_base.json').write_text(
         json.dumps(annotations, ensure_ascii=False, indent=2), encoding='utf-8'
     )
     total_spans = sum(len(a['annotations'][0]['result']) for a in annotations)
-    print(f"[convertWikiann] wrote annotations/corrected.json ({total_spans} labeled spans)")
+    print(f"[convertWikiann] wrote annotations/wikiann_base.json ({total_spans} labeled spans)")
 
     gold = []
     for ann in annotations:

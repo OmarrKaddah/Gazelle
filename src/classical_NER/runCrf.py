@@ -7,8 +7,8 @@ from pathlib import Path
 from featureExtract import tokenize, posTag, tokenFeatures, loadGazetteer
 
 
-def loadModel():
-    path = Path('models/crf.pkl')
+def loadModel(name='crf'):
+    path = Path(__file__).resolve().parent / 'models' / f'{name}.pkl'
     print(f"[loadModel] reading {path}")
     crf = pickle.loads(path.read_bytes())
     print(f"[loadModel] loaded — classes: {crf.classes_}")
@@ -23,20 +23,19 @@ def bioToSpans(tokens, labels, chunkId, docName):
     spans = []
     current = None
     for tok, label in zip(tokens, labels):
-        if label.startswith('B-'):
+        if label == 'B':
             if current:
                 spans.append(current)
             current = {
                 'chunkId': chunkId,
                 'docName': docName,
                 'text':    tok['word'],
-                'type':    label[2:],
                 'start':   tok['start'],
                 'end':     tok['end'],
                 'score':   1.0,
                 'source':  'crf',
             }
-        elif label.startswith('I-') and current:
+        elif label == 'I' and current:
             current['text'] += ' ' + tok['word']
             current['end']   = tok['end']
         else:
@@ -64,31 +63,33 @@ def predictChunk(crf, chunk, orgTriggers, moneyTriggers, monthNames):
     return spans
 
 
-def dumpEntities(entities, docName):
-    Path('extractions/crf').mkdir(parents=True, exist_ok=True)
-    out = Path(f'extractions/crf/{docName}_crf_entities.json')
+def dumpEntities(entities, docName, modelName):
+    outDir = Path(f'extractions/{modelName}')
+    outDir.mkdir(parents=True, exist_ok=True)
+    out = outDir / f'{docName}_entities.json'
     out.write_text(json.dumps(entities, ensure_ascii=False, indent=2), encoding='utf-8')
     print(f"  saved -> {out}")
 
 
-def runDoc(crf, docName, orgTriggers, moneyTriggers, monthNames):
+def runDoc(crf, docName, orgTriggers, moneyTriggers, monthNames, modelName):
     chunks   = loadChunks(docName)
     print(f"[runDoc] {docName} — {len(chunks)} chunks")
     entities = []
     for chunk in chunks:
         entities.extend(predictChunk(crf, chunk, orgTriggers, moneyTriggers, monthNames))
-    dumpEntities(entities, docName)
-    type_counts = {}
-    for e in entities:
-        type_counts[e['type']] = type_counts.get(e['type'], 0) + 1
-    print(f"  total: {len(entities)} entities — {type_counts}")
+    dumpEntities(entities, docName, modelName)
+    print(f"  total: {len(entities)} entities")
     return entities
 
 
 if __name__ == '__main__':
+    import sys
+    nameArgs  = [a for a in sys.argv if a.startswith('--model=')]
+    modelName = nameArgs[0].split('=', 1)[1] if nameArgs else 'crf'
+
     print("=" * 50)
-    print("STEP 1 — load model")
-    crf = loadModel()
+    print(f"STEP 1 — load model ({modelName})")
+    crf = loadModel(modelName)
 
     print("=" * 50)
     print("STEP 2 — load gazetteer")
@@ -96,19 +97,15 @@ if __name__ == '__main__':
 
     print("=" * 50)
     print("STEP 3 — run inference on all documents")
-    docNames = sorted(p.stem for p in Path('chunks').glob('*.json'))
-    print(f"  found {len(docNames)} documents: {docNames}")
+    bankDocs = sorted(p.stem for p in Path('chunks').glob('*.json')
+                      if not p.stem.startswith('wikiann') and not p.stem.startswith('anercorp'))
+    print(f"  found {len(bankDocs)} bank documents: {bankDocs}")
 
     all_entities = []
-    for docName in docNames:
-        entities = runDoc(crf, docName, orgTriggers, moneyTriggers, monthNames)
+    for docName in bankDocs:
+        entities = runDoc(crf, docName, orgTriggers, moneyTriggers, monthNames, modelName)
         all_entities.extend(entities)
 
     print("=" * 50)
-    total_type_counts = {}
-    for e in all_entities:
-        total_type_counts[e['type']] = total_type_counts.get(e['type'], 0) + 1
-    print(f"DONE — {len(all_entities)} total entities across {len(docNames)} documents")
-    for etype, count in sorted(total_type_counts.items()):
-        print(f"  {etype}: {count}")
+    print(f"DONE — {len(all_entities)} total entities across {len(bankDocs)} documents")
     print("=" * 50)

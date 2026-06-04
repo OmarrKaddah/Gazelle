@@ -32,9 +32,9 @@ def trainCrf(X_train, y_train):
     print("[trainCrf] fitting CRF (lbfgs, c1=0.1, c2=0.1, max_iter=200)...")
     crf = sklearn_crfsuite.CRF(
         algorithm='lbfgs',
-        c1=0.1,
-        c2=0.1,
-        max_iterations=200,
+        c1=0.05,
+        c2=0.05,
+        max_iterations=500,
         all_possible_transitions=True,
         verbose=True,
     )
@@ -56,17 +56,19 @@ def evaluate(crf, X_test, y_test):
     print(classification_report(y_test, y_pred, digits=4))
 
 
-def saveModel(crf):
+def saveModel(crf, name='crf'):
     base = Path(__file__).resolve().parent
     model_dir = base / 'models'
     model_dir.mkdir(exist_ok=True)
-    model_path = model_dir / 'crf.pkl'
+    model_path = model_dir / f'{name}.pkl'
     model_path.write_bytes(pickle.dumps(crf))
     print(f"[saveModel] saved -> {model_path}")
 
 
 if __name__ == '__main__':
-    use_all = '--all' in sys.argv
+    use_all   = '--all' in sys.argv
+    nameArgs  = [a for a in sys.argv if a.startswith('--name=')]
+    modelName = nameArgs[0].split('=', 1)[1] if nameArgs else 'crf'
 
     print("=" * 50)
     print("STEP 1 — load training data")
@@ -97,6 +99,6 @@ if __name__ == '__main__':
 
     print("=" * 50)
     print("STEP 4 — save model" if use_all else "STEP 5 — save model")
-    saveModel(crf)
+    saveModel(crf, modelName)
     print("=" * 50)
     print("trainCrf done")
