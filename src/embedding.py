@@ -2,7 +2,7 @@ import json
 import requests
 from pathlib import Path
 from neo4j import GraphDatabase
-from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, EMBED_DIM, CHUNK_EMBED_BATCH, OLLAMA_EMBED_URL, OLLAMA_EMBED_MODEL
+from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, NEO4J_DB, EMBED_DIM, CHUNK_EMBED_BATCH, OLLAMA_EMBED_URL, OLLAMA_EMBED_MODEL
 
 
 _session = requests.Session()
@@ -59,7 +59,7 @@ def writeEmbedding(tx, chunkId, embedding):
 def embedDoc(docName):
     chunks = loadChunks(docName)
     with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
-        with driver.session() as session:
+        with driver.session(database=NEO4J_DB) as session:
             session.execute_write(setupVectorIndex)
             session.execute_write(setupFulltextIndex)
             for i in range(0, len(chunks), CHUNK_EMBED_BATCH):

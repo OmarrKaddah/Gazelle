@@ -94,12 +94,36 @@ extractions/*
 !chunks/musique.json
 !extractions/musique_entities.json
 !extractions/musique_triples.json
+chunks/
+extractions/
+
+# =====================================================================
+# Project: eval results (regenerable; gold/ is hand-curated and kept)
+# =====================================================================
+eval/results.json
+
+# =====================================================================
+# Offline install cache
+# =====================================================================
+wheelhouse/
+wheelhouse_win/
+
+# Large model binaries
+models/
+*.bin
+*.vec
+
+# CAMeL Tools downloaded data
+.camel_tools/
 
 # =====================================================================
 # Misc
 # =====================================================================
 *.tmp
 *.bak
+*.pdf
+*.txt
+*.json
 plans/
 .ini
 
@@ -135,3 +159,7 @@ requirements_gliner.txt
 wheelhouse/
 wheelhouse_win/
 
+
+ocr_dataset/*
+classical_env/*
+gliner_env/*
