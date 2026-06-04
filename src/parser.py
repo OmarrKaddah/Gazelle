@@ -17,6 +17,10 @@ class ParsedElement:
     accessLevel: str
 
 
+def stripEmptyTableLines(markdown):
+    return '\n'.join(l for l in markdown.split('\n') if not re.fullmatch(r'\s*\|+\s*', l))
+
+
 def splitBlocks(markdown):
     return [b.strip() for b in re.split(r'\n\s*\n', markdown) if b.strip()]
 
@@ -54,7 +58,7 @@ def parseMarkdown(docName):
     sectionPath = []
     counter = 0
     for entry in pages:
-        for block in splitBlocks(entry['markdown']):
+        for block in splitBlocks(stripEmptyTableLines(entry['markdown'])):
             counter += 1
             kind = classifyBlock(block)
             if kind == 'heading':

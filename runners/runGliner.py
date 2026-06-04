@@ -1,4 +1,3 @@
-import _bootstrap  # noqa: F401
 from pathlib import Path
 from glinerExtract import extractEntities, dumpEntities
 

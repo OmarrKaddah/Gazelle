@@ -70,3 +70,7 @@ PATH_LIMIT = 300
 REL_TYPE_TOP = 5
 REL_TYPE_FLOOR = 0.25
 ENTITY_WEIGHT = 0.6  # path score = ENTITY_WEIGHT * entity_sim + (1-ENTITY_WEIGHT) * rel_sim
+
+# Reranking
+RERANK_MODEL_PATH = os.environ.get('RERANK_MODEL_PATH', 'BAAI/bge-reranker-v2-m3')
+RERANK_OVERFETCH = int(os.environ.get('RERANK_OVERFETCH', '3'))

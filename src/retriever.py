@@ -5,8 +5,9 @@ from ontology import RELATIONSHIP_DESCRIPTIONS
 from config import (
     NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD,
     RRF_K, OVERFETCH, PATH_DEPTH, SEED_K, PATH_LIMIT,
-    REL_TYPE_TOP, REL_TYPE_FLOOR, ENTITY_WEIGHT,
+    REL_TYPE_TOP, REL_TYPE_FLOOR, ENTITY_WEIGHT, RERANK_OVERFETCH,
 )
+from reranker import rerank
 
 
 # Pre-compute relation-type embeddings once per process. RELATIONSHIP_DESCRIPTIONS
@@ -254,17 +255,18 @@ def graphSearch(query, k):
                 'score': p['score'],
             })
 
-    ranked = sorted(chunkScores.items(), key=lambda x: -x[1])[:k]
-    print(f"[DEBUG] graphSearch: {len(chunkScores)} scored chunks -> top {len(ranked)}")
-    out = []
+    candidateCount = k * RERANK_OVERFETCH
+    ranked = sorted(chunkScores.items(), key=lambda x: -x[1])[:candidateCount]
+    print(f"[DEBUG] graphSearch: {len(chunkScores)} scored chunks -> {len(ranked)} rerank candidates (k={k}, overfetch={RERANK_OVERFETCH})")
+    candidates = []
     for cid, score in ranked:
         chunk = chunkMap[cid]
         chunk['score'] = score
         chunk['source'] = 'graph'
         chunk['paths'] = sorted(chunkPaths[cid], key=lambda p: -p['score'])[:3]
-        out.append(chunk)
-        print(f"  chunkId={cid} score={score:.4f} doc={chunk['docName']}")
-    return out
+        candidates.append(chunk)
+        print(f"  chunkId={cid} pathScore={score:.4f} doc={chunk['docName']}")
+    return rerank(query, candidates, topK=k)
 
 
 def retrieve(query, mode='vector', k=5, clearance='public'):

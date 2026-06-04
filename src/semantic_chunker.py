@@ -4,7 +4,7 @@ from typing import List
 from langchain_experimental.text_splitter import SemanticChunker
 from langchain_core.embeddings import Embeddings
 
-from chunker import Chunk, countTokens, dumpChunks
+from chunker import Chunk, countTokens, dumpChunks, parseMarkdownTable, tableToSentences, absorbTableHeaders
 from parser import ParsedElement
 import os
 from dotenv import load_dotenv
@@ -73,13 +73,16 @@ def chunkDoc(elements: List[ParsedElement], breakpoint_threshold_type: str = 'pe
     chunks: List[Chunk] = []
     idx = 0
 
+    elements = absorbTableHeaders(elements)
     for elem in elements:
         if not getattr(elem, 'text', '').strip():
             continue
         if elem.elementType == 'heading':
             continue
         if elem.elementType == 'table':
-            ch = _create_chunk_from_element(elem.docName, elem, elem.text, idx)
+            parsed = parseMarkdownTable(elem.text)
+            tableText = tableToSentences(*parsed) if parsed else elem.text
+            ch = _create_chunk_from_element(elem.docName, elem, tableText, idx)
             idx += 1
             chunks.append(ch)
             continue
