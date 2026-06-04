@@ -21,8 +21,8 @@ if NER_STRATEGY == 'llm':
 else:
     from glinerExtract import extractEntities, dumpEntities
 
-from llmExtract import extractDoc, dumpExtractions
-from kgWriter import writeDoc
+from typedOntologyExtract import extractDoc, dumpExtractions
+from typedKgWriter import writeDoc
 from embedding import embedDoc
 from ocr import runOcrAndDump
 

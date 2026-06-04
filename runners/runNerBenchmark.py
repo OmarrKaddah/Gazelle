@@ -20,7 +20,7 @@ def buildSnippet(strategy, docName):
 import json
 import time
 from {entityModule} import extractEntities
-from llmExtract import extractDoc
+from typedOntologyExtract import extractDoc
 
 docName = {docName!r}
 

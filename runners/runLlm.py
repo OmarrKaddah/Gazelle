@@ -1,6 +1,6 @@
 import _bootstrap  # noqa: F401
 from pathlib import Path
-from llmExtract import extractDoc, dumpExtractions
+from typedOntologyExtract import extractDoc, dumpExtractions
 
 for chunk in sorted(Path("chunks").glob("*.json")):
     docName = chunk.stem

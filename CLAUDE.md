@@ -27,11 +27,11 @@ src/chunker.py      → chunks/*.json        (token-bounded, section-aware)
        ├──► src/glinerExtract.py           → extractions/*_entities.json
        │           (GLiNER Arabic NER)
        │
-       └──► src/llmExtract.py              → extractions/*.json
+       └──► src/typedOntologyExtract.py   → extractions/*.json   (RETIRED typed lineage)
                    (Ollama LLM relation extraction, uses gliner output as entity list)
                             │
                             ▼
-                   src/kgWriter.py          (writes Chunk/Entity/Relation nodes to Neo4j)
+                   src/typedKgWriter.py     (writes Chunk/Entity/Relation nodes to Neo4j; RETIRED)
                             │
                    src/entityEmbedding.py   (BGE-M3 embeddings on canonical entities)
                             │
@@ -167,9 +167,11 @@ This is a **separate, self-contained subsystem** for the retrieval upgrade, not 
 Graph building is consolidated to **two routes** (the earlier typed and bare-triple lineages are retired — see below). Both share the prep pipeline (ocr → parser → chunker → embedding → chunks + vector index) and both are retrieved by PPR; they diverge **only** at graph construction:
 
 - **Route 1 — Classical:** GLiNER entities + co-mention `COOCCURS_WITH` edges (`glinerExtract.py` → `kgBuild.buildEntityLayer`). Cheap, deterministic **baseline**. Retrieval only — no descriptions, so it cannot feed community summaries.
-- **Route 2 — LLM (deployed):** one LLM pass extracts entities **+ relationships + descriptions** (`graphExtract.py` → `graphBuild.py` → `(:Entity {description})-[:RELATED {predicate, description, weight}]->(:Entity)`). The only route that feeds the **global arm** (Leiden communities + summaries). Uses DeepSeek via OpenRouter, reusing `llmTriples.callLLM`. Route 2 == Stages 5+6 of `docs/GLOBAL_PLAN.md`.
+- **Route 2 — LLM (deployed):** one LLM pass extracts entities **+ relationships + descriptions** (`graphExtract.py` → `graphBuild.py` → `(:Entity {description})-[:RELATED {weight, description}]->(:Entity)`). The only route that feeds the **global arm** (Leiden communities + summaries). Uses `llmTriples.callLLM` with the `openrouter` backend (configurable via `GRAPH_EXTRACT_BACKEND`). Route 2 == Stages 5+6 of `docs/GLOBAL_PLAN.md`. **Built.**
 
-**Retired but kept on disk as documented prior effort (do not delete):** the ontology-**typed** pipeline (`llmExtract.py` + `kgWriter.py`); the bare-**triples** intermediate (`llmTriples` bare prompt + `kgBuild.writeTripleEdges` + `runTripleEdges.py`, PPR v7). `graphExtract.py`/`graphBuild.py` are **not yet built** — they are the immediate Route-2 work.
+**End-to-end runner:** `runners/runPipeline.py` is the consolidated orchestrator — shared prep (ocr → parser → chunker → embed) then branches on `GRAPH_ROUTE` (`1` = Route 1 GLiNER+co-mention via `kgBuild.buildEntityLayer`; `2` = Route 2 via `graphExtract`+`graphBuild`). Strategy knobs all live in `config.py`: `CHUNKER_TYPE`, `NER_STRATEGY`, `GRAPH_ROUTE`, `GRAPH_EXTRACT_BACKEND`. (The older `run.py`/`runAll.py` remain but run the RETIRED typed lineage.)
+
+**Retired but kept on disk as documented prior effort (do not delete):** the ontology-**typed** pipeline, renamed for clarity to `typedOntologyExtract.py` (was `llmExtract.py`) + `typedKgWriter.py` (was `kgWriter.py`), still wired into the old `run.py`/`runAll.py`/`runLlm.py`/`runKg.py`; the bare-**triples** intermediate (`llmTriples` bare prompt + `kgBuild.writeTripleEdges` + `runTripleEdges.py`, PPR v7).
 
 ## Design Docs (`docs/`) — read before extending the graph work
 

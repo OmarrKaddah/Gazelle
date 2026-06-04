@@ -1,6 +1,6 @@
 import _bootstrap  # noqa: F401
 from pathlib import Path
-from kgWriter import writeDoc, writeDocEntitiesOnly, clearDb
+from typedKgWriter import writeDoc, writeDocEntitiesOnly, clearDb
 
 clearDb()
 

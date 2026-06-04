@@ -26,8 +26,8 @@ if CHUNKER_TYPE == 'semantic':
 else:
     from chunker import chunkDoc, dumpChunks
 
-from llmExtract import extractDoc, dumpExtractions
-from kgWriter import writeDoc, writeDocEntitiesOnly, clearDb
+from typedOntologyExtract import extractDoc, dumpExtractions
+from typedKgWriter import writeDoc, writeDocEntitiesOnly, clearDb
 from entityEmbedding import embedEntities
 from entityAlign import deduplicate
 

@@ -35,6 +35,10 @@ CHUNKER_TYPE = os.environ.get('CHUNKER_TYPE', 'semantic').lower() # valid values
 # Entity extraction (NER)
 NER_STRATEGY = os.environ.get('NER_STRATEGY', 'gliner').lower() # valid values: "gliner" (src/glinerExtract.py) or "llm" (src/llmNER.py)
 
+# Graph construction route
+GRAPH_ROUTE = os.environ.get('GRAPH_ROUTE', '1') # "1" = GLiNER + co-mention (classical baseline, kgBuild), "2" = full-LLM entities+rels+descriptions (graphExtract+graphBuild)
+GRAPH_EXTRACT_BACKEND = os.environ.get('GRAPH_EXTRACT_BACKEND', 'openrouter') # callLLM backend for Route 2 (ollama|groq|openrouter|gemini)
+
 # Chat API
 OLLAMA_CHAT_MODEL = os.environ.get('OLLAMA_CHAT_MODEL', 'llama3.1:8b')
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
