@@ -27,8 +27,10 @@ else:
     defaultName = arg
 corpus = sys.argv[3] if len(sys.argv) > 3 else defaultName
 
+# Global arm: Leiden over the semantic relation layer (RELATED) + identity bridging (SYNONYM).
+# Co-mention is deliberately excluded — its density smears community structure.
 adjacency, idToIdx, idxToId = loadEntityGraph(
-    scope, includeSynonyms=True, useCoMention=True, useTriples=True
+    scope, includeSynonyms=True, useCoMention=False, useTriples=False, useRelated=True
 )
 hierarchy = leidenHierarchy(adjacency, resolution=resolution)
 writeCommunities(hierarchy, idxToId, corpus)

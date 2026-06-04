@@ -54,9 +54,23 @@ def fetchTripleEdges(scope):
     return fetchEdges(cypher, **params)
 
 
-def loadEntityGraph(scope, includeSynonyms=False, synonymWeight=1.0, useCoMention=True, useTriples=False):
+def fetchRelatedEdges(scope):
+    where, params = scopeClause(scope, 'a', 'b')
+    cypher = f'''
+    MATCH (a:Entity)-[r:RELATED]->(b:Entity)
+    {where}
+    RETURN a.canonicalId AS src, b.canonicalId AS dst, r.weight AS weight
+    '''
+    return fetchEdges(cypher, **params)
+
+
+def loadEntityGraph(scope, includeSynonyms=False, synonymWeight=1.0, useCoMention=False, useTriples=False, useRelated=True):
     # scope: a docName, a list of docNames, or None for the whole corpus.
+    # Default layers reflect the Route 2 deployment: RELATED relations + (optional) SYNONYM.
+    # co-mention is off by default (its v7b benefit was measured on bare TRIPLE edges, not RELATED).
     edges = []
+    if useRelated:
+        edges += fetchRelatedEdges(scope)
     if useCoMention:
         edges += fetchCoMentionEdges(scope)
     if useTriples:
@@ -123,7 +137,7 @@ def applyNodeSpecificity(seedMass, idxToId, entityToChunks):
 # ── retrieval index ──────────────────────────────────────────────
 
 class RetrievalIndex:
-    def __init__(self, docName, entityAlignment=False, synonymWeight=1.0, coMentionEdges=True, tripleEdges=False):
+    def __init__(self, docName, entityAlignment=True, synonymWeight=1.0, coMentionEdges=False, tripleEdges=False, relatedEdges=True):
         self.docName = docName
         self.embEntityIds, _, self.embs = loadEntityEmbeddings(docName)
         self.adjacency, self.idToIdx, self.idxToId = loadEntityGraph(
@@ -132,13 +146,16 @@ class RetrievalIndex:
             synonymWeight=synonymWeight,
             useCoMention=coMentionEdges,
             useTriples=tripleEdges,
+            useRelated=relatedEdges,
         )
         self.entityToChunks = loadEntityToChunks(docName)
-        self.printSummary(entityAlignment, synonymWeight, coMentionEdges, tripleEdges)
+        self.printSummary(entityAlignment, synonymWeight, coMentionEdges, tripleEdges, relatedEdges)
 
-    def printSummary(self, entityAlignment, synonymWeight, coMentionEdges, tripleEdges):
+    def printSummary(self, entityAlignment, synonymWeight, coMentionEdges, tripleEdges, relatedEdges):
         mentions = sum(len(chunks) for chunks in self.entityToChunks.values())
         edgeParts = []
+        if relatedEdges:
+            edgeParts.append('related')
         if coMentionEdges:
             edgeParts.append('co-mention')
         if tripleEdges:

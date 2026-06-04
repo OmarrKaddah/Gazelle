@@ -50,10 +50,10 @@ def buildNameLookup(entities):
 
 
 def mergeRelationships(instances, lookup):
-    edges = defaultdict(lambda: {'weight': 0, 'descriptions': set()})
+    edges = defaultdict(lambda: {'weight': 0, 'descriptions': set(), 'predicates': defaultdict(int)})
     raw = unmatched = selfRef = 0
     for inst in instances:
-        for src, dst, desc, _strength in inst['relationships']:
+        for src, dst, predicate, desc, _strength in inst['relationships']:
             raw += 1
             srcId = lookup.get(canonicalKey(src))
             dstId = lookup.get(canonicalKey(dst))
@@ -67,9 +67,17 @@ def mergeRelationships(instances, lookup):
             edge['weight'] += 1
             if desc:
                 edge['descriptions'].add(desc)
+            if predicate:
+                edge['predicates'][predicate] += 1
     print(f'[graphBuild] {raw} raw rels, {unmatched} unmatched (orphan endpoints), {selfRef} self-referential, {len(edges)} unique pairs')
     return [
-        {'src': src, 'dst': dst, 'weight': d['weight'], 'description': ' '.join(sorted(d['descriptions']))}
+        {
+            'src': src,
+            'dst': dst,
+            'weight': d['weight'],
+            'predicate': max(d['predicates'], key=d['predicates'].get) if d['predicates'] else '',
+            'description': ' '.join(sorted(d['descriptions'])),
+        }
         for (src, dst), d in edges.items()
     ]
 
@@ -98,7 +106,7 @@ def writeRelated(tx, edges):
         UNWIND $edges AS e
         MATCH (a:Entity {canonicalId: e.src}), (b:Entity {canonicalId: e.dst})
         MERGE (a)-[r:RELATED]->(b)
-        SET r.weight = e.weight, r.description = e.description
+        SET r.weight = e.weight, r.predicate = e.predicate, r.description = e.description
         ''',
         edges=edges,
     )

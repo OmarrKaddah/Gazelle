@@ -16,7 +16,7 @@ Allowed entity types:
 
 From the PASSAGE extract:
 1. "entities": each as {{"name": <exact surface form from the passage>, "type": <one allowed type>, "description": <one concise sentence describing the entity, grounded ONLY in the passage>}}
-2. "relationships": for each pair of extracted entities that are clearly related, {{"source": <entity name>, "target": <entity name>, "description": <how they relate, one concise sentence>, "strength": <integer 1-10>}}
+2. "relationships": for each pair of extracted entities that are clearly related, {{"source": <entity name>, "target": <entity name>, "predicate": <1-3 word relation label, e.g. "issued", "regulates", "amends">, "description": <how they relate, one concise sentence>, "strength": <integer 1-10>}}
 
 Rules:
 - Use the entity's surface form from the passage as "name"; keep Arabic text in Arabic.
@@ -42,7 +42,7 @@ def parseElements(raw):
         if e.get('name')
     ]
     relationships = [
-        (r['source'], r['target'], r.get('description', ''), r.get('strength', 1))
+        (r['source'], r['target'], r.get('predicate', ''), r.get('description', ''), r.get('strength', 1))
         for r in data.get('relationships', [])
         if r.get('source') and r.get('target')
     ]

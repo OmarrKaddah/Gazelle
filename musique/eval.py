@@ -89,6 +89,7 @@ def main():
             synonymWeight=CONFIG['synonymWeight'],
             coMentionEdges=CONFIG['coMentionEdges'],
             tripleEdges=CONFIG['tripleEdges'],
+            relatedEdges=CONFIG.get('relatedEdges', False),
         )
 
     print(f'[eval] running retrieval...')
