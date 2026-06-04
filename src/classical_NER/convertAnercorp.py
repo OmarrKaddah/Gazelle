@@ -121,11 +121,12 @@ if __name__ == '__main__':
     print(f"[convertAnercorp] wrote chunks/{docName}.json ({len(chunks)} chunks)")
 
     Path('annotations').mkdir(exist_ok=True)
-    Path('annotations/anercorp_base.json').write_text(
-        json.dumps(annotations, ensure_ascii=False, indent=2), encoding='utf-8'
-    )
-    total_spans = sum(len(a['annotations'][0]['result']) for a in annotations)
-    print(f"[convertAnercorp] wrote annotations/anercorp_base.json ({total_spans} labeled spans)")
+    if 'test' not in docName:
+        Path('annotations/anercorp_base.json').write_text(
+            json.dumps(annotations, ensure_ascii=False, indent=2), encoding='utf-8'
+        )
+        total_spans = sum(len(a['annotations'][0]['result']) for a in annotations)
+        print(f"[convertAnercorp] wrote annotations/anercorp_base.json ({total_spans} labeled spans)")
 
     gold = []
     for ann in annotations:

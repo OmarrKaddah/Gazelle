@@ -54,6 +54,11 @@ def loadAnnotations(includeWikiann=False, includeAnercorp=False):
         print(f"  {len(anerTasks)} tasks, {sum(len(a['spans']) for a in anerTasks)} spans")
         tasks = anerTasks + tasks
 
+    before = len(tasks)
+    tasks = [t for t in tasks if isArabic(t['text'])]
+    skipped = before - len(tasks)
+    if skipped:
+        print(f"  skipped {skipped} non-Arabic chunks")
     print(f"[loadAnnotations] total: {len(tasks)} tasks")
     return tasks
 
@@ -72,6 +77,12 @@ def loadGazetteer():
                      'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'}
     print(f"[loadGazetteer] {len(orgTriggers)} org triggers, {len(moneyTriggers)} money triggers, {len(monthNames)} month names")
     return gazSets, orgTriggers, moneyTriggers, monthNames
+
+
+def isArabic(text, threshold=0.10):
+    arabic = sum(1 for c in text if '؀' <= c <= 'ۿ')
+    alpha  = sum(1 for c in text if c.isalpha())
+    return (arabic / alpha) >= threshold if alpha > 0 else False
 
 
 def tokenize(text):

@@ -4,7 +4,7 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from pathlib import Path
-from featureExtract import tokenize, posTag, tokenFeatures, loadGazetteer
+from featureExtract import tokenize, posTag, tokenFeatures, loadGazetteer, isArabic
 
 
 def loadModel(name='crf'):
@@ -48,6 +48,8 @@ def bioToSpans(tokens, labels, chunkId, docName):
 
 
 def predictChunk(crf, chunk, orgTriggers, moneyTriggers, monthNames):
+    if not isArabic(chunk['text']):
+        return []
     tokens = tokenize(chunk['text'])
     words  = [t['word'] for t in tokens]
     pos    = posTag(words)
