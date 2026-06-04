@@ -74,6 +74,7 @@ $RECYCLE.BIN/
 # Comment this out if your corpus is public.
 # =====================================================================
 Documents/
+Scraped/
 musique/data
 
 # =====================================================================
@@ -122,3 +123,4 @@ WhatsApp Image *.png
 graphTraversal/datasets/
 graphTraversal/figures/
 
+.venv*

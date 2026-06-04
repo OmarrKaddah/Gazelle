@@ -1,21 +1,24 @@
 import json
-import os
+import sys
 from pathlib import Path
 from tqdm import tqdm
 from gliner import GLiNER
-from dotenv import load_dotenv
 from ontology import ENTITIES
-from config import GLINER_MODEL, GLINER_THRESHOLD
+from config import GLINER_MODEL, GLINER_MODEL_EN, GLINER_THRESHOLD
 
-load_dotenv()
+_models = {}
 
-THRESHOLD = float(os.getenv('GLINER_THRESHOLD', '0.5'))
-GLINER_MODEL = os.getenv('GLINER_MODEL', 'NAMAA-Space/gliner_arabic-v2.1')
-labels = list(ENTITIES.keys())
 
-print(f"Loading GLiNER model: {GLINER_MODEL}", flush=True)
-model = GLiNER.from_pretrained(GLINER_MODEL)
-print(f"Model loaded. Threshold: {THRESHOLD}", flush=True)
+def getModel(lang):
+    name = GLINER_MODEL_EN if lang == 'en' else GLINER_MODEL
+    if name not in _models:
+        print(f"Loading GLiNER model: {name}", flush=True)
+        _models[name] = GLiNER.from_pretrained(name)
+    return _models[name]
+
+
+def getLabels(lang):
+    return list(ENTITIES.keys())
 
 
 def loadChunks(docName):

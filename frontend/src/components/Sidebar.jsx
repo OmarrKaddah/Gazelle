@@ -12,6 +12,7 @@ import {
 const TOOLS = [
   { id: 'chat', label: 'Chat', Icon: ChatIcon },
   { id: 'graph', label: 'Graph Explorer', Icon: GraphIcon },
+  { id: 'pipeline', label: 'Pipeline', Icon: SettingsIcon },
 ];
 
 export default function Sidebar({ open, onToggle, view, onViewChange, chatState, user, onLogout }) {

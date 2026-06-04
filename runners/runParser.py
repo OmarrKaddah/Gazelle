@@ -1,18 +1,19 @@
 import _bootstrap  # noqa: F401
+import sys
 from pathlib import Path
 from parser import parseDoc, dumpParsed
 
-INPUT_DIR = Path("Doc_Out")
+# Parse: Doc_Out/<stem>.md -> parsed/<stem>.json
+# Optional args restrict to specific doc names: python runners/runParser.py chapter_1 chapter_2
+only = {a.lower() for a in sys.argv[1:]}
 
-sources = sorted(INPUT_DIR.glob("*.md"))
-
-for source in sources:
+for source in sorted(Path("Doc_Out").glob("*.md")):
     docName = source.stem.lower()
-    out = Path(f"parsed/{docName}.json")
-    if out.exists():
+    if only and docName not in only:
+        continue
+    if Path(f"parsed/{docName}.json").exists():
         print(f"[skip] {source.name}")
         continue
     print(f"[parse] {source.name}")
-    elements = parseDoc(str(source))
-    dumpParsed(elements, docName)
+    dumpParsed(parseDoc(str(source)), docName)
     print(f"        -> parsed/{docName}.json")

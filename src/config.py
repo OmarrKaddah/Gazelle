@@ -38,6 +38,7 @@ NER_STRATEGY = os.environ.get('NER_STRATEGY', 'gliner').lower() # valid values: 
 # Graph construction route
 GRAPH_ROUTE = os.environ.get('GRAPH_ROUTE', '1') # "1" = GLiNER + co-mention (classical baseline, kgBuild), "2" = full-LLM entities+rels+descriptions (graphExtract+graphBuild)
 GRAPH_EXTRACT_BACKEND = os.environ.get('GRAPH_EXTRACT_BACKEND', 'openrouter') # callLLM backend for Route 2 (ollama|groq|openrouter|gemini)
+GRAPH_EXTRACT_WORKERS = int(os.environ.get('GRAPH_EXTRACT_WORKERS', '6')) # parallel chunk extraction requests in Route 2
 
 # Chat API
 OLLAMA_CHAT_MODEL = os.environ.get('OLLAMA_CHAT_MODEL', 'llama3.1:8b')
@@ -48,7 +49,7 @@ GROQ_API_KEY = os.environ.get('GROQ_API_KEY')
 # OpenRouter (for OpenIE triple extraction)
 OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
 OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY', '')
-OPENROUTER_MODEL = os.environ.get('OPENROUTER_MODEL', 'moonshotai/kimi-k2.6:free')
+OPENROUTER_MODEL = os.environ.get('OPENROUTER_MODEL', 'deepseek/deepseek-v4-flash')
 
 # Google AI Studio (Gemini)
 GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions'
@@ -84,3 +85,4 @@ PATH_LIMIT = 300
 REL_TYPE_TOP = 5
 REL_TYPE_FLOOR = 0.25
 ENTITY_WEIGHT = 0.6  # path score = ENTITY_WEIGHT * entity_sim + (1-ENTITY_WEIGHT) * rel_sim
+LOCAL_COMENTION_EDGES = os.environ.get('LOCAL_COMENTION_EDGES', '0') == '1'  # graph mode: walk COOCCURS_WITH (Route 1 graphs)

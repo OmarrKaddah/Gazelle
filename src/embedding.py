@@ -17,13 +17,48 @@ def embedTexts(texts):
     return resp.json()["embeddings"]
 
 
-def embedQuery(query):
+nanRescued = 0  # running count of chunks that triggered a NaN and had to be rescued
+
+
+def embedNanSafe(text):
+    # bge-m3 on Ollama deterministically emits NaN for certain (non-empty) inputs — a model/quant
+    # bug, not bad data. Escapes that work vary by input; try content-preserving ones, then shrink.
     try:
-        return embedTexts([query])[0]
+        return embedTexts([text])[0]
     except RuntimeError as e:
         if 'NaN' not in str(e):
             raise
-        return embedTexts([query + ' .'])[0]
+    global nanRescued
+    nanRescued += 1
+    try:
+        return embedTexts([text.lower()])[0]
+    except RuntimeError as e:
+        if 'NaN' not in str(e):
+            raise
+    t = text
+    while len(t) > 8:
+        t = t[:len(t) * 3 // 4]
+        try:
+            return embedTexts([t])[0]
+        except RuntimeError as e:
+            if 'NaN' not in str(e):
+                raise
+    return embedTexts(['.'])[0]
+
+
+def embedQuery(query):
+    return embedNanSafe(query)
+
+
+def embedBatch(texts):
+    # One bad input would fail the whole batch; on NaN, fall back to per-item NaN-safe embedding.
+    try:
+        return embedTexts(texts)
+    except RuntimeError as e:
+        if 'NaN' not in str(e):
+            raise
+        print(f"  [warn] bge-m3 NaN in batch of {len(texts)}; retrying per-item", flush=True)
+        return [embedNanSafe(t) for t in texts]
 
 
 def loadChunks(docName):
@@ -58,6 +93,7 @@ def writeEmbedding(tx, chunkId, embedding):
 
 def embedDoc(docName):
     chunks = loadChunks(docName)
+    before = nanRescued
     with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
         with driver.session() as session:
             session.execute_write(setupVectorIndex)
@@ -65,7 +101,9 @@ def embedDoc(docName):
             for i in range(0, len(chunks), CHUNK_EMBED_BATCH):
                 batch = chunks[i:i + CHUNK_EMBED_BATCH]
                 texts = [c['text'] for c in batch]
-                embs = embedTexts(texts)
+                embs = embedBatch(texts)
                 for chunk, emb in zip(batch, embs):
                     session.execute_write(writeEmbedding, chunk['chunkId'], emb)
                 print(f"Embedded {min(i + CHUNK_EMBED_BATCH, len(chunks))}/{len(chunks)}", flush=True)
+    bad = nanRescued - before
+    print(f"[embed] {docName}: {len(chunks)} chunks, {bad} needed NaN rescue", flush=True)

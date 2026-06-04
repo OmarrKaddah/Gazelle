@@ -11,18 +11,14 @@ from db.models import User
 
 load_dotenv()
 
+# Airgapped build: SQLite only — no Postgres, no asyncpg (nothing that can't be carried on a USB).
+# Any non-sqlite DATABASE_URL left over in .env is ignored so we never try to reach a Postgres server.
 DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite+aiosqlite:///./gazelle.db")
+if not DATABASE_URL.startswith("sqlite"):
+    print(f"[db] ignoring non-sqlite DATABASE_URL ({DATABASE_URL.split('://', 1)[0]}://…); this build is SQLite-only", flush=True)
+    DATABASE_URL = "sqlite+aiosqlite:///./gazelle.db"
 
-if DATABASE_URL.startswith("sqlite"):
-    engine = create_async_engine(DATABASE_URL)
-else:
-    engine = create_async_engine(
-        DATABASE_URL,
-        pool_pre_ping=True,
-        pool_size=20,
-        max_overflow=40,
-    )
-
+engine = create_async_engine(DATABASE_URL)
 asyncSessionFactory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 

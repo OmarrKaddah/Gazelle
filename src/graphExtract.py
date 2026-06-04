@@ -1,7 +1,8 @@
 import json
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from config import GRAPH_EXTRACT_BACKEND
+from config import GRAPH_EXTRACT_BACKEND, GRAPH_EXTRACT_WORKERS
 from kgBuild import loadChunks
 from llmTriples import callLLM
 from ontology import ENTITIES
@@ -49,12 +50,15 @@ def parseElements(raw):
     return {'entities': entities, 'relationships': relationships}
 
 
+def extractChunk(chunk, backend):
+    elements = parseElements(extractElements(chunk['text'], backend))
+    return {'chunkId': chunk['chunkId'], **elements}
+
+
 def extractDoc(docName, backend=GRAPH_EXTRACT_BACKEND):
-    results = []
-    for chunk in loadChunks(docName):
-        elements = parseElements(extractElements(chunk['text'], backend))
-        results.append({'chunkId': chunk['chunkId'], **elements})
-    return results
+    chunks = loadChunks(docName)
+    with ThreadPoolExecutor(max_workers=GRAPH_EXTRACT_WORKERS) as pool:
+        return list(pool.map(lambda c: extractChunk(c, backend), chunks))
 
 
 def dumpElements(results, docName):

@@ -1,6 +1,10 @@
 # Per-document access levels. Edit DOC_ACCESS to mark a document as confidential or restricted.
 # Documents not listed here default to 'internal'.
 
+from neo4j import GraphDatabase
+
+from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
+
 LEVELS = ['public', 'internal', 'confidential', 'restricted']
 
 DEFAULT_LEVEL = 'internal'
@@ -28,12 +32,17 @@ def docLevel(docName):
     return DOC_ACCESS.get(docName, DEFAULT_LEVEL)
 
 
+def allDocNames():
+    # The universe of ingested docs is whatever exists in Neo4j, not just the DOC_ACCESS dict —
+    # so the scraped corpus (unlisted -> DEFAULT_LEVEL) is included, not silently filtered out.
+    with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
+        with driver.session() as session:
+            return [r['doc'] for r in session.run('MATCH (d:Document) RETURN d.docName AS doc')]
+
+
 def allowedDocs(userClearance):
     threshold = levelRank(userClearance)
-    return [
-        doc for doc, lvl in DOC_ACCESS.items()
-        if levelRank(lvl) <= threshold
-    ]
+    return [doc for doc in allDocNames() if levelRank(docLevel(doc)) <= threshold]
 
 
 def canSeeDoc(docName, userClearance):

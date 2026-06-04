@@ -62,10 +62,20 @@ def callLLM(prompt, backend='ollama'):
         'response_format': {'type': 'json_object'},
         **cfg['extra'],
     }
-    for attempt in range(3):
-        resp = requests.post(cfg['url'], json=payload, headers=cfg['headers'], timeout=600)
-        if resp.status_code == 429 and attempt < 2:
+    for attempt in range(6):
+        try:
+            resp = requests.post(cfg['url'], json=payload, headers=cfg['headers'], timeout=600)
+        except requests.exceptions.RequestException as e:
+            if attempt == 5:
+                print(f'[callLLM] {backend} network error, giving up after 6 attempts: {type(e).__name__}: {e}', flush=True)
+                raise
+            wait = 2 ** attempt
+            print(f'[callLLM] {backend} network error ({type(e).__name__}) on attempt {attempt + 1}/6; retrying in {wait}s', flush=True)
+            time.sleep(wait)
+            continue
+        if resp.status_code == 429 and attempt < 5:
             wait = float(resp.headers.get('Retry-After', 5))
+            print(f'[callLLM] {backend} 429 rate-limited on attempt {attempt + 1}/6; waiting {wait + 1}s', flush=True)
             time.sleep(wait + 1)
             continue
         if resp.status_code != 200:

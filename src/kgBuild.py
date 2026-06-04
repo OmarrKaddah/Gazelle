@@ -14,7 +14,18 @@ def loadEntitySpans(docName):
     return json.loads(Path(f'extractions/{docName}_entities.json').read_text(encoding='utf-8'))
 
 
+# Arabic normalization (Lucene ArabicNormalizer set): fold alef/ya/ta-marbuta variants and drop
+# tatweel + diacritics, so variant surface forms merge to one canonical key. Digits are preserved.
+_AR_DIACRITICS = re.compile('[ـً-ٰٟ]')  # tatweel, tashkeel, superscript alef
+_AR_FOLD = str.maketrans({
+    'أ': 'ا', 'إ': 'ا', 'آ': 'ا', 'ٱ': 'ا',  # أإآٱ -> ا
+    'ى': 'ي',  # ى -> ي
+    'ة': 'ه',  # ة -> ه
+})
+
+
 def canonicalKey(text):
+    text = _AR_DIACRITICS.sub('', text).translate(_AR_FOLD)
     return re.sub(r'\s+', ' ', text).strip().lower()
 
 

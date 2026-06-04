@@ -6,11 +6,12 @@ import {
   XIcon,
 } from './Icons';
 import { authHeaders } from '../hooks/useAuth';
+import GraphPath from './GraphPath';
 
 const MODES = [
   { id: 'vector', label: 'Vector', desc: 'Pure semantic similarity' },
-  { id: 'hybrid', label: 'Hybrid', desc: 'Vector + lexical fusion' },
-  { id: 'graph', label: 'Graph', desc: 'Vector seeds + graph hops' },
+  { id: 'fusion', label: 'Fusion', desc: 'Vector + keyword (RRF)' },
+  { id: 'graph', label: 'Graph', desc: 'PPR over the knowledge graph' },
 ];
 
 const SUGGESTIONS = [
@@ -20,7 +21,7 @@ const SUGGESTIONS = [
 ];
 
 const SETTINGS_KEY = 'gazelle.settings.v1';
-const DEFAULTS = { mode: 'vector', k: 5, hops: 1, provider: 'ollama' };
+const DEFAULTS = { mode: 'vector', k: 5, provider: 'ollama' };
 
 function loadSettings() {
   try {
@@ -113,7 +114,6 @@ export default function ChatView({ chatState }) {
           chatId: chat.id,
           mode: settings.mode,
           k: settings.k,
-          hops: settings.hops,
           provider: settings.provider,
         }),
       });
@@ -134,6 +134,8 @@ export default function ChatView({ chatState }) {
           const evt = JSON.parse(line.slice(6));
           if (evt.type === 'citations') {
             messages = patchLast(messages, { citations: evt.citations });
+          } else if (evt.type === 'graph') {
+            messages = patchLast(messages, { graph: { seeds: evt.seeds, pathEdges: evt.pathEdges } });
           } else if (evt.type === 'token') {
             messages = patchLast(messages, { text: messages[messages.length - 1].text + evt.text });
           } else if (evt.type === 'done' && evt.chatId && !chat.id) {
@@ -280,6 +282,9 @@ function Message({ message }) {
       {message.citations && message.citations.length > 0 && (
         <Citations citations={message.citations} mode={message.mode} />
       )}
+      {message.mode === 'graph' && message.graph && message.graph.seeds.length > 0 && (
+        <GraphPath graph={message.graph} citations={message.citations || []} />
+      )}
     </div>
   );
 }
@@ -366,7 +371,8 @@ function Citation({ citation, index }) {
   const sourceColor =
     {
       vector: 'bg-brand text-adib-glow',
-      hybrid: 'bg-adib text-white',
+      fusion: 'bg-adib text-white',
+      graph: 'bg-gold text-brand',
       seed: 'bg-brand text-adib-glow',
       neighbor: 'bg-gold text-brand',
     }[citation.source] || 'bg-cream-deeper text-ink-muted';
@@ -435,7 +441,6 @@ function Composer({ query, setQuery, send, streaming, settings, setSettings, pro
             <span className="font-mono">{settings.provider}</span>
             <span className="text-cream-edge">·</span>
             <span className="font-mono">k={settings.k}</span>
-            {settings.mode === 'graph' && <span className="font-mono">·{settings.hops}-hop</span>}
           </button>
           {settingsOpen && (
             <SettingsPopover
@@ -559,25 +564,6 @@ function SettingsPopover({ settings, setSettings, providers, onClose }) {
           />
         </SettingRow>
 
-        {settings.mode === 'graph' && (
-          <SettingRow label="Hops" value={settings.hops}>
-            <div className="flex gap-1">
-              {[1, 2].map((h) => (
-                <button
-                  key={h}
-                  onClick={() => setSettings({ ...settings, hops: h })}
-                  className={`flex-1 py-1 text-[11px] font-medium rounded ${
-                    settings.hops === h
-                      ? 'bg-adib text-white shadow-sm'
-                      : 'bg-cream-frame text-ink-muted hover:bg-cream-deeper'
-                  }`}
-                >
-                  {h}-hop
-                </button>
-              ))}
-            </div>
-          </SettingRow>
-        )}
 
         <div className="text-[10.5px] text-ink-faint pt-2 mt-2 border-t border-cream-border">
           Settings persist locally. Disabled providers need an API key in <code className="font-mono text-[10px]">.env</code>.

@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import ChatView from './components/ChatView';
 import GraphExplorer from './components/GraphExplorer';
+import PipelineView from './components/PipelineView';
 import Login from './components/Login';
 import { useChats } from './hooks/useChats';
 import { useAuth } from './hooks/useAuth';
 
-const VIEWS = { CHAT: 'chat', GRAPH: 'graph' };
+const VIEWS = { CHAT: 'chat', GRAPH: 'graph', PIPELINE: 'pipeline' };
 const SIDEBAR_KEY = 'gazelle.sidebar.open';
 
 export default function App() {
@@ -52,6 +53,7 @@ export default function App() {
       <main className="flex-1 flex flex-col min-w-0 bg-cream">
         {view === VIEWS.CHAT && <ChatView chatState={chatState} user={auth.user} />}
         {view === VIEWS.GRAPH && <GraphExplorer />}
+        {view === VIEWS.PIPELINE && <PipelineView />}
       </main>
     </div>
   );
