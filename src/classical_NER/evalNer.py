@@ -9,7 +9,7 @@ def loadGold(docName):
 
 
 def loadCrf(docName, modelName):
-    path = Path(f'extractions/{modelName}/{docName}_entities.json')
+    path = Path(f'extractions/{docName}_{modelName}_entities.json')
     return json.loads(path.read_text(encoding='utf-8'))
 
 

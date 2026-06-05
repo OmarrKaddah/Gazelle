@@ -25,6 +25,7 @@ def bioToSpans(tokens, labels, chunkId, docName):
     for tok, label in zip(tokens, labels):
         if label == 'B':
             if current:
+                current['type'] = current['text']
                 spans.append(current)
             current = {
                 'chunkId': chunkId,
@@ -33,16 +34,17 @@ def bioToSpans(tokens, labels, chunkId, docName):
                 'start':   tok['start'],
                 'end':     tok['end'],
                 'score':   1.0,
-                'source':  'crf',
             }
         elif label == 'I' and current:
             current['text'] += ' ' + tok['word']
             current['end']   = tok['end']
         else:
             if current:
+                current['type'] = current['text']
                 spans.append(current)
             current = None
     if current:
+        current['type'] = current['text']
         spans.append(current)
     return spans
 
@@ -66,9 +68,8 @@ def predictChunk(crf, chunk, orgTriggers, moneyTriggers, monthNames):
 
 
 def dumpEntities(entities, docName, modelName):
-    outDir = Path(f'extractions/{modelName}')
-    outDir.mkdir(parents=True, exist_ok=True)
-    out = outDir / f'{docName}_entities.json'
+    Path('extractions').mkdir(exist_ok=True)
+    out = Path(f'extractions/{docName}_{modelName}_entities.json')
     out.write_text(json.dumps(entities, ensure_ascii=False, indent=2), encoding='utf-8')
     print(f"  saved -> {out}")
 
