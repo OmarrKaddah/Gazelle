@@ -5,13 +5,13 @@ from collections import defaultdict
 from pathlib import Path
 from retrieve import RetrievalIndex
 from khop import KhopIndex
-from loadChunks import chunkId, DEV, LIMIT
+from loadChunks import chunkId, paragraphText, DEV, LIMIT
 
 
 # ── version + config for this run ────────────────────────────────
 VERSION = 'v8'
-LABEL = 'route2related'
-NOTES = 'Route 2 graph (OpenRouter LLM extraction -> RELATED {predicate,description,weight}) retrieved by PPR. Default deployment layers: RELATED + SYNONYM (entity alignment). co-mention and bare triples OFF. Same PPR knobs as the best prior run (v4/v7b: alpha=0.5, seedTopK=5, synonymWeight=1.0). First eval of the unified RELATED edge on a fresh Neo4j instance.'
+LABEL = 'route2related_2wiki'
+NOTES = 'Route 2 graph (OpenRouter LLM extraction -> RELATED {predicate,description,weight}) retrieved by PPR on 2WikiMultiHopQA. Default layers: RELATED + SYNONYM. co-mention and bare triples OFF. Same knobs as the musique v8 run (alpha=0.5, seedTopK=5, synonymWeight=1.0).'
 CONFIG = {
     'retriever': 'ppr',
     'pprAlpha': 0.5,
@@ -33,17 +33,21 @@ OUT = OUT_DIR / f'{VERSION}_{LABEL}.json'
 
 
 def loadGold():
-    rows = [json.loads(l) for l in DEV.read_text(encoding='utf-8').splitlines() if l.strip()]
+    rows = json.loads(DEV.read_text(encoding='utf-8'))
     rows = rows if LIMIT is None else rows[:LIMIT]
     gold = []
     for ex in rows:
-        supporting = [p for p in ex.get('paragraphs', []) if p.get('is_supporting')]
-        goldIds = {chunkId(p['paragraph_text']) for p in supporting if p.get('paragraph_text')}
-        hop = ex['id'].split('_')[0]
+        supTitles = {t for t, _ in ex.get('supporting_facts', [])}
+        goldIds = set()
+        for title, sentences in ex.get('context', []):
+            if title in supTitles:
+                text = paragraphText(sentences)
+                if text:
+                    goldIds.add(chunkId(text))
         gold.append({
-            'id': ex['id'],
+            'id': ex['_id'],
             'question': ex['question'],
-            'hop': hop,
+            'hop': ex.get('type', 'unknown'),
             'goldChunkIds': sorted(goldIds),
             'answer': ex.get('answer'),
         })
@@ -81,15 +85,15 @@ def main():
     OUT_DIR.mkdir(exist_ok=True)
     print(f'[eval] {VERSION}_{LABEL}  ({NOTES})')
     print(f'[eval] config: {CONFIG}')
-    print(f'[eval] musique dev (LIMIT={LIMIT})')
+    print(f'[eval] 2wiki dev (LIMIT={LIMIT})')
     gold = loadGold()
     print(f'[eval] {len(gold)} questions loaded')
     print(f'[eval] building index...')
     if CONFIG.get('retriever') == 'khop':
-        index = KhopIndex('musique', depth=CONFIG['khopDepth'])
+        index = KhopIndex('2wiki', depth=CONFIG['khopDepth'])
     else:
         index = RetrievalIndex(
-            'musique',
+            '2wiki',
             entityAlignment=CONFIG['entityAlignment'],
             synonymWeight=CONFIG['synonymWeight'],
             coMentionEdges=CONFIG['coMentionEdges'],
@@ -138,7 +142,7 @@ def main():
     byHop = defaultdict(list)
     for q in perQuestion:
         byHop[q['hop']].append(q)
-    print('by hop count:')
+    print('by question type:')
     for hop in sorted(byHop):
         printBlock(f'  {hop}', aggregate(byHop[hop]), len(byHop[hop]))
 

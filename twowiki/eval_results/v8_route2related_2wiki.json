@@ -1,0 +1,6545 @@
+{
+  "version": "v8",
+  "label": "route2related_2wiki",
+  "notes": "Route 2 graph (OpenRouter LLM extraction -> RELATED {predicate,description,weight}) retrieved by PPR on 2WikiMultiHopQA. Default layers: RELATED + SYNONYM. co-mention and bare triples OFF. Same knobs as the musique v8 run (alpha=0.5, seedTopK=5, synonymWeight=1.0).",
+  "config": {
+    "retriever": "ppr",
+    "pprAlpha": 0.5,
+    "seedTopK": 5,
+    "relatedEdges": true,
+    "entityAlignment": true,
+    "synonymWeight": 1.0,
+    "coMentionEdges": false,
+    "tripleEdges": false,
+    "nodeSpecificity": false
+  },
+  "aggregate": {
+    "recall@1": 0.32375,
+    "hit@1": 0.73,
+    "recall@2": 0.535,
+    "hit@2": 0.875,
+    "recall@5": 0.71375,
+    "hit@5": 0.96,
+    "recall@10": 0.83375,
+    "hit@10": 0.975
+  },
+  "byHop": {
+    "compositional": {
+      "recall@1": 0.3055555555555556,
+      "hit@1": 0.6111111111111112,
+      "recall@2": 0.45,
+      "hit@2": 0.7888888888888889,
+      "recall@5": 0.6333333333333333,
+      "hit@5": 0.9222222222222223,
+      "recall@10": 0.7833333333333333,
+      "hit@10": 0.9555555555555556
+    },
+    "comparison": {
+      "recall@1": 0.4479166666666667,
+      "hit@1": 0.8958333333333334,
+      "recall@2": 0.8229166666666666,
+      "hit@2": 1.0,
+      "recall@5": 1.0,
+      "hit@5": 1.0,
+      "recall@10": 1.0,
+      "hit@10": 1.0
+    },
+    "inference": {
+      "recall@1": 0.3409090909090909,
+      "hit@1": 0.6818181818181818,
+      "recall@2": 0.5227272727272727,
+      "hit@2": 0.8181818181818182,
+      "recall@5": 0.6818181818181818,
+      "hit@5": 1.0,
+      "recall@10": 0.9090909090909091,
+      "hit@10": 1.0
+    },
+    "bridge_comparison": {
+      "recall@1": 0.20625,
+      "hit@1": 0.825,
+      "recall@2": 0.3875,
+      "hit@2": 0.95,
+      "recall@5": 0.56875,
+      "hit@5": 0.975,
+      "recall@10": 0.70625,
+      "hit@10": 0.975
+    }
+  },
+  "perQuestion": [
+    {
+      "id": "8813f87c0bdd11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Who is the mother of the director of film Polish-Russian War (Film)?",
+      "answer": "Ma\u0142gorzata Braunek",
+      "goldChunkIds": [
+        "2wiki-015b8e620440d1cc",
+        "2wiki-d7febb5908df58ba"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-db7a7bd3416c17eb",
+        "2wiki-015b8e620440d1cc",
+        "2wiki-455830e8ade84f07",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-d7febb5908df58ba",
+        "2wiki-c199f9f4f2fef96b",
+        "2wiki-7bb83dc21ac7efd1",
+        "2wiki-981c47f776cb2e08",
+        "2wiki-061d484fd18ddb65"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "61a46987092f11ebbdaeac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Which film came out first, Blind Shaft or The Mask Of Fu Manchu?",
+      "answer": "The Mask Of Fu Manchu",
+      "goldChunkIds": [
+        "2wiki-c573e066cad22767",
+        "2wiki-f081d97e39c0e33b"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-f081d97e39c0e33b",
+        "2wiki-c573e066cad22767",
+        "2wiki-3a9082c9fef238c7",
+        "2wiki-4204cc5a252bfa9d",
+        "2wiki-4242dca167e4c494",
+        "2wiki-786a33e81125f1a4",
+        "2wiki-8ed7d6955aeb84d1",
+        "2wiki-c7d121e880699864",
+        "2wiki-d2710d2e128c5a22",
+        "2wiki-04e2f0d821b61d97"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "e2a3bf2a0bdd11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "When did John V, Prince Of Anhalt-Zerbst's father die?",
+      "answer": "12 June 1516",
+      "goldChunkIds": [
+        "2wiki-792f4561db541e7b",
+        "2wiki-aec34fe856ef59b5"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-792f4561db541e7b",
+        "2wiki-577c3b397a462abc",
+        "2wiki-d7e55499662a0642",
+        "2wiki-e45a97ca4f579a43",
+        "2wiki-7fe0f86884137fbf",
+        "2wiki-fb21b0a6b5bd44ae",
+        "2wiki-878f451517222cc6",
+        "2wiki-aec34fe856ef59b5",
+        "2wiki-41a4d79eb645cfc6",
+        "2wiki-3a3f3066343441d1"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "0cd3bdea0bde11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What is the award that the director of film Wearing Velvet Slippers Under A Golden Umbrella won?",
+      "answer": "Myanmar Motion Picture Academy Awards",
+      "goldChunkIds": [
+        "2wiki-0decf8edec2742c2",
+        "2wiki-3675a8fbf5adc9f0"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-0decf8edec2742c2",
+        "2wiki-8b1947ec09998466",
+        "2wiki-596f40b6281cb950",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-c710719c097bea5e",
+        "2wiki-bfd9a516b6748f16",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-9bf79f0c693efef3"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "f9dcb4a60bda11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the director of film Ronnie Rocket born?",
+      "answer": "Missoula, Montana",
+      "goldChunkIds": [
+        "2wiki-5b60518c01a655ca",
+        "2wiki-9bce2f73f6c67730"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-9bce2f73f6c67730",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-596f40b6281cb950",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-9bf79f0c693efef3",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-061d484fd18ddb65"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "8981e1ce0bb011ebab90acde48001122",
+      "hop": "inference",
+      "question": "Who is Charles Bretagne Marie De La Tr\u00e9moille's paternal grandfather?",
+      "answer": "Charles Armand Ren\u00e9 de La Tr\u00e9moille",
+      "goldChunkIds": [
+        "2wiki-036410cc0de437b2",
+        "2wiki-f734ca8c2bec98ba"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-036410cc0de437b2",
+        "2wiki-98697dfe63bb5b59",
+        "2wiki-9033462586b4c16f",
+        "2wiki-e701209a61fcbec2",
+        "2wiki-d891b551893c1bec",
+        "2wiki-f734ca8c2bec98ba",
+        "2wiki-da409f2a11d68f67",
+        "2wiki-c7dcb4dd0f819b4e",
+        "2wiki-ae1686f051b90063",
+        "2wiki-dc6bfac98d1294da"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "019bed300bde11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the father of \u0218tefan I. Neni\u021bescu born?",
+      "answer": "Gala\u021bi",
+      "goldChunkIds": [
+        "2wiki-aec292487dca7e4d",
+        "2wiki-fc9635125b68324d"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-fc9635125b68324d",
+        "2wiki-aec292487dca7e4d",
+        "2wiki-1c7e903e347803eb",
+        "2wiki-6a3a6ba36b517999",
+        "2wiki-297253c67cce4d3f",
+        "2wiki-837ed84c2f757784",
+        "2wiki-013d3e0688959fd5",
+        "2wiki-cf0f372963fbd365",
+        "2wiki-98fc06061edd5cf0",
+        "2wiki-8c0d9bf215fd80e6"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "a7b9672009c311ebbdb0ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Are North Marion High School (Oregon) and Seoul High School both located in the same country?",
+      "answer": "no",
+      "goldChunkIds": [
+        "2wiki-2697cfed950c6f7e",
+        "2wiki-b1c3f76df334a30d"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-b1c3f76df334a30d",
+        "2wiki-2697cfed950c6f7e",
+        "2wiki-93e0635e0af81547",
+        "2wiki-2485c6bd1ef5ace1",
+        "2wiki-307c4dae862db716",
+        "2wiki-282f7d92815a4468",
+        "2wiki-c1efd1d079b0d2e4",
+        "2wiki-ef6ec4873a676bbe",
+        "2wiki-e88989a5240ea29a",
+        "2wiki-efec584a78c075ac"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "298f23b8088a11ebbd6eac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director who was born later, El Extra\u00f1o Viaje or Love In Pawn?",
+      "answer": "El Extra\u00f1o Viaje",
+      "goldChunkIds": [
+        "2wiki-369a913876652e8b",
+        "2wiki-8c6dabfa3a8359ac",
+        "2wiki-c31e8b848537ce8e",
+        "2wiki-d6d7bc7b58c4bb9d"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-8c6dabfa3a8359ac",
+        "2wiki-6150c8714f40215c",
+        "2wiki-8280155c6e4f1043",
+        "2wiki-8f0ba6dedd62b412",
+        "2wiki-d6d7bc7b58c4bb9d",
+        "2wiki-fd7adab512f96e5c",
+        "2wiki-f8c3fee21719150f",
+        "2wiki-259525dd066fbda1",
+        "2wiki-ff245185ad3c641f",
+        "2wiki-cab09ab58542fb0d"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.25,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2ec440560bb011ebab90acde48001122",
+      "hop": "inference",
+      "question": "Who is the maternal grandfather of Antiochus X Eusebes?",
+      "answer": "Ptolemy IX Lathyros",
+      "goldChunkIds": [
+        "2wiki-0ef9cacc7a058f35",
+        "2wiki-ed6acbffff7ff6f8"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-0ef9cacc7a058f35",
+        "2wiki-e13c159ab3bd22ac",
+        "2wiki-ed6acbffff7ff6f8",
+        "2wiki-6c9f1b072bd02449",
+        "2wiki-d2603f6e7703121a",
+        "2wiki-11f00eaaf5aa5504",
+        "2wiki-cbb85ba6b6c79a06",
+        "2wiki-49acb72e165a1ffb",
+        "2wiki-c3b2c709cf554ab4",
+        "2wiki-4b65d9abf50aae25"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "05f8a691087b11ebbd67ac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director died first, Crimen A Las Tres or The Working Class Goes To Heaven?",
+      "answer": "The Working Class Goes To Heaven",
+      "goldChunkIds": [
+        "2wiki-0ba1270aa1a9d203",
+        "2wiki-1b2ff3da335b4eac",
+        "2wiki-577bdb4eb259224d",
+        "2wiki-740007b6a88fb370"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-1b2ff3da335b4eac",
+        "2wiki-577bdb4eb259224d",
+        "2wiki-56605b0c3762fdbd",
+        "2wiki-740007b6a88fb370",
+        "2wiki-29697daad9119c9b",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-596f40b6281cb950"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.75,
+        "hit@5": 1.0,
+        "recall@10": 0.75,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "645c9a5a08c311ebbd8dac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director born first, Once A Gentleman or The Girl In White?",
+      "answer": "Once A Gentleman",
+      "goldChunkIds": [
+        "2wiki-1c8ff280ddb15d94",
+        "2wiki-6ff447fdeb4b703e",
+        "2wiki-8afd5b2e7a8337da",
+        "2wiki-c17d7492462fc199"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-1c8ff280ddb15d94",
+        "2wiki-6ff447fdeb4b703e",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c199f9f4f2fef96b",
+        "2wiki-c17d7492462fc199",
+        "2wiki-7bb83dc21ac7efd1",
+        "2wiki-981c47f776cb2e08",
+        "2wiki-7f8b9e897d17d362",
+        "2wiki-ebef3f7e88ef5df8"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.75,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "5bec3cd408a711ebbd7fac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director who died earlier, Il Seduttore or The Trial Of Joan Of Arc?",
+      "answer": "The Trial Of Joan Of Arc",
+      "goldChunkIds": [
+        "2wiki-4c025f10d13af8f8",
+        "2wiki-7488a106ab871b10",
+        "2wiki-eea7c8516e747829",
+        "2wiki-f14974808b7a4e9a"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-eea7c8516e747829",
+        "2wiki-7488a106ab871b10",
+        "2wiki-df6ed9a496b5ae41",
+        "2wiki-f14974808b7a4e9a",
+        "2wiki-4c025f10d13af8f8",
+        "2wiki-467e01020ab5c3bf",
+        "2wiki-dfaf0c9f319c7ef2",
+        "2wiki-3eb67f24b4bb99d9",
+        "2wiki-1aec0be46dd90c60",
+        "2wiki-902d6a04da88d39f"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "464cfa460bd911eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the director of film Thomas Jefferson (Film) born?",
+      "answer": "Brooklyn",
+      "goldChunkIds": [
+        "2wiki-547d4c368f8130ef",
+        "2wiki-90d566427b97b59c"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-90d566427b97b59c",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c199f9f4f2fef96b",
+        "2wiki-b1c3f76df334a30d",
+        "2wiki-e88989a5240ea29a",
+        "2wiki-c000c4b2b02d0304",
+        "2wiki-04e2f0d821b61d97",
+        "2wiki-e42d2f204b109fc2",
+        "2wiki-5da98ee581890541"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "c05e16a40bdd11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Why did Grand Duke Kirill Vladimirovich Of Russia's wife die?",
+      "answer": "stroke",
+      "goldChunkIds": [
+        "2wiki-57a5bebb94593b1a",
+        "2wiki-6402ea18d066cd40"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-57a5bebb94593b1a",
+        "2wiki-42c6d4c0d0609657",
+        "2wiki-820022e83c56a44d",
+        "2wiki-6402ea18d066cd40",
+        "2wiki-0af4eed59d70687c",
+        "2wiki-e9c90e3568dd5564",
+        "2wiki-d20f92420784fdfb",
+        "2wiki-082b3877d8d605bf",
+        "2wiki-ed70c275591897f4",
+        "2wiki-fc91acf863b8b360"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2935f1640bda11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the place of death of the director of film Beat Girl?",
+      "answer": "Nice",
+      "goldChunkIds": [
+        "2wiki-04e2f0d821b61d97",
+        "2wiki-fe3ba8ba3aaf80c1"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-04e2f0d821b61d97",
+        "2wiki-24cafab1ddfda01d",
+        "2wiki-3e150b0cf9f1fbe8",
+        "2wiki-596f40b6281cb950",
+        "2wiki-061d484fd18ddb65",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-c710719c097bea5e",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-bfd9a516b6748f16",
+        "2wiki-bf7d2bf7146340b1"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "ada1b358085211ebbd58ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Who died first, Fleetwood Sheppard or George William Whitaker?",
+      "answer": "Fleetwood Sheppard",
+      "goldChunkIds": [
+        "2wiki-22cbd5b1013565c1",
+        "2wiki-bf93e12d71bad43c"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-bf93e12d71bad43c",
+        "2wiki-22cbd5b1013565c1",
+        "2wiki-ba9a4cee0522ecde",
+        "2wiki-0d0197936599ea49",
+        "2wiki-fdc7258edf084077",
+        "2wiki-a18fb023d0b461f3",
+        "2wiki-60bfc38426fa4c71",
+        "2wiki-a65ec15f802d1643",
+        "2wiki-03c59734abc75ebc",
+        "2wiki-fe447e07a2e64cb4"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "3f857208086c11ebbd61ac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director born first, The Raven'S Dance or Ke\u00efta! L'H\u00e9ritage Du Griot?",
+      "answer": "The Raven'S Dance",
+      "goldChunkIds": [
+        "2wiki-070de9bbad659007",
+        "2wiki-1f6a664c404751d7",
+        "2wiki-5016591893c73693",
+        "2wiki-fb480babd069712e"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-5016591893c73693",
+        "2wiki-3e82c7371626ee95",
+        "2wiki-fb480babd069712e",
+        "2wiki-070de9bbad659007",
+        "2wiki-bc08e149983b3f4e",
+        "2wiki-9af9031d9552aee8",
+        "2wiki-37ba2e7449a793f3",
+        "2wiki-271524bcfb4d3311",
+        "2wiki-dcea073914b9be80",
+        "2wiki-ba9a4cee0522ecde"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.25,
+        "hit@2": 1.0,
+        "recall@5": 0.75,
+        "hit@5": 1.0,
+        "recall@10": 0.75,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "dfe93efe0bdd11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "When did Jean Martin (Singer)'s husband die?",
+      "answer": "1983",
+      "goldChunkIds": [
+        "2wiki-03df2044e0fe3e03",
+        "2wiki-5e621ab4fb224a44"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-5e621ab4fb224a44",
+        "2wiki-215ce10b5c3493ac",
+        "2wiki-05536dfc4f4dbdc6",
+        "2wiki-747ce74e8bec2a49",
+        "2wiki-7b03e650cf9b09bd",
+        "2wiki-8c91683368551d60",
+        "2wiki-05e2e559bd28dbf9",
+        "2wiki-da6f952fd5eb161b",
+        "2wiki-73a0c672bf2a0271",
+        "2wiki-bdaa8360016ce1fa"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "1d890623088711ebbd6dac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director who died earlier, Tangled Destinies or The Daltons' Women?",
+      "answer": "Tangled Destinies",
+      "goldChunkIds": [
+        "2wiki-3152ccee43e49170",
+        "2wiki-6b58f1d2081e24bb",
+        "2wiki-bdf90533291afade",
+        "2wiki-f2c50b0b6ede96a4"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-f2c50b0b6ede96a4",
+        "2wiki-3152ccee43e49170",
+        "2wiki-86e63d8b3fddd1ec",
+        "2wiki-49c241d5bcd92739",
+        "2wiki-046bbde968ba2ed6",
+        "2wiki-6b58f1d2081e24bb",
+        "2wiki-bdf90533291afade",
+        "2wiki-159bb31ed6868438",
+        "2wiki-210edc0ec5405482",
+        "2wiki-ef44df41764e2f99"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "d8c36503097411ebbdb0ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Which film was released earlier, Moment Of Danger or The Ballad Of Josie?",
+      "answer": "Moment Of Danger",
+      "goldChunkIds": [
+        "2wiki-6faee0bbe2f2c56b",
+        "2wiki-d4e26766ad613f65"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-06327c9e5999234e",
+        "2wiki-6faee0bbe2f2c56b",
+        "2wiki-d4e26766ad613f65",
+        "2wiki-8b41fb9eab89aed5",
+        "2wiki-25736fe4f2ed0141",
+        "2wiki-5bee64d1bfe441aa",
+        "2wiki-43c38627c51467ac",
+        "2wiki-f14974808b7a4e9a",
+        "2wiki-f73fd6a572e5da28",
+        "2wiki-7ec5e6bb1b877d2e"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2207e9060bda11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What nationality is the director of film World And Time Enough?",
+      "answer": "United States",
+      "goldChunkIds": [
+        "2wiki-51bd5277c10e2c36",
+        "2wiki-609bf3ac47d0750e"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-c199f9f4f2fef96b",
+        "2wiki-8b1947ec09998466",
+        "2wiki-609bf3ac47d0750e",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-3e150b0cf9f1fbe8",
+        "2wiki-55107ff1c3c6137b",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-596f40b6281cb950",
+        "2wiki-8c958ab7c1c4cd3c"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "7abc1e3008d511ebbd98ac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director died earlier, Poker In Bed or The Machine To Kill Bad People?",
+      "answer": "The Machine To Kill Bad People",
+      "goldChunkIds": [
+        "2wiki-1c0f6e8f228790ea",
+        "2wiki-1fa2f2b0ef2ff0d1",
+        "2wiki-85cb088afe8acc07",
+        "2wiki-bf7d2bf7146340b1"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-85cb088afe8acc07",
+        "2wiki-1c0f6e8f228790ea",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-8b1947ec09998466",
+        "2wiki-04275a4bc748c260",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-596f40b6281cb950",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-9bf79f0c693efef3",
+        "2wiki-8c958ab7c1c4cd3c"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.75,
+        "hit@5": 1.0,
+        "recall@10": 0.75,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "ae331827088b11ebbd6fac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film whose director is younger, Heads I Win, Tails You Lose or The Incredible Sarah?",
+      "answer": "Heads I Win, Tails You Lose",
+      "goldChunkIds": [
+        "2wiki-94457837342a47ba",
+        "2wiki-ba8e505f19b6d2a7",
+        "2wiki-d2df560dce77aaaa",
+        "2wiki-d84ec0165ea01a0a"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-ba8e505f19b6d2a7",
+        "2wiki-94457837342a47ba",
+        "2wiki-0e5f1001ff7ef6df",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-596f40b6281cb950",
+        "2wiki-8c958ab7c1c4cd3c"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2002bf0c0bb011ebab90acde48001122",
+      "hop": "inference",
+      "question": "Who is Catherine Of Pomerania, Countess Palatine Of Neumarkt's father-in-law?",
+      "answer": "Rupert",
+      "goldChunkIds": [
+        "2wiki-6aac51028651fd16",
+        "2wiki-9fe715a6bd652e24"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-9fe715a6bd652e24",
+        "2wiki-6aac51028651fd16",
+        "2wiki-70990ae7c3f653cd",
+        "2wiki-33b1e0550e8e2f75",
+        "2wiki-015047eb281ff94b",
+        "2wiki-aad7334b449b60e0",
+        "2wiki-a0a2dfe16ff27a18",
+        "2wiki-ed70c275591897f4",
+        "2wiki-9f10096e004c14ed",
+        "2wiki-da09ebc57c0e6482"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "c531e7560baf11ebab90acde48001122",
+      "hop": "inference",
+      "question": "Who is Marie Z\u00e9phyrine Of France's paternal grandmother?",
+      "answer": "Marie Leszczy\u0144ska",
+      "goldChunkIds": [
+        "2wiki-0dde6834a481e857",
+        "2wiki-be45b25a75f1b491"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-be45b25a75f1b491",
+        "2wiki-826856ac274729b0",
+        "2wiki-c5f8bd7b10ac3522",
+        "2wiki-f75f732f28b9b34d",
+        "2wiki-8db4df4d851572e9",
+        "2wiki-0dde6834a481e857",
+        "2wiki-862c47321611e0cf",
+        "2wiki-abdc5b1d8dfab0de",
+        "2wiki-61d7cc55ba30e8af",
+        "2wiki-37ba2e7449a793f3"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "4d982dc308c111ebbd8bac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director died earlier, Condemned Women or Faces In The Dark?",
+      "answer": "Condemned Women",
+      "goldChunkIds": [
+        "2wiki-2862fe1489c73e32",
+        "2wiki-28a22cda481f97b4",
+        "2wiki-8f09bb4d770f952f",
+        "2wiki-bac003e1bb2c906d"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-28a22cda481f97b4",
+        "2wiki-8f09bb4d770f952f",
+        "2wiki-d23e541f4afc035a",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-596f40b6281cb950",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-c710719c097bea5e",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-9bf79f0c693efef3"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "a9cc5f240bdb11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Who is the spouse of the director of film Eden And After?",
+      "answer": "Catherine Robbe-Grillet",
+      "goldChunkIds": [
+        "2wiki-76711fa293278a71",
+        "2wiki-c7dcb4dd0f819b4e"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-db7a7bd3416c17eb",
+        "2wiki-c2c673e8e6033141",
+        "2wiki-76711fa293278a71",
+        "2wiki-c199f9f4f2fef96b",
+        "2wiki-8b1947ec09998466",
+        "2wiki-3e150b0cf9f1fbe8",
+        "2wiki-55107ff1c3c6137b",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-f14974808b7a4e9a",
+        "2wiki-061d484fd18ddb65"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "6ebe05740bde11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the place of death of Anastasia Of Serbia's husband?",
+      "answer": "Hilandar",
+      "goldChunkIds": [
+        "2wiki-1c7e903e347803eb",
+        "2wiki-6a3a6ba36b517999"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-3de2c35eab5b3297",
+        "2wiki-6a3a6ba36b517999",
+        "2wiki-1751033f2e220547",
+        "2wiki-59cf1ae9cf1516ee",
+        "2wiki-ed70c275591897f4",
+        "2wiki-599e4b675afff6d0",
+        "2wiki-1c7e903e347803eb",
+        "2wiki-52c569cb9f972a53",
+        "2wiki-82241e6c84cb64e5",
+        "2wiki-851a0c452a80460b"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "a0065fe9085f11ebbd5dac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Are Fire In Hell and The Tiger: An Old Hunter'S Tale from the same country?",
+      "answer": "yes",
+      "goldChunkIds": [
+        "2wiki-282f7d92815a4468",
+        "2wiki-ef6ec4873a676bbe"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-ef6ec4873a676bbe",
+        "2wiki-282f7d92815a4468",
+        "2wiki-f2c6a7ef7698a269",
+        "2wiki-2211aad116af8d87",
+        "2wiki-8c0d9bf215fd80e6",
+        "2wiki-c1efd1d079b0d2e4",
+        "2wiki-0bf066cb33dd65b5",
+        "2wiki-2697cfed950c6f7e",
+        "2wiki-990de9a4e899a559",
+        "2wiki-94cf0a25e41a794a"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "7c490349090311ebbdadac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Which film was released more recently, Lo Zappatore or Placer Sangriento?",
+      "answer": "Placer Sangriento",
+      "goldChunkIds": [
+        "2wiki-759fbaaba77864a4",
+        "2wiki-a5eddc1724565b9a"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-f266ab0bfaaae09e",
+        "2wiki-a5eddc1724565b9a",
+        "2wiki-02bd74f9f804f253",
+        "2wiki-759fbaaba77864a4",
+        "2wiki-f14974808b7a4e9a",
+        "2wiki-fcb4b2f952fb29f4",
+        "2wiki-eea7c8516e747829",
+        "2wiki-210edc0ec5405482",
+        "2wiki-2cd5ce67f19e1deb",
+        "2wiki-ce86302627935108"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "8d2382e0085811ebbd5aac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Was \u015eemsettin Ba\u015f or Gwenc'Hlan Le Scou\u00ebzec born first?",
+      "answer": "Gwenc'Hlan Le Scou\u00ebzec",
+      "goldChunkIds": [
+        "2wiki-2f1d172c1aadb9ad",
+        "2wiki-57600fd95d2dfb28"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-2f1d172c1aadb9ad",
+        "2wiki-8bb01501412cdea2",
+        "2wiki-57600fd95d2dfb28",
+        "2wiki-06cc9f922129656c",
+        "2wiki-23959dc2df8e63c0",
+        "2wiki-1f43baa48b933a0d",
+        "2wiki-9ad6c1a00018efdf",
+        "2wiki-c32c2406b5978f38",
+        "2wiki-403f816b3c89979e",
+        "2wiki-5a9bcd0211d16237"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "1a114c5e088f11ebbd71ac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director born later, Bhoomiyude Avakashikal or The Majesty Of The Law?",
+      "answer": "Bhoomiyude Avakashikal",
+      "goldChunkIds": [
+        "2wiki-1cdf31018e94dbe3",
+        "2wiki-5328e42d5f147085",
+        "2wiki-a94f16ac135cc128",
+        "2wiki-fcb4b2f952fb29f4"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-fcb4b2f952fb29f4",
+        "2wiki-1cdf31018e94dbe3",
+        "2wiki-a94f16ac135cc128",
+        "2wiki-2aa387a7469ce0cc",
+        "2wiki-76e6e9d7fb5a11fb",
+        "2wiki-596f40b6281cb950",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-c710719c097bea5e",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-bf7d2bf7146340b1"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.75,
+        "hit@5": 1.0,
+        "recall@10": 0.75,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "7a1d9d7c0bb011ebab90acde48001122",
+      "hop": "inference",
+      "question": "Who is Cornelia (Wife Of Caesar)'s child-in-law?",
+      "answer": "Pompey",
+      "goldChunkIds": [
+        "2wiki-85bb64486a518e09",
+        "2wiki-99667ba02b2fb216"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-99667ba02b2fb216",
+        "2wiki-85bb64486a518e09",
+        "2wiki-2eac80143dbf9d90",
+        "2wiki-ba946a2a15e275fa",
+        "2wiki-6e6c1936d59639c7",
+        "2wiki-ae246b966d1b32ee",
+        "2wiki-664d5c2fe5291c39",
+        "2wiki-de86995aeb94bf96",
+        "2wiki-823fd28ef543a185",
+        "2wiki-734a47e1b0414f5a"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "0bedb7e80bdc11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Why did John Middleton Murry's wife die?",
+      "answer": "tuberculosis",
+      "goldChunkIds": [
+        "2wiki-45d1e9e83b20aa6c",
+        "2wiki-b8cdf1719645d65a"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-f1485176032ccee6",
+        "2wiki-45d1e9e83b20aa6c",
+        "2wiki-87db2b670da60f2c",
+        "2wiki-7be50c466157d70e",
+        "2wiki-7e4980f18ac478f9",
+        "2wiki-efc32b5a902efab2",
+        "2wiki-cd12e703c220371c",
+        "2wiki-b8cdf1719645d65a",
+        "2wiki-574d3f4c453a46f7",
+        "2wiki-fe447e07a2e64cb4"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "1869092c0bb011ebab90acde48001122",
+      "hop": "inference",
+      "question": "Who is the paternal grandfather of Taj Al-Dawla?",
+      "answer": "Rukn al-Dawla",
+      "goldChunkIds": [
+        "2wiki-c9f62a53324bf862",
+        "2wiki-e528b06fabcb936e"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-c9f62a53324bf862",
+        "2wiki-e528b06fabcb936e",
+        "2wiki-09f0d8ed96a55f42",
+        "2wiki-519f6b1803af6865",
+        "2wiki-f2eddff78824c1b4",
+        "2wiki-214caebe92bd859c",
+        "2wiki-111dd735c68745b9",
+        "2wiki-b8d8ff1c1264f8e2"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "9980b1ed089d11ebbd78ac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Do both films Payment On Demand and My Cousin From Warsaw have the directors from the same country?",
+      "answer": "yes",
+      "goldChunkIds": [
+        "2wiki-7bb83dc21ac7efd1",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-de86995aeb94bf96",
+        "2wiki-f9bfd132221880de"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-7bb83dc21ac7efd1",
+        "2wiki-b461065b9e0f3d6d",
+        "2wiki-f9bfd132221880de",
+        "2wiki-b757818ad45e13cb",
+        "2wiki-55107ff1c3c6137b",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-04275a4bc748c260",
+        "2wiki-76e6e9d7fb5a11fb",
+        "2wiki-4992a17a03beb69f"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.25,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "c19b72520bdb11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What is the place of birth of the director of film And The Spring Comes?",
+      "answer": "Xi'an",
+      "goldChunkIds": [
+        "2wiki-e68d572655a30a3a",
+        "2wiki-ec1921507d0ff18f"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-c199f9f4f2fef96b",
+        "2wiki-e68d572655a30a3a",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-3e150b0cf9f1fbe8",
+        "2wiki-55107ff1c3c6137b",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-596f40b6281cb950",
+        "2wiki-8c958ab7c1c4cd3c"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "3a84baaf088311ebbd6dac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Who died first, Madame Pasca or James A. Donohoe?",
+      "answer": "Madame Pasca",
+      "goldChunkIds": [
+        "2wiki-2a74f5a729411222",
+        "2wiki-ade468b9453c400c"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-2ed64c185a2a4a69",
+        "2wiki-2a74f5a729411222",
+        "2wiki-ade468b9453c400c",
+        "2wiki-86614283530994ef",
+        "2wiki-f148b2c3c34a0418",
+        "2wiki-ca7b7f9804640094",
+        "2wiki-015dd74a38c98d98",
+        "2wiki-822f13252792fe60",
+        "2wiki-b757818ad45e13cb",
+        "2wiki-7ba0c5a967f16d23"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "633132f008b711ebbd88ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Who was born later, D'Arcy Coulson or Thomas William Adams?",
+      "answer": "D'Arcy Coulson",
+      "goldChunkIds": [
+        "2wiki-e97dc24d60e277b1",
+        "2wiki-fd267d3645ef79fd"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-fd267d3645ef79fd",
+        "2wiki-12a6ecba97d2c285",
+        "2wiki-96d1b400b28b4fe1",
+        "2wiki-6672d1175b28162d",
+        "2wiki-e97dc24d60e277b1",
+        "2wiki-ddce435cdf5321b6",
+        "2wiki-1748d1407f642f91",
+        "2wiki-0dbaea239c54d1bc",
+        "2wiki-4075e597f23df14a",
+        "2wiki-9711cfe0046b8671"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "9aee006a09c211ebbdb0ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Are Simonds Catholic College and Saginaw High School (Texas) both located in the same country?",
+      "answer": "no",
+      "goldChunkIds": [
+        "2wiki-8ad1d260edae9062",
+        "2wiki-e5511d518f50fb25"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-8ad1d260edae9062",
+        "2wiki-0bc6c04417ab3aa7",
+        "2wiki-e5511d518f50fb25",
+        "2wiki-e16c1ec37512bb79",
+        "2wiki-2482f6e5ee1ecbbe",
+        "2wiki-a96fd824fb1d94ef",
+        "2wiki-046bbde968ba2ed6",
+        "2wiki-5e621ab4fb224a44",
+        "2wiki-dd980f3d84e12d18",
+        "2wiki-fc42de8bddbd3c4f"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "b3110a5e0bda11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Which country Prince Nikolaus Wilhelm Of Nassau's mother is from?",
+      "answer": "German",
+      "goldChunkIds": [
+        "2wiki-754d465ed299bc47",
+        "2wiki-bd5e872bf42a7f7d"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-b00d1adafcdf11f9",
+        "2wiki-fb21b0a6b5bd44ae",
+        "2wiki-754d465ed299bc47",
+        "2wiki-d6f8e9928a0a7145",
+        "2wiki-2eb01b97c1411826",
+        "2wiki-bd5e872bf42a7f7d",
+        "2wiki-68bdcf41173c8fd2",
+        "2wiki-72de5d81897c9604",
+        "2wiki-c8e3fb797d3b7433",
+        "2wiki-fc91acf863b8b360"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "5b6b8c02089711ebbd77ac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film whose director was born first, 45 Fathers or The Intended?",
+      "answer": "45 Fathers",
+      "goldChunkIds": [
+        "2wiki-4aee74986377b818",
+        "2wiki-5f70c7dda4a1d01c",
+        "2wiki-7ea513ad5691a422",
+        "2wiki-9d3fa933cbfc373e"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-7ea513ad5691a422",
+        "2wiki-9d3fa933cbfc373e",
+        "2wiki-5f70c7dda4a1d01c",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c199f9f4f2fef96b",
+        "2wiki-7bb83dc21ac7efd1",
+        "2wiki-bfd9a516b6748f16",
+        "2wiki-981c47f776cb2e08",
+        "2wiki-4aee74986377b818"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.75,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "3705552a0bb011ebab90acde48001122",
+      "hop": "inference",
+      "question": "Who is the paternal grandfather of Alexandre Berthier, 3Rd Prince Of Wagram?",
+      "answer": "Louis-Alexandre Berthier",
+      "goldChunkIds": [
+        "2wiki-5372d0ea8f217931",
+        "2wiki-ae1686f051b90063"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-933c997b54a293be",
+        "2wiki-67561533f687c0ca",
+        "2wiki-0af4eed59d70687c",
+        "2wiki-5372d0ea8f217931",
+        "2wiki-ae1686f051b90063",
+        "2wiki-403f816b3c89979e",
+        "2wiki-a27df26255a80a95",
+        "2wiki-6e39ce0ab83e62a7",
+        "2wiki-1d4089ee09250f10",
+        "2wiki-57a5bebb94593b1a"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "07e964920bde11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the husband of Caterina Visconti born?",
+      "answer": "Pavia",
+      "goldChunkIds": [
+        "2wiki-f77c045252f423cd",
+        "2wiki-ff255e939cfd026c"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-f77c045252f423cd",
+        "2wiki-ff255e939cfd026c",
+        "2wiki-fd3f9a0561ef00d6",
+        "2wiki-6307f6db8270c43e",
+        "2wiki-e0d3cc8a8fdcef06",
+        "2wiki-2c9fe72f2b732767",
+        "2wiki-7e0364ac753ea761",
+        "2wiki-0bd457e6ce09de05",
+        "2wiki-e067684a97f2b359",
+        "2wiki-624bb39ca2dc94de"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "f7c4fdf2087611ebbd67ac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director who was born later, A Quiet Place In The Country or When Were You Born?",
+      "answer": "A Quiet Place In The Country",
+      "goldChunkIds": [
+        "2wiki-0ba1270aa1a9d203",
+        "2wiki-8e75089a256fb021",
+        "2wiki-93d1ac4a837f2d6d",
+        "2wiki-c710719c097bea5e"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-93d1ac4a837f2d6d",
+        "2wiki-8e75089a256fb021",
+        "2wiki-596f40b6281cb950",
+        "2wiki-d6ef096c5967189c",
+        "2wiki-5372971c70593cf1",
+        "2wiki-c710719c097bea5e",
+        "2wiki-6ce8f47adf9333db",
+        "2wiki-0ba1270aa1a9d203",
+        "2wiki-577bdb4eb259224d",
+        "2wiki-8c958ab7c1c4cd3c"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "db19bf4c086e11ebbd62ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Who was born first, John Beach or Gordon Persons?",
+      "answer": "John Beach",
+      "goldChunkIds": [
+        "2wiki-1bc745bf66c199f4",
+        "2wiki-77c1180feb499312"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-77c1180feb499312",
+        "2wiki-1bc745bf66c199f4",
+        "2wiki-f1cc406b8944cdd4",
+        "2wiki-a9d7a4e80f3f705a",
+        "2wiki-176fdc2517e5ad09",
+        "2wiki-8c91683368551d60",
+        "2wiki-05e2e559bd28dbf9",
+        "2wiki-418804102441f529",
+        "2wiki-5e621ab4fb224a44",
+        "2wiki-332a8edbdd535b7e"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "9e6d7bdc08a111ebbd79ac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director born earlier, The House By The Cemetery or Charlie Chan In Honolulu?",
+      "answer": "Charlie Chan In Honolulu",
+      "goldChunkIds": [
+        "2wiki-038a8a5167eab843",
+        "2wiki-0fcb9056e14c2c18",
+        "2wiki-93998a4c199ee382",
+        "2wiki-9580487b93d8248c"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-04bad7bd01497dac",
+        "2wiki-93998a4c199ee382",
+        "2wiki-495109717e37c12d",
+        "2wiki-038a8a5167eab843",
+        "2wiki-4aee74986377b818",
+        "2wiki-7a04630b8269a0f3",
+        "2wiki-9580487b93d8248c",
+        "2wiki-3450f2b2f2cfe2e2",
+        "2wiki-7ea513ad5691a422",
+        "2wiki-3851abc5343c5900"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.25,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.75,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "c3c94d0a0bdc11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Who is the child of the director of film La Leona (Film)?",
+      "answer": "V\u00edctor B\u00f3",
+      "goldChunkIds": [
+        "2wiki-823fd28ef543a185",
+        "2wiki-d7877c4981e880f5"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-823fd28ef543a185",
+        "2wiki-64480925711a10d0",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c199f9f4f2fef96b",
+        "2wiki-d7877c4981e880f5",
+        "2wiki-7bb83dc21ac7efd1",
+        "2wiki-de86995aeb94bf96",
+        "2wiki-e75c17bac3247b86",
+        "2wiki-6e6c1936d59639c7"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "96fb4aee0baf11ebab90acde48001122",
+      "hop": "inference",
+      "question": "Who is Blanche Of Portugal (1259\u20131321)'s paternal grandmother?",
+      "answer": "Urraca of Castile",
+      "goldChunkIds": [
+        "2wiki-9c9f0a1fa25404c4",
+        "2wiki-a651e44f3d45114b"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-9c9f0a1fa25404c4",
+        "2wiki-4dfac488e35701cd",
+        "2wiki-ff255e939cfd026c",
+        "2wiki-f77c045252f423cd",
+        "2wiki-8993175d65e0ce5e",
+        "2wiki-f4d2d2a22d50179d",
+        "2wiki-0c4ba2bcd0858d73",
+        "2wiki-de86995aeb94bf96",
+        "2wiki-a930284281ed8750",
+        "2wiki-6dc637e793827539"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "e618b2c608c911ebbd92ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Who lived longer, Giuseppe Cesari or Nicos Poulantzas?",
+      "answer": "Giuseppe Cesari",
+      "goldChunkIds": [
+        "2wiki-65e261b6955efe81",
+        "2wiki-96977f377e418be1"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-96977f377e418be1",
+        "2wiki-bb392fce49ad2a3a",
+        "2wiki-65e261b6955efe81",
+        "2wiki-c000c4b2b02d0304",
+        "2wiki-65a9932ff2c1a923",
+        "2wiki-9e621a0e07cf5e3f",
+        "2wiki-2c9fe72f2b732767",
+        "2wiki-ef6481065ed6ae79",
+        "2wiki-14dea7c0947cec69",
+        "2wiki-7bb83dc21ac7efd1"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "d71f453b085811ebbd5bac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Are director of film Nights On The Road and director of film Swann In Love (Film) from the same country?",
+      "answer": "yes",
+      "goldChunkIds": [
+        "2wiki-259525dd066fbda1",
+        "2wiki-8280155c6e4f1043",
+        "2wiki-d47c67c41c7ee282",
+        "2wiki-ff48097f862a7e94"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-596f40b6281cb950",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-c710719c097bea5e",
+        "2wiki-8b1947ec09998466",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-bfd9a516b6748f16",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-9bf79f0c693efef3",
+        "2wiki-76e6e9d7fb5a11fb"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "f7eb7e31088c11ebbd70ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Who is older, Aryeh Ben-Eliezer or Jason Pociask?",
+      "answer": "Aryeh Ben-Eliezer",
+      "goldChunkIds": [
+        "2wiki-1327c5fc0202d2b7",
+        "2wiki-262a5c410565d155"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-1327c5fc0202d2b7",
+        "2wiki-262a5c410565d155",
+        "2wiki-722ac9116515b2ed",
+        "2wiki-9baf6cbb7609bc68",
+        "2wiki-672a88ba79d166c5",
+        "2wiki-51bd5277c10e2c36",
+        "2wiki-0edffc61ebf3485d",
+        "2wiki-6e1b352716deef87",
+        "2wiki-17b965e332ee90f1",
+        "2wiki-e17c61e60b698c5d"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "e41c14820bd911eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where does the director of film Man At Bath work at?",
+      "answer": "Cahiers du cin\u00e9ma",
+      "goldChunkIds": [
+        "2wiki-02bd74f9f804f253",
+        "2wiki-403f816b3c89979e"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-02bd74f9f804f253",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-3e150b0cf9f1fbe8",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-596f40b6281cb950",
+        "2wiki-9bf79f0c693efef3",
+        "2wiki-76e6e9d7fb5a11fb",
+        "2wiki-04275a4bc748c260",
+        "2wiki-8c958ab7c1c4cd3c"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "27e835ee0bb011ebab90acde48001122",
+      "hop": "inference",
+      "question": "Who is Arthur Gore, 2Nd Earl Of Arran's paternal grandfather?",
+      "answer": "Sir Arthur Gore, 2nd Baronet",
+      "goldChunkIds": [
+        "2wiki-00be44fb569b5374",
+        "2wiki-6aeb8cad518e2e42"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-6aeb8cad518e2e42",
+        "2wiki-00be44fb569b5374",
+        "2wiki-2b8fc44d75340a1a",
+        "2wiki-afc21d5210c13f86",
+        "2wiki-53be01f4e00e9eec",
+        "2wiki-93a86334d1b4fe0a",
+        "2wiki-b6440583cbf4a06a",
+        "2wiki-4c64fc71da32cbd0",
+        "2wiki-1b2ff3da335b4eac",
+        "2wiki-902d6a04da88d39f"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "3f635554096511ebbdafac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Are both Kaufland and Otrag located in the same country?",
+      "answer": "yes",
+      "goldChunkIds": [
+        "2wiki-6ca0cb7560f5ba07",
+        "2wiki-8e03b042ffbaad99"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-6ca0cb7560f5ba07",
+        "2wiki-8e03b042ffbaad99",
+        "2wiki-f8c3fee21719150f",
+        "2wiki-8ce4a1ec36133b37",
+        "2wiki-f73fd6a572e5da28",
+        "2wiki-259525dd066fbda1",
+        "2wiki-ff245185ad3c641f",
+        "2wiki-6402ea18d066cd40",
+        "2wiki-747ce74e8bec2a49",
+        "2wiki-bd5e872bf42a7f7d"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "b69ad95c08ad11ebbd83ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Which film came out earlier, Aanaval Mothiram or Heroes Of The Street?",
+      "answer": "Heroes Of The Street",
+      "goldChunkIds": [
+        "2wiki-942c2adb591483c6",
+        "2wiki-c4c55cf857de5acd"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-c4c55cf857de5acd",
+        "2wiki-942c2adb591483c6",
+        "2wiki-7b43dae6e1c190c7",
+        "2wiki-18af5687be4927a7",
+        "2wiki-ffd1813c086fc4b6",
+        "2wiki-2aa387a7469ce0cc",
+        "2wiki-fcb4b2f952fb29f4",
+        "2wiki-c39d1a5eaca120ad",
+        "2wiki-71077b0b8bf55e9f",
+        "2wiki-7cfc658dba968c7a"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "931a85420bdd11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the father of Lord Patrick Crichton-Stuart born?",
+      "answer": "London",
+      "goldChunkIds": [
+        "2wiki-613d774af7e77233",
+        "2wiki-bc99fdd4c0887920"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-613d774af7e77233",
+        "2wiki-f4d2d2a22d50179d",
+        "2wiki-bc99fdd4c0887920",
+        "2wiki-a0a2dfe16ff27a18",
+        "2wiki-42d9697ae98a508a",
+        "2wiki-8bb01501412cdea2",
+        "2wiki-d6bc737efc67b7d2",
+        "2wiki-2122f0ccdc2f0b99",
+        "2wiki-015047eb281ff94b",
+        "2wiki-d6ef096c5967189c"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "0bbded440bda11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Which country the director of film Daadagiri is from?",
+      "answer": "Pakistan",
+      "goldChunkIds": [
+        "2wiki-647e8c1d1a8d63e7",
+        "2wiki-fd27539d0b85f280"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-fd27539d0b85f280",
+        "2wiki-55107ff1c3c6137b",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-04275a4bc748c260",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-9bf79f0c693efef3",
+        "2wiki-596f40b6281cb950"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "258867240bdd11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the wife of Douglas Leiterman born?",
+      "answer": "Winnipeg, Manitoba",
+      "goldChunkIds": [
+        "2wiki-4075e597f23df14a",
+        "2wiki-84d6566a5dd6510e"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-4075e597f23df14a",
+        "2wiki-bccebd7200aeb41f",
+        "2wiki-f266ab0bfaaae09e",
+        "2wiki-942c2adb591483c6",
+        "2wiki-4b8625e85b7d421e",
+        "2wiki-9a708ac23ba09291",
+        "2wiki-7cfc658dba968c7a",
+        "2wiki-84d6566a5dd6510e",
+        "2wiki-cb56295e85718f60",
+        "2wiki-6672d1175b28162d"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "3cbd107e0bde11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What is the place of birth of the performer of song Who...?",
+      "answer": "Fukuoka",
+      "goldChunkIds": [
+        "2wiki-cbb85ba6b6c79a06",
+        "2wiki-cfe61c2062defbcb"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-cfe61c2062defbcb",
+        "2wiki-747ce74e8bec2a49",
+        "2wiki-215ce10b5c3493ac",
+        "2wiki-cbb85ba6b6c79a06",
+        "2wiki-5f2af186f30f1bb0",
+        "2wiki-c37b007d11ed3938",
+        "2wiki-77c016687cb9e3c7",
+        "2wiki-86a2afa2fb16da62",
+        "2wiki-2402153d79eb2740",
+        "2wiki-a8b9834f999ed35b"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "5e8240ea0bdd11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the place of death of the director of film Mole Men Against The Son Of Hercules?",
+      "answer": "Roma",
+      "goldChunkIds": [
+        "2wiki-7e0364ac753ea761",
+        "2wiki-84298e106cf3c81b"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-7e0364ac753ea761",
+        "2wiki-ba946a2a15e275fa",
+        "2wiki-734a47e1b0414f5a",
+        "2wiki-9eab9d5e7f047f00",
+        "2wiki-f201646a73597a5b",
+        "2wiki-84298e106cf3c81b",
+        "2wiki-ae246b966d1b32ee",
+        "2wiki-51967b2489a22325",
+        "2wiki-1009a7fa3493ec73",
+        "2wiki-e75c17bac3247b86"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "6638110e0bdb11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the father of Alexandre Gaydamak born?",
+      "answer": "Moscow, USSR",
+      "goldChunkIds": [
+        "2wiki-2955ffc611066e03",
+        "2wiki-97ce82424bf77e5c"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-2955ffc611066e03",
+        "2wiki-97ce82424bf77e5c",
+        "2wiki-f3f4ec6942f34821",
+        "2wiki-ea207aade6fb0792",
+        "2wiki-4142cbf94d184902",
+        "2wiki-6f1c2f0d4afdace2",
+        "2wiki-d47fba7786aabdb7",
+        "2wiki-834b355d4f44ceb4",
+        "2wiki-945f2582861290af",
+        "2wiki-0edffc61ebf3485d"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "7de9188c088b11ebbd6fac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director who died earlier, Toen 'T Licht Verdween or Boum Sur Paris?",
+      "answer": "Toen 'T Licht Verdween",
+      "goldChunkIds": [
+        "2wiki-206a9455f5347603",
+        "2wiki-67ce4581324c5500",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-fc4fd4469af173bb"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-fc4fd4469af173bb",
+        "2wiki-206a9455f5347603",
+        "2wiki-9af9031d9552aee8",
+        "2wiki-8b1947ec09998466",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-061d484fd18ddb65",
+        "2wiki-f14974808b7a4e9a",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-9bf79f0c693efef3"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.75,
+        "hit@5": 1.0,
+        "recall@10": 0.75,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "3972d2b60baf11ebab90acde48001122",
+      "hop": "inference",
+      "question": "Who is Gaston, Duke Of Orl\u00e9ans's paternal grandmother?",
+      "answer": "Jeanne d'Albret",
+      "goldChunkIds": [
+        "2wiki-1efaffc308d14371",
+        "2wiki-b1c7ed4a6e9a11ba"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-1efaffc308d14371",
+        "2wiki-f4c5735df1edaf1c",
+        "2wiki-615d1e858204115a",
+        "2wiki-a930284281ed8750",
+        "2wiki-2af17f4551c6862d",
+        "2wiki-789fb1f33ede168d",
+        "2wiki-b1c7ed4a6e9a11ba",
+        "2wiki-821a48c7de807850",
+        "2wiki-061d484fd18ddb65",
+        "2wiki-0c4ba2bcd0858d73"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "a8cbc4c40bdc11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the director of film The Half-Way Girl born?",
+      "answer": "New York",
+      "goldChunkIds": [
+        "2wiki-8c5a790a081f8933",
+        "2wiki-941acbf917ce112a"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-8c5a790a081f8933",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-c710719c097bea5e",
+        "2wiki-596f40b6281cb950",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-3fe0fe04f364a47e",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-4992a17a03beb69f"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "32e50df00bb011ebab90acde48001122",
+      "hop": "inference",
+      "question": "Who is the father-in-law of Sophia Of Wittelsbach?",
+      "answer": "Louis II",
+      "goldChunkIds": [
+        "2wiki-30a36f2ea12b7e0b",
+        "2wiki-5b240e06d6a67a93"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-5b240e06d6a67a93",
+        "2wiki-837ed84c2f757784",
+        "2wiki-9f10096e004c14ed",
+        "2wiki-3d3e8f5f84fb17f3",
+        "2wiki-933c997b54a293be",
+        "2wiki-126e8bbbf9565d3d",
+        "2wiki-9fe715a6bd652e24",
+        "2wiki-851a0c452a80460b",
+        "2wiki-7b931ae4ef4f3d8b",
+        "2wiki-1eec02679c319277"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "deb907f80bdd11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the place of death of Lambert I, Count Of Louvain's father?",
+      "answer": "Bohemia",
+      "goldChunkIds": [
+        "2wiki-1f0a46fddb949a0f",
+        "2wiki-a184a28b00445a98"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-881aa200451b3186",
+        "2wiki-1f0a46fddb949a0f",
+        "2wiki-de53e00102dfff45",
+        "2wiki-781e10a0d0ec6969",
+        "2wiki-9beaaf36741b6b6b",
+        "2wiki-1bce123b0b0d3a50",
+        "2wiki-66d092d35af006ff",
+        "2wiki-1968b0f0e7570be6",
+        "2wiki-ca9993d1fc772c51",
+        "2wiki-ec6bfcd552d91aa6"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "b81fbe620bdc11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the director of film Highway Dragnet born?",
+      "answer": "Gura Humorului",
+      "goldChunkIds": [
+        "2wiki-3e150b0cf9f1fbe8",
+        "2wiki-a66cb3cbf8a47885"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-a66cb3cbf8a47885",
+        "2wiki-5351ed9507aa0182",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-596f40b6281cb950",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-c710719c097bea5e"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "3717c0600bde11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where did Prince Gustav Of Thurn And Taxis (1848\u20131914)'s mother die?",
+      "answer": "Meran",
+      "goldChunkIds": [
+        "2wiki-b0fa64604a8158f9",
+        "2wiki-d107b9f011e57736"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-e2262ea8def2aa3e",
+        "2wiki-b92152cbfc148c5d",
+        "2wiki-870615a2ff670b77",
+        "2wiki-460707a3317c8885",
+        "2wiki-3ae6589fa1d7788e",
+        "2wiki-1d84ea689ef1f950",
+        "2wiki-0110189a3eaeb392",
+        "2wiki-7121dd89504b471f",
+        "2wiki-d107b9f011e57736",
+        "2wiki-3fe0fe04f364a47e"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "0f1ac1a00bdb11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What is the award that the performer of song Sunday Papers earned?",
+      "answer": "Grammy",
+      "goldChunkIds": [
+        "2wiki-8a658bd9bca88106",
+        "2wiki-faa862a82585de9e"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-faa862a82585de9e",
+        "2wiki-747ce74e8bec2a49",
+        "2wiki-5c9d103600074390",
+        "2wiki-215ce10b5c3493ac",
+        "2wiki-294d750c8c2163a4",
+        "2wiki-8a658bd9bca88106",
+        "2wiki-6f75d43bf5d6b61c",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-f7e8c0578e08e42a",
+        "2wiki-73a0c672bf2a0271"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "f420d4a008a311ebbd7cac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director born first, Antonieta or Dodging The Dole?",
+      "answer": "Dodging The Dole",
+      "goldChunkIds": [
+        "2wiki-0f14b0dd18b41b8d",
+        "2wiki-41626fa75f89d81f",
+        "2wiki-7794de2bc1bd63d6",
+        "2wiki-f7e8c0578e08e42a"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-0f14b0dd18b41b8d",
+        "2wiki-41626fa75f89d81f",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-bfd9a516b6748f16",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-596f40b6281cb950",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-9bf79f0c693efef3"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "6638a0f0084e11ebbd56ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Are both Nikolsk Airport and Svobodny Airport located in the same country?",
+      "answer": "yes",
+      "goldChunkIds": [
+        "2wiki-1429cf10a4e0dc09",
+        "2wiki-be234b1182f2069f"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-1429cf10a4e0dc09",
+        "2wiki-76bd37fdd363ee1b",
+        "2wiki-be234b1182f2069f",
+        "2wiki-3c0956ffeabcae82",
+        "2wiki-a340c8ac7739ffc8",
+        "2wiki-531ec5fbd1519438",
+        "2wiki-5e2bd2616add1048",
+        "2wiki-98071d802ff3267a",
+        "2wiki-0fda8015bfa5866f",
+        "2wiki-55ff28ada3a5e49e"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "07388c7c0bb011ebab90acde48001122",
+      "hop": "inference",
+      "question": "Who is the maternal grandfather of Amadeus Vii, Count Of Savoy?",
+      "answer": "Peter I",
+      "goldChunkIds": [
+        "2wiki-3563e474b9b9bb3c",
+        "2wiki-add2b9fb678b39ef"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-add2b9fb678b39ef",
+        "2wiki-8523ff4319de6604",
+        "2wiki-b2e00c1d4ee98796",
+        "2wiki-bb514fe1a761e2db",
+        "2wiki-9aa74ead42dd3ced",
+        "2wiki-ac6a1ae5cdc0e473",
+        "2wiki-3563e474b9b9bb3c",
+        "2wiki-0bedcd8c254d3576",
+        "2wiki-24b6b40b63b547d6",
+        "2wiki-598162424f5e7b40"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "83ff07cd096711ebbdafac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Are both businesses, Telus and Ztr Control Systems, located in the same country?",
+      "answer": "yes",
+      "goldChunkIds": [
+        "2wiki-00b9a6d30976bc03",
+        "2wiki-27f845f00982c678"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-00b9a6d30976bc03",
+        "2wiki-27f845f00982c678",
+        "2wiki-4904547e2952ca0b",
+        "2wiki-dfbe16126558249b",
+        "2wiki-609bf3ac47d0750e",
+        "2wiki-7be50c466157d70e",
+        "2wiki-ee5f398ec3374530",
+        "2wiki-23b7554eb662b1e1",
+        "2wiki-fe447e07a2e64cb4",
+        "2wiki-0e5f1001ff7ef6df"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "7a57c5d2089111ebbd73ac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Do both films, Dial M For Murder and Marius (1931 Film), have the directors who are from the same country?",
+      "answer": "yes",
+      "goldChunkIds": [
+        "2wiki-539c4b06daccc5d6",
+        "2wiki-73a0c672bf2a0271",
+        "2wiki-c000c4b2b02d0304",
+        "2wiki-c199f9f4f2fef96b"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-c000c4b2b02d0304",
+        "2wiki-73a0c672bf2a0271",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-d50ab19876ce1c65",
+        "2wiki-d5e136bbf985ccb5",
+        "2wiki-539c4b06daccc5d6",
+        "2wiki-9711cfe0046b8671",
+        "2wiki-596f40b6281cb950",
+        "2wiki-8c958ab7c1c4cd3c"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.75,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "42f6d3b208b911ebbd88ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Who is older, Dyson Parody or Gene Watson?",
+      "answer": "Gene Watson",
+      "goldChunkIds": [
+        "2wiki-5508dabca8a9aad3",
+        "2wiki-7f76dbefa6f0c8e7"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-7f76dbefa6f0c8e7",
+        "2wiki-0dcd61a78a044996",
+        "2wiki-5508dabca8a9aad3",
+        "2wiki-02eb476d1a2d8885",
+        "2wiki-4075e597f23df14a",
+        "2wiki-082494dd09096f85",
+        "2wiki-ddce435cdf5321b6",
+        "2wiki-5e621ab4fb224a44",
+        "2wiki-596f40b6281cb950",
+        "2wiki-8c91683368551d60"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "f1ff478c089011ebbd72ac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Are both directors of films The Princess Bride (Film) and I Never Sang For My Father from the same country?",
+      "answer": "yes",
+      "goldChunkIds": [
+        "2wiki-2ed8dfebfacc1cbc",
+        "2wiki-2ef4455d8a73514b",
+        "2wiki-d8005cb00b267bb2",
+        "2wiki-fc5224b9ff11062b"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-fc5224b9ff11062b",
+        "2wiki-d8005cb00b267bb2",
+        "2wiki-0e259cde7dd5246e",
+        "2wiki-e8861e9cae1c5ff0",
+        "2wiki-d39a623ed31cdc3f",
+        "2wiki-2ed8dfebfacc1cbc",
+        "2wiki-bfd9a516b6748f16",
+        "2wiki-da150ab3a8246968",
+        "2wiki-596f40b6281cb950",
+        "2wiki-8c958ab7c1c4cd3c"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.75,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "6b55ac320bdb11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "When did Prince John Konstantinovich Of Russia's mother die?",
+      "answer": "24 March 1927",
+      "goldChunkIds": [
+        "2wiki-082b3877d8d605bf",
+        "2wiki-1987d22372dbd2e4"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-1987d22372dbd2e4",
+        "2wiki-ed70c275591897f4",
+        "2wiki-98071d802ff3267a",
+        "2wiki-192bb3b7c6abc825",
+        "2wiki-e9c90e3568dd5564",
+        "2wiki-3c0956ffeabcae82",
+        "2wiki-a340c8ac7739ffc8",
+        "2wiki-531ec5fbd1519438",
+        "2wiki-0fda8015bfa5866f",
+        "2wiki-55ff28ada3a5e49e"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "424d56700bde11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Which country Audofleda's husband is from?",
+      "answer": "Ostrogothic Kingdom",
+      "goldChunkIds": [
+        "2wiki-11f00eaaf5aa5504",
+        "2wiki-c3b2c709cf554ab4"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-c3b2c709cf554ab4",
+        "2wiki-1e5bca0d07359350",
+        "2wiki-e528b06fabcb936e",
+        "2wiki-596f40b6281cb950",
+        "2wiki-d695d4a1ae168f1b",
+        "2wiki-197b00a9378b7d30",
+        "2wiki-082494dd09096f85",
+        "2wiki-33257c3e0ecec68d",
+        "2wiki-6014201752d3dd39",
+        "2wiki-11f00eaaf5aa5504"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "5c0c69f80bdd11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What is the place of birth of the director of film Letter To The King?",
+      "answer": "Kurdish",
+      "goldChunkIds": [
+        "2wiki-0b318cb6fef69a5c",
+        "2wiki-cb5ccc7be49e957b"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-c199f9f4f2fef96b",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-0b318cb6fef69a5c",
+        "2wiki-cb5ccc7be49e957b",
+        "2wiki-7bb83dc21ac7efd1",
+        "2wiki-8c0d9bf215fd80e6",
+        "2wiki-0bf066cb33dd65b5",
+        "2wiki-282f7d92815a4468",
+        "2wiki-98fc06061edd5cf0"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "ac786909087411ebbd67ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Are both bands, Snowman (Band) and Jessamine (Band), from the same country?",
+      "answer": "no",
+      "goldChunkIds": [
+        "2wiki-aff8e67c035a521d",
+        "2wiki-e43be1f12a4cf2d5"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-aff8e67c035a521d",
+        "2wiki-e43be1f12a4cf2d5",
+        "2wiki-d695d4a1ae168f1b",
+        "2wiki-77ef8b4beb26055a",
+        "2wiki-888a0346b69a7440",
+        "2wiki-8c6eaff5fcd58636",
+        "2wiki-3460253f3bb1a4e7",
+        "2wiki-d4863e1035cd0250",
+        "2wiki-18cf1d5dc1fdc1e1",
+        "2wiki-30db33169daa1925"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "29427eea0bdd11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the performer of song God (John Lennon Song) born?",
+      "answer": "Liverpool",
+      "goldChunkIds": [
+        "2wiki-188d9af04afae37c",
+        "2wiki-d4fd59ac3e64b7f8"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-747ce74e8bec2a49",
+        "2wiki-215ce10b5c3493ac",
+        "2wiki-d4fd59ac3e64b7f8",
+        "2wiki-210edc0ec5405482",
+        "2wiki-188d9af04afae37c",
+        "2wiki-bdaa8360016ce1fa",
+        "2wiki-ace681b7c7ed4639",
+        "2wiki-45e160a2813f91d4",
+        "2wiki-c2c673e8e6033141",
+        "2wiki-a58b2cfc70d72a31"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "d370f0b0085711ebbd5aac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director who died earlier, Captain Kidd And The Slave Girl or Relax Freddie?",
+      "answer": "Captain Kidd And The Slave Girl",
+      "goldChunkIds": [
+        "2wiki-2862fe1489c73e32",
+        "2wiki-73e76244fc54bc84",
+        "2wiki-b34ad7dc1886296a",
+        "2wiki-dd83d00d47034d9e"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-73e76244fc54bc84",
+        "2wiki-2c88f1abd96661e6",
+        "2wiki-dd83d00d47034d9e",
+        "2wiki-cbceda6c7a4940ed",
+        "2wiki-5d60321df07db6f1",
+        "2wiki-b34ad7dc1886296a",
+        "2wiki-038a0f676a4435c5",
+        "2wiki-86e63d8b3fddd1ec",
+        "2wiki-7ba0c5a967f16d23",
+        "2wiki-a2c885b479b1222b"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.25,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.75,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "a9f9985a09a211ebbdb0ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Which song was released more recently, Go Ahead And Break My Heart or Knee Deep In My Heart?",
+      "answer": "Go Ahead And Break My Heart",
+      "goldChunkIds": [
+        "2wiki-3dec53a40f631d58",
+        "2wiki-c37b007d11ed3938"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-3dec53a40f631d58",
+        "2wiki-c37b007d11ed3938",
+        "2wiki-1adc96b0fa56b50a",
+        "2wiki-1f3a6e2c06a5bf4c",
+        "2wiki-ce947ca2e7800424",
+        "2wiki-c60dc05cca6c04ce",
+        "2wiki-ee097f3f75d60c38",
+        "2wiki-5bee64d1bfe441aa",
+        "2wiki-b34b79528f0101b3",
+        "2wiki-61d7cc55ba30e8af"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "53ab316c08b911ebbd88ac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director who died later, The Fatal Mistake or The Devil'S Hairpin?",
+      "answer": "The Devil'S Hairpin",
+      "goldChunkIds": [
+        "2wiki-b5b880e62b56cd94",
+        "2wiki-b757818ad45e13cb",
+        "2wiki-ba637de78d5eb7db",
+        "2wiki-bfd9a516b6748f16"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-ba637de78d5eb7db",
+        "2wiki-b5b880e62b56cd94",
+        "2wiki-bfd9a516b6748f16",
+        "2wiki-b757818ad45e13cb",
+        "2wiki-c31e8b848537ce8e",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-596f40b6281cb950",
+        "2wiki-7f8b9e897d17d362",
+        "2wiki-8c958ab7c1c4cd3c"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "bc633e2c0baf11ebab90acde48001122",
+      "hop": "inference",
+      "question": "Who is Maria Luisa Of Savoy's father-in-law?",
+      "answer": "Louis, Grand Dauphin",
+      "goldChunkIds": [
+        "2wiki-821a48c7de807850",
+        "2wiki-e270e70168d750bc"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-9aa74ead42dd3ced",
+        "2wiki-7c1dc5ebc7b2bf83",
+        "2wiki-ac6a1ae5cdc0e473",
+        "2wiki-e270e70168d750bc",
+        "2wiki-98769e35389e7d08",
+        "2wiki-921e9676f8716136",
+        "2wiki-6f41bf462d920214",
+        "2wiki-821a48c7de807850",
+        "2wiki-f77c045252f423cd",
+        "2wiki-837ed84c2f757784"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2b4bd5020baf11ebab90acde48001122",
+      "hop": "inference",
+      "question": "Who is the paternal grandfather of Kuj\u014d Yoritsugu?",
+      "answer": "Kuj\u014d Michiie",
+      "goldChunkIds": [
+        "2wiki-2402153d79eb2740",
+        "2wiki-86a2afa2fb16da62"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-86a2afa2fb16da62",
+        "2wiki-2402153d79eb2740",
+        "2wiki-d84ec0165ea01a0a",
+        "2wiki-ba8e505f19b6d2a7",
+        "2wiki-cbb85ba6b6c79a06",
+        "2wiki-cfe61c2062defbcb",
+        "2wiki-6666ccdad206ee12",
+        "2wiki-d32dea6be26f5d58",
+        "2wiki-c599bb97b6e0e9d9",
+        "2wiki-7e0364ac753ea761"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "3647118c0bdd11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What is the place of birth of the director of film Marianela (1940 Film)?",
+      "answer": "Madrid",
+      "goldChunkIds": [
+        "2wiki-80784418217e0d5a",
+        "2wiki-e3d47443a3b8056f"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-80784418217e0d5a",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-c31e8b848537ce8e",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-596f40b6281cb950",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-9bf79f0c693efef3",
+        "2wiki-8c958ab7c1c4cd3c"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "d6074911090011ebbdadac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Which film came out first, Repeated Absences or She Wore A Yellow Ribbon?",
+      "answer": "She Wore A Yellow Ribbon",
+      "goldChunkIds": [
+        "2wiki-9a708ac23ba09291",
+        "2wiki-f69bc549f2378ccb"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-f69bc549f2378ccb",
+        "2wiki-9a708ac23ba09291",
+        "2wiki-bd8e08ba427e497e",
+        "2wiki-4b8625e85b7d421e",
+        "2wiki-f266ab0bfaaae09e",
+        "2wiki-cd7de89c82fe8a4f",
+        "2wiki-4284f8f142e40696",
+        "2wiki-88a70f4e39e8f567",
+        "2wiki-dc6bfac98d1294da",
+        "2wiki-bdaa8360016ce1fa"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "146b7443086611ebbd5eac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Who lived longer, Edward Dearle or Michael Doeberl?",
+      "answer": "Edward Dearle",
+      "goldChunkIds": [
+        "2wiki-101b3a5716538d34",
+        "2wiki-4a2fbba19dc2838b"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-4a2fbba19dc2838b",
+        "2wiki-101b3a5716538d34",
+        "2wiki-9504643e8307fc39",
+        "2wiki-c4d98f56e617ca01",
+        "2wiki-0c4ba2bcd0858d73",
+        "2wiki-f4d2d2a22d50179d",
+        "2wiki-de86995aeb94bf96",
+        "2wiki-a8ea8c51866eb68c",
+        "2wiki-feec9a09cb169091",
+        "2wiki-4dfac488e35701cd"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "ea1fc06c0bda11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where does Karin Stoltenberg's husband work at?",
+      "answer": "United Nations",
+      "goldChunkIds": [
+        "2wiki-9a6417096670b70d",
+        "2wiki-f70806dd05ee78c6"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-9a6417096670b70d",
+        "2wiki-f70806dd05ee78c6",
+        "2wiki-bd5e872bf42a7f7d",
+        "2wiki-cb56295e85718f60",
+        "2wiki-eb18045db6213afc",
+        "2wiki-4075e597f23df14a",
+        "2wiki-7030fe416d11e5f2",
+        "2wiki-05ac87871b22b1d0",
+        "2wiki-04275a4bc748c260",
+        "2wiki-c6de000ce7d0dba3"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "00c75ffc0bde11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the director of film Lettre Ouverte born?",
+      "answer": "Paris",
+      "goldChunkIds": [
+        "2wiki-35dc85a0c30d016b",
+        "2wiki-6e39ce0ab83e62a7"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-8b1947ec09998466",
+        "2wiki-c199f9f4f2fef96b",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-596f40b6281cb950",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-9bf79f0c693efef3",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-061d484fd18ddb65"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "94198d580bb011ebab90acde48001122",
+      "hop": "inference",
+      "question": "Who is William Ii, Count Of Flanders's paternal grandmother?",
+      "answer": "Mathilde of Bourbon",
+      "goldChunkIds": [
+        "2wiki-aad7334b449b60e0",
+        "2wiki-fd9344bf885f1e54"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-daf5bed8e5339bb9",
+        "2wiki-fd9344bf885f1e54",
+        "2wiki-27cd2f7b3598d460",
+        "2wiki-5288860f0b08f0c7",
+        "2wiki-aad7334b449b60e0",
+        "2wiki-6873d6ad62183907",
+        "2wiki-f90871c1578ca38a",
+        "2wiki-ba6435edbe791b3d",
+        "2wiki-419d50e423fca4a9",
+        "2wiki-5d49d01e75050c17"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "71d8e20e0bdb11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What is the place of birth of Clara Novello's father?",
+      "answer": "London",
+      "goldChunkIds": [
+        "2wiki-574d3f4c453a46f7",
+        "2wiki-d39240623581a7df"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-d39240623581a7df",
+        "2wiki-0d977b94ccd31e4b",
+        "2wiki-84e487041dda30eb",
+        "2wiki-574d3f4c453a46f7",
+        "2wiki-73a0c672bf2a0271",
+        "2wiki-820715dba5409433",
+        "2wiki-a8ea8c51866eb68c",
+        "2wiki-fe447e07a2e64cb4",
+        "2wiki-b9be7b132126f90f",
+        "2wiki-9fbe3a76c911df4f"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "0323cdea090d11ebbdadac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Which film came out earlier, Emmy Of Stork'S Nest or Indira Vizha?",
+      "answer": "Emmy Of Stork'S Nest",
+      "goldChunkIds": [
+        "2wiki-d5079086259d8540",
+        "2wiki-fce2b371782ed901"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-fce2b371782ed901",
+        "2wiki-d5079086259d8540",
+        "2wiki-df842c260e1fd323",
+        "2wiki-45d1e9e83b20aa6c",
+        "2wiki-e97dc24d60e277b1",
+        "2wiki-99d911818b959519"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "f7c153ce092e11ebbdaeac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Which film came out first, Celine: Through The Eyes Of The World or Dilan 1991?",
+      "answer": "Celine: Through The Eyes Of The World",
+      "goldChunkIds": [
+        "2wiki-84c771138737e660",
+        "2wiki-b34b79528f0101b3"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-b34b79528f0101b3",
+        "2wiki-84c771138737e660",
+        "2wiki-ee097f3f75d60c38",
+        "2wiki-747ce74e8bec2a49",
+        "2wiki-0dcd61a78a044996",
+        "2wiki-53263b14e6df44eb",
+        "2wiki-a3cac7e5effb9d72",
+        "2wiki-155ab1466784f059",
+        "2wiki-27f845f00982c678",
+        "2wiki-30727020886753c1"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "0f44750808e411ebbda4ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Who was born earlier, Silas Hardy or Lee Mantle?",
+      "answer": "Lee Mantle",
+      "goldChunkIds": [
+        "2wiki-c32e9f3be14ab26c",
+        "2wiki-ca7b7f9804640094"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-9c9179f0170d60eb",
+        "2wiki-ca7b7f9804640094",
+        "2wiki-c32e9f3be14ab26c",
+        "2wiki-10eaa3619dbf9260",
+        "2wiki-b757818ad45e13cb",
+        "2wiki-d807f0e76d8c0338",
+        "2wiki-73a0c672bf2a0271",
+        "2wiki-3e150b0cf9f1fbe8",
+        "2wiki-5e480ebee7dc73ca",
+        "2wiki-fd54a576451633c7"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "e701105e0bdd11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the place of burial of Albert Frederick, Duke Of Prussia's mother?",
+      "answer": "K\u00f6nigsberg",
+      "goldChunkIds": [
+        "2wiki-a7747345df1f9c6a",
+        "2wiki-e9de60b103c642e3"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-e9de60b103c642e3",
+        "2wiki-8db4df4d851572e9",
+        "2wiki-ed007216b5ef1875",
+        "2wiki-a7747345df1f9c6a",
+        "2wiki-7cd9442ca0e0913f",
+        "2wiki-6402ea18d066cd40",
+        "2wiki-65e261b6955efe81",
+        "2wiki-851a0c452a80460b",
+        "2wiki-57a5bebb94593b1a",
+        "2wiki-ae4f838840eb61d8"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "b5e9ef2c0bdd11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the place of death of Juan Carlos Gumucio's wife?",
+      "answer": "Homs",
+      "goldChunkIds": [
+        "2wiki-49acb72e165a1ffb",
+        "2wiki-d2603f6e7703121a"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-49acb72e165a1ffb",
+        "2wiki-e65c311809167d36",
+        "2wiki-1a297fe33ae42327",
+        "2wiki-24e8ef4cfc25a70e",
+        "2wiki-d2603f6e7703121a",
+        "2wiki-30db33169daa1925",
+        "2wiki-f081d97e39c0e33b",
+        "2wiki-b1b8e59ee96031bd",
+        "2wiki-2065e08a99177b3e",
+        "2wiki-eda34ba66b94d4ea"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "48c8f7f80bdd11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Who is the father of the director of film Gramps Is In The Resistance?",
+      "answer": "Alain Poir\u00e9",
+      "goldChunkIds": [
+        "2wiki-1699351f332f37ad",
+        "2wiki-d51fa86a06713a41"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-1699351f332f37ad",
+        "2wiki-1f43baa48b933a0d",
+        "2wiki-c199f9f4f2fef96b",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-8b1947ec09998466",
+        "2wiki-f14974808b7a4e9a",
+        "2wiki-7794de2bc1bd63d6",
+        "2wiki-49d3521d156b9237",
+        "2wiki-d51fa86a06713a41",
+        "2wiki-f136c7cdb6468d0d"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "aa0370860bdb11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What is the place of birth of the performer of song Heaven (Namie Amuro Song)?",
+      "answer": "Naha, Okinawa",
+      "goldChunkIds": [
+        "2wiki-42600e2437b31cd2",
+        "2wiki-5f2af186f30f1bb0"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-42600e2437b31cd2",
+        "2wiki-5f2af186f30f1bb0",
+        "2wiki-747ce74e8bec2a49",
+        "2wiki-cfe61c2062defbcb",
+        "2wiki-c34d379220182627",
+        "2wiki-b34b79528f0101b3",
+        "2wiki-a5b695765c3dbe9f",
+        "2wiki-902a05b676c09e87",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-89d4114fbf20f300"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "a5bed06e0bdc11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What nationality is Philip Of Ibelin (1180\u20131227)'s mother?",
+      "answer": "Byzantine",
+      "goldChunkIds": [
+        "2wiki-8cd56b49256969a7",
+        "2wiki-945f2582861290af"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-3550b507b2462e5e",
+        "2wiki-0745cba8d322e467",
+        "2wiki-7218369181ed9303",
+        "2wiki-f814e323dd0d2bff",
+        "2wiki-c1453e5da20f5d10",
+        "2wiki-bcf748ea3721e3b1",
+        "2wiki-8cd56b49256969a7",
+        "2wiki-672a2c5edcbdee99",
+        "2wiki-945f2582861290af",
+        "2wiki-d3a077a04058eb73"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "d13381ae08da11ebbd9cac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Who was born later, Joseph J. Magliocco or Viktoriya Zeynep G\u00fcne\u015f?",
+      "answer": "Viktoriya Zeynep G\u00fcne\u015f",
+      "goldChunkIds": [
+        "2wiki-23f0bf411ecb6503",
+        "2wiki-7ca0f948242ea80f"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-23f0bf411ecb6503",
+        "2wiki-1009a7fa3493ec73",
+        "2wiki-e9d4f3e8df065fd3",
+        "2wiki-7ca0f948242ea80f",
+        "2wiki-8c0d9bf215fd80e6",
+        "2wiki-834b355d4f44ceb4",
+        "2wiki-f201646a73597a5b",
+        "2wiki-2cd5ce67f19e1deb",
+        "2wiki-0edffc61ebf3485d",
+        "2wiki-0bf066cb33dd65b5"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2294ccfc0bdc11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "When is the lead guitarist of List Of The Dillinger Escape Plan Band Members's birthday?",
+      "answer": "August 8, 1975",
+      "goldChunkIds": [
+        "2wiki-069a107bfcb9a148",
+        "2wiki-fd23dbf4f92a2d70"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-91f115fa0e4a7253",
+        "2wiki-747ce74e8bec2a49",
+        "2wiki-215ce10b5c3493ac",
+        "2wiki-8e75089a256fb021",
+        "2wiki-c710719c097bea5e",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-7794de2bc1bd63d6",
+        "2wiki-fd7adab512f96e5c",
+        "2wiki-941acbf917ce112a",
+        "2wiki-e3d47443a3b8056f"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "e8d8f7200bdd11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where does Huma Abedin's husband work at?",
+      "answer": "Chuck Schumer",
+      "goldChunkIds": [
+        "2wiki-010d8d1a9135d393",
+        "2wiki-12508b0197272e7a"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-12508b0197272e7a",
+        "2wiki-30db33169daa1925",
+        "2wiki-00e0ffa0e2a9064e",
+        "2wiki-faa862a82585de9e",
+        "2wiki-8a658bd9bca88106",
+        "2wiki-814ec7c11e62d990",
+        "2wiki-ff98682d027cbb80",
+        "2wiki-686b00e8672ab0d8",
+        "2wiki-53263b14e6df44eb",
+        "2wiki-c5ed4c56c4b5d8fe"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "c2ccbd23087811ebbd67ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Are the movies About A Wife, A Dream And Another... and The Doolins Of Oklahoma, from the same country?",
+      "answer": "no",
+      "goldChunkIds": [
+        "2wiki-47904e0a6605e0a1",
+        "2wiki-983bde7a17177310"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-47904e0a6605e0a1",
+        "2wiki-983bde7a17177310",
+        "2wiki-5bee64d1bfe441aa",
+        "2wiki-bdaa8360016ce1fa",
+        "2wiki-ee097f3f75d60c38",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-61d7cc55ba30e8af",
+        "2wiki-3dec53a40f631d58",
+        "2wiki-108da4c36942d6fe",
+        "2wiki-d081de646e7c73ca"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "cf06000e094611ebbdaeac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Which film came out earlier, Out Of The Rain or Les R\u00e9sultats Du F\u00e9minisme?",
+      "answer": "Les R\u00e9sultats Du F\u00e9minisme",
+      "goldChunkIds": [
+        "2wiki-03980cc21abda6c7",
+        "2wiki-6b9abab777a2bfc7"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-03980cc21abda6c7",
+        "2wiki-6b9abab777a2bfc7",
+        "2wiki-1f5c4c2ff08f8504",
+        "2wiki-c1a6963681e0273f",
+        "2wiki-c4c55cf857de5acd",
+        "2wiki-6ce8f47adf9333db",
+        "2wiki-7c11f533ac7eae9c",
+        "2wiki-31f76390d2fc543d",
+        "2wiki-820715dba5409433",
+        "2wiki-51bd5277c10e2c36"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "844fe30c0bda11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where did Giacomo Feo's wife die?",
+      "answer": "Florence",
+      "goldChunkIds": [
+        "2wiki-91e7f40ba9e2a0c8",
+        "2wiki-e0d3cc8a8fdcef06"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-7a42ac505c9a92f1",
+        "2wiki-91e7f40ba9e2a0c8",
+        "2wiki-b391d4af6985c020",
+        "2wiki-294d750c8c2163a4",
+        "2wiki-3152ccee43e49170",
+        "2wiki-e65c311809167d36",
+        "2wiki-1a297fe33ae42327",
+        "2wiki-e0d3cc8a8fdcef06",
+        "2wiki-24e8ef4cfc25a70e",
+        "2wiki-53263b14e6df44eb"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "c32ac4ca0bda11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What is the place of birth of the director of film Swedenhielms?",
+      "answer": "Helsingfors",
+      "goldChunkIds": [
+        "2wiki-6ddc823da8d3d844",
+        "2wiki-f8c3fee21719150f"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-6ddc823da8d3d844",
+        "2wiki-b24481b6f8a0f9a5",
+        "2wiki-b5efec3d687db024",
+        "2wiki-9fe715a6bd652e24",
+        "2wiki-9f10096e004c14ed",
+        "2wiki-2ea87dbc773e573d",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-138baac3ffb9c29d",
+        "2wiki-b34b79528f0101b3",
+        "2wiki-f465feeeb78a495d"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "6021e2d80bde11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Which country Jan Baptist Van Rensselaer's father is from?",
+      "answer": "Dutch",
+      "goldChunkIds": [
+        "2wiki-70a3a6a98d293e24",
+        "2wiki-762c4d6847e845ef"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-8f8000d3ad4136d6",
+        "2wiki-762c4d6847e845ef",
+        "2wiki-9a02154aff42b883",
+        "2wiki-6672d1175b28162d",
+        "2wiki-70a3a6a98d293e24",
+        "2wiki-dfbe16126558249b",
+        "2wiki-f22410adec610630",
+        "2wiki-4075e597f23df14a",
+        "2wiki-3851abc5343c5900",
+        "2wiki-b1c3f76df334a30d"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "8eaa7497095c11ebbdaeac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Which film was released earlier, Sathyavan Savithri or Kids Of The Round Table?",
+      "answer": "Kids Of The Round Table",
+      "goldChunkIds": [
+        "2wiki-1602d22bcdf3012a",
+        "2wiki-e3093ff98d6cb3c7"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-1602d22bcdf3012a",
+        "2wiki-e3093ff98d6cb3c7",
+        "2wiki-7202684d8f263a3c",
+        "2wiki-39f76b8024064b3d",
+        "2wiki-f9266f50f60244f9",
+        "2wiki-49446987ec36bc5b",
+        "2wiki-57f56be63e5ec4e1",
+        "2wiki-af3097aea8c81590",
+        "2wiki-23959dc2df8e63c0",
+        "2wiki-48fcfb332ea06222"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "b5b63b160bdb11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where did Gigi Causey's husband graduate from?",
+      "answer": "Tisch",
+      "goldChunkIds": [
+        "2wiki-8c56ed45575c7b69",
+        "2wiki-9c5482c2d7a41e54"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-d695d4a1ae168f1b",
+        "2wiki-197b00a9378b7d30",
+        "2wiki-9c5482c2d7a41e54",
+        "2wiki-1e5bca0d07359350",
+        "2wiki-082494dd09096f85",
+        "2wiki-33257c3e0ecec68d",
+        "2wiki-4d521dd1ab032032",
+        "2wiki-c3156247419a71a8",
+        "2wiki-6014201752d3dd39",
+        "2wiki-8c56ed45575c7b69"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "4b1b91720bde11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What nationality is Geodeung Of Geumgwan Gaya's mother?",
+      "answer": "India",
+      "goldChunkIds": [
+        "2wiki-1cc84eaab1f52c25",
+        "2wiki-e8e9bca53394a4ab"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-84e81387df455f9a",
+        "2wiki-2455616b21fce354",
+        "2wiki-88b629b0c895c422",
+        "2wiki-2aadc98c192a8e13",
+        "2wiki-598ee30311b91376",
+        "2wiki-e8e9bca53394a4ab",
+        "2wiki-1cc84eaab1f52c25",
+        "2wiki-389c062f1c6fcca5",
+        "2wiki-cdbb0b48e7276eed",
+        "2wiki-f3bf73783a95c665"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "5bf96996085111ebbd58ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Which film was released earlier, Xenoa or Divorce Invitation?",
+      "answer": "Xenoa",
+      "goldChunkIds": [
+        "2wiki-053f338933440afe",
+        "2wiki-ffd1813c086fc4b6"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-053f338933440afe",
+        "2wiki-ffd1813c086fc4b6",
+        "2wiki-c39d1a5eaca120ad",
+        "2wiki-596f40b6281cb950",
+        "2wiki-04bad7bd01497dac",
+        "2wiki-108da4c36942d6fe",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-c710719c097bea5e",
+        "2wiki-b0f4bb7ddc6c48eb",
+        "2wiki-64480925711a10d0"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "0458640a0bdd11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What is the cause of death of Alex Matthiessen's father?",
+      "answer": "leukemia",
+      "goldChunkIds": [
+        "2wiki-d807f0e76d8c0338",
+        "2wiki-f3cb208b0907484a"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-f3cb208b0907484a",
+        "2wiki-d807f0e76d8c0338",
+        "2wiki-f39ac05f81d285ad",
+        "2wiki-945f2582861290af",
+        "2wiki-56605b0c3762fdbd",
+        "2wiki-577bdb4eb259224d",
+        "2wiki-8c91683368551d60",
+        "2wiki-065e82dc545068f9",
+        "2wiki-83033c6622122c68",
+        "2wiki-82a2e440aa266abe"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "94dd39d80bdd11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What is the place of birth of Remigius Of Rouen's father?",
+      "answer": "Herstal",
+      "goldChunkIds": [
+        "2wiki-2b1cb05193b4ab09",
+        "2wiki-ef7ce00ba272fdf9"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-2b1cb05193b4ab09",
+        "2wiki-d6c6dab4785f5b8f",
+        "2wiki-e526e647518899a1",
+        "2wiki-07963e9a8bba5d48",
+        "2wiki-8d42c824ceb12cda",
+        "2wiki-ef7ce00ba272fdf9",
+        "2wiki-2476de2c0030f48f",
+        "2wiki-11f00eaaf5aa5504",
+        "2wiki-902d6a04da88d39f",
+        "2wiki-e75c17bac3247b86"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "abc68a180bd911eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "When did Lord Patrick Crichton-Stuart's father die?",
+      "answer": "22 January 1794",
+      "goldChunkIds": [
+        "2wiki-613d774af7e77233",
+        "2wiki-bc99fdd4c0887920"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-613d774af7e77233",
+        "2wiki-bc99fdd4c0887920",
+        "2wiki-f4d2d2a22d50179d",
+        "2wiki-42d9697ae98a508a",
+        "2wiki-d6bc737efc67b7d2",
+        "2wiki-8bb01501412cdea2",
+        "2wiki-2122f0ccdc2f0b99",
+        "2wiki-015047eb281ff94b",
+        "2wiki-d6ef096c5967189c",
+        "2wiki-a0a2dfe16ff27a18"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "363279db08d011ebbd95ac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director who was born earlier, It'S A Joke, Son! or The Thirty Nine Steps (1978 Film)?",
+      "answer": "It'S A Joke, Son!",
+      "goldChunkIds": [
+        "2wiki-422937cb34da9340",
+        "2wiki-4242dca167e4c494",
+        "2wiki-9f6a5f0a9dd35792",
+        "2wiki-ec2232a21d50f00e"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-422937cb34da9340",
+        "2wiki-539c4b06daccc5d6",
+        "2wiki-9f6a5f0a9dd35792",
+        "2wiki-38dae7bf2ba56405",
+        "2wiki-e6c9f407d9d6aa2f",
+        "2wiki-5440b6a7f59e4ced",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-c199f9f4f2fef96b",
+        "2wiki-8b1947ec09998466",
+        "2wiki-7bb83dc21ac7efd1"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.25,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "bbccb00a08c211ebbd8cac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Are both directors of films The Slayer (Film) and Moscow Heat from the same country?",
+      "answer": "yes",
+      "goldChunkIds": [
+        "2wiki-391345635f246588",
+        "2wiki-7627a5cf697c5e96",
+        "2wiki-7c4735b943785dd5",
+        "2wiki-fa212d54c3593f88"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-391345635f246588",
+        "2wiki-a064cc413fa0f34f",
+        "2wiki-7627a5cf697c5e96",
+        "2wiki-2065e08a99177b3e",
+        "2wiki-4142cbf94d184902",
+        "2wiki-d84ec0165ea01a0a",
+        "2wiki-b34ad7dc1886296a",
+        "2wiki-981c47f776cb2e08",
+        "2wiki-c31e8b848537ce8e",
+        "2wiki-7794de2bc1bd63d6"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.25,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "5c77f7ed08ac11ebbd82ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Which school was established first, Whitehorse Manor Junior School or Sabawoon Rehabilitation Centre?",
+      "answer": "Sabawoon Rehabilitation Centre",
+      "goldChunkIds": [
+        "2wiki-7037f20572629c93",
+        "2wiki-7c74da1d90266fb7"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-7037f20572629c93",
+        "2wiki-d50e206323dfef3a",
+        "2wiki-7c74da1d90266fb7",
+        "2wiki-55107ff1c3c6137b",
+        "2wiki-e56daff164fdfee6",
+        "2wiki-37ba2e7449a793f3",
+        "2wiki-dd980f3d84e12d18",
+        "2wiki-12508b0197272e7a",
+        "2wiki-083f3a123b4cf863",
+        "2wiki-03c59734abc75ebc"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "b4e780a5088f11ebbd72ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Are Little Sachigo Lake and Holden Lake located in the same country?",
+      "answer": "yes",
+      "goldChunkIds": [
+        "2wiki-155ab1466784f059",
+        "2wiki-1a9ed0e509d84f6b"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-a09cc4635609fd0e",
+        "2wiki-1a9ed0e509d84f6b",
+        "2wiki-155ab1466784f059",
+        "2wiki-a3cac7e5effb9d72",
+        "2wiki-0dcd61a78a044996",
+        "2wiki-27f845f00982c678",
+        "2wiki-588e5544e91c279e",
+        "2wiki-04275a4bc748c260",
+        "2wiki-c6de000ce7d0dba3",
+        "2wiki-6578c0b345947c35"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "97ce0ec00baf11ebab90acde48001122",
+      "hop": "inference",
+      "question": "Who is Henriette Of France (1727\u20131752)'s maternal grandfather?",
+      "answer": "Stanis\u0142aw Leszczy\u0144ski",
+      "goldChunkIds": [
+        "2wiki-a2efc90b1c07a057",
+        "2wiki-bb5f7ce394739202"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-826856ac274729b0",
+        "2wiki-c5f8bd7b10ac3522",
+        "2wiki-b1c7ed4a6e9a11ba",
+        "2wiki-077777aca444c408",
+        "2wiki-a2efc90b1c07a057",
+        "2wiki-881aa200451b3186",
+        "2wiki-0dde6834a481e857",
+        "2wiki-bb5f7ce394739202",
+        "2wiki-789fb1f33ede168d",
+        "2wiki-7168a67417ebee4e"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "69a7e9ca08e011ebbda1ac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director born first, Leave It To Henry or The Last Night Of Scheherazade?",
+      "answer": "Leave It To Henry",
+      "goldChunkIds": [
+        "2wiki-008cc2cec33262d1",
+        "2wiki-1ebf85e50074d977",
+        "2wiki-2065e08a99177b3e",
+        "2wiki-998ebbe6fa22926a"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-008cc2cec33262d1",
+        "2wiki-2065e08a99177b3e",
+        "2wiki-1ebf85e50074d977",
+        "2wiki-5aaa25d43499e301",
+        "2wiki-5404e129e7f8a385",
+        "2wiki-04bad7bd01497dac",
+        "2wiki-998ebbe6fa22926a",
+        "2wiki-18b7e7d1ca48a464",
+        "2wiki-7794de2bc1bd63d6",
+        "2wiki-71cc34c4b9a3c9f3"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.75,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "04a544a40bde11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What is the date of death of Gero Ii, Margrave Of The Saxon Ostmark's father?",
+      "answer": "3 August 979",
+      "goldChunkIds": [
+        "2wiki-6ad1f3dc9d8ec644",
+        "2wiki-b14938830294570c"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-b8d8ff1c1264f8e2",
+        "2wiki-6ad1f3dc9d8ec644",
+        "2wiki-6aeb8cad518e2e42",
+        "2wiki-d983a2ec9d489795",
+        "2wiki-881aa200451b3186",
+        "2wiki-00be44fb569b5374",
+        "2wiki-53be01f4e00e9eec",
+        "2wiki-1968b0f0e7570be6",
+        "2wiki-afc21d5210c13f86",
+        "2wiki-93a86334d1b4fe0a"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "4f49c369098d11ebbdb0ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Are Tomskoye, Amur Oblast and Pleshkovo located in the same country?",
+      "answer": "yes",
+      "goldChunkIds": [
+        "2wiki-531ec5fbd1519438",
+        "2wiki-8de8119730d8f2d5"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-531ec5fbd1519438",
+        "2wiki-8de8119730d8f2d5",
+        "2wiki-3c0956ffeabcae82",
+        "2wiki-a340c8ac7739ffc8",
+        "2wiki-98071d802ff3267a",
+        "2wiki-0fda8015bfa5866f",
+        "2wiki-5e2bd2616add1048",
+        "2wiki-55ff28ada3a5e49e",
+        "2wiki-76bd37fdd363ee1b",
+        "2wiki-01462d653b924161"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "a982212e08a311ebbd7bac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Which film came out earlier, I Am Breathing or Ulti Ganga?",
+      "answer": "Ulti Ganga",
+      "goldChunkIds": [
+        "2wiki-122746f4ac701fcc",
+        "2wiki-9eb7dbb79c6d4fc7"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-9eb7dbb79c6d4fc7",
+        "2wiki-122746f4ac701fcc",
+        "2wiki-fd27539d0b85f280",
+        "2wiki-f14974808b7a4e9a",
+        "2wiki-c199f9f4f2fef96b",
+        "2wiki-b757818ad45e13cb",
+        "2wiki-3f9f12b8af1e6be2",
+        "2wiki-3e150b0cf9f1fbe8",
+        "2wiki-c31e8b848537ce8e",
+        "2wiki-7214af90f47ffc81"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "c30b9f8108b211ebbd85ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Who was born later, Levon Julfalakyan or Charlotte Spurkeland?",
+      "answer": "Charlotte Spurkeland",
+      "goldChunkIds": [
+        "2wiki-a5cc8d7e2a28b623",
+        "2wiki-eb18045db6213afc"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-eb18045db6213afc",
+        "2wiki-a5cc8d7e2a28b623",
+        "2wiki-894ce25502318fc5",
+        "2wiki-789fb1f33ede168d",
+        "2wiki-d891b551893c1bec",
+        "2wiki-ce86302627935108",
+        "2wiki-7d469e8b3c534982",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-aa6223ba10a69ca1",
+        "2wiki-98697dfe63bb5b59"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "a08505d20bdc11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Who is the father of the director of film Red 2 (Film)?",
+      "answer": "Aldo Parisot",
+      "goldChunkIds": [
+        "2wiki-1c1e80b4c746c923",
+        "2wiki-45ff33e879a2fae1"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-45ff33e879a2fae1",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-8b1947ec09998466",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-596f40b6281cb950",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-9bf79f0c693efef3",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-061d484fd18ddb65"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "982f8e440bdb11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "When was the company that published American Scientist founded?",
+      "answer": "1886",
+      "goldChunkIds": [
+        "2wiki-2cc156c0b9df0921",
+        "2wiki-b2ff3ef7274dd258"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-2cc156c0b9df0921",
+        "2wiki-d109c0908e7dfacb",
+        "2wiki-83033c6622122c68",
+        "2wiki-631d8270f20d51d6",
+        "2wiki-1a6950583a887429",
+        "2wiki-8c91683368551d60",
+        "2wiki-065e82dc545068f9",
+        "2wiki-82a2e440aa266abe",
+        "2wiki-9288011f51c5cc16",
+        "2wiki-113d72ba21c4aab0"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "5142f59e0bda11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What is the place of birth of Jo Planckaert's father?",
+      "answer": "Nevele",
+      "goldChunkIds": [
+        "2wiki-42a059bdf507e304",
+        "2wiki-831db75beadbaa5f"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-abdc5b1d8dfab0de",
+        "2wiki-831db75beadbaa5f",
+        "2wiki-956bba593d75c4fd",
+        "2wiki-42a059bdf507e304",
+        "2wiki-39a7fc9c7b853454",
+        "2wiki-6d2a87e668cb06e4",
+        "2wiki-9f674ae001c7c572",
+        "2wiki-81d81d2e895d2513",
+        "2wiki-9bf79f0c693efef3",
+        "2wiki-6732ee62eebc5a1b"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "041581680bdc11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What is the place of birth of Gwilym Lloyd George's father?",
+      "answer": "Manchester",
+      "goldChunkIds": [
+        "2wiki-00e0ffa0e2a9064e",
+        "2wiki-686b00e8672ab0d8"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-00e0ffa0e2a9064e",
+        "2wiki-3ce936d2da10fe03",
+        "2wiki-d8cdb01443e7c45c",
+        "2wiki-686b00e8672ab0d8",
+        "2wiki-b9be7b132126f90f",
+        "2wiki-99d911818b959519",
+        "2wiki-2b8b18f2e26efeb5",
+        "2wiki-30727020886753c1",
+        "2wiki-9711cfe0046b8671",
+        "2wiki-5440b6a7f59e4ced"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "ad43c9300bdb11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What is the place of birth of James Douglas, 3Rd Earl Of Angus's father?",
+      "answer": "Tantallon Castle",
+      "goldChunkIds": [
+        "2wiki-75e29f50278c7ff0",
+        "2wiki-bccebd7200aeb41f"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-36e443de949bbaf7",
+        "2wiki-bccebd7200aeb41f",
+        "2wiki-75e29f50278c7ff0",
+        "2wiki-5794359eae9d353f",
+        "2wiki-4ac64a723084405e",
+        "2wiki-f1cc406b8944cdd4",
+        "2wiki-0c4ba2bcd0858d73",
+        "2wiki-f4d2d2a22d50179d",
+        "2wiki-cf8cee6692046c8a",
+        "2wiki-42d9697ae98a508a"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "5839dbac0bde11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What nationality is the director of film They Call It Love?",
+      "answer": "American",
+      "goldChunkIds": [
+        "2wiki-709ebca01f3e8e28",
+        "2wiki-b16766e05293b152"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-b16766e05293b152",
+        "2wiki-36cd341239261cf0",
+        "2wiki-25736fe4f2ed0141",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c199f9f4f2fef96b",
+        "2wiki-7794de2bc1bd63d6",
+        "2wiki-8b41fb9eab89aed5",
+        "2wiki-7bb83dc21ac7efd1",
+        "2wiki-fd7adab512f96e5c"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "22d296de0bde11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What is the place of birth of Zhanna Nemtsova's father?",
+      "answer": "Sochi",
+      "goldChunkIds": [
+        "2wiki-834b355d4f44ceb4",
+        "2wiki-d439de0cea76505c"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-d439de0cea76505c",
+        "2wiki-834b355d4f44ceb4",
+        "2wiki-1c7e903e347803eb",
+        "2wiki-6a3a6ba36b517999",
+        "2wiki-97ce82424bf77e5c",
+        "2wiki-3de2c35eab5b3297",
+        "2wiki-013d3e0688959fd5",
+        "2wiki-3c0956ffeabcae82",
+        "2wiki-a340c8ac7739ffc8",
+        "2wiki-531ec5fbd1519438"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "ae85fcce089411ebbd75ac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director born earlier, Santa Fe Uprising or Trainer And Temptress?",
+      "answer": "Trainer And Temptress",
+      "goldChunkIds": [
+        "2wiki-2df84b24bd3e5308",
+        "2wiki-509812a9bc86ce7d",
+        "2wiki-a563a42f4a778ae4",
+        "2wiki-cbe12d4aea8ce655"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-6cef254de848cd13",
+        "2wiki-2df84b24bd3e5308",
+        "2wiki-a563a42f4a778ae4",
+        "2wiki-c199f9f4f2fef96b",
+        "2wiki-8b1947ec09998466",
+        "2wiki-3e150b0cf9f1fbe8",
+        "2wiki-55107ff1c3c6137b",
+        "2wiki-de86995aeb94bf96",
+        "2wiki-152b6aa20abd6839",
+        "2wiki-c76229ad42398ad4"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.25,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "c01a2fa8087111ebbd63ac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director who was born earlier, Adam'S Rib or Thendral Veesum?",
+      "answer": "Adam'S Rib",
+      "goldChunkIds": [
+        "2wiki-108da4c36942d6fe",
+        "2wiki-510eb2abcf4a011f",
+        "2wiki-596f40b6281cb950",
+        "2wiki-76eee2c4b0f8c54c"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-76eee2c4b0f8c54c",
+        "2wiki-108da4c36942d6fe",
+        "2wiki-596f40b6281cb950",
+        "2wiki-9baf6cbb7609bc68",
+        "2wiki-b0f4bb7ddc6c48eb",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-e12580349eff10c1",
+        "2wiki-c199f9f4f2fef96b",
+        "2wiki-7bb83dc21ac7efd1"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.75,
+        "hit@5": 1.0,
+        "recall@10": 0.75,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "9c3ff1040bdb11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Which country the composer of film Continental, A Film Without Guns is from?",
+      "answer": "French",
+      "goldChunkIds": [
+        "2wiki-5c0e262ebec6367b",
+        "2wiki-b9794020b5333dbd"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-5c0e262ebec6367b",
+        "2wiki-55107ff1c3c6137b",
+        "2wiki-eb89ce431e3b1002",
+        "2wiki-888a0346b69a7440",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-8b1947ec09998466",
+        "2wiki-ddd2a84324061796",
+        "2wiki-c199f9f4f2fef96b",
+        "2wiki-04275a4bc748c260",
+        "2wiki-b9794020b5333dbd"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "81ca57e60bdc11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the director of film Age-Old Friends born?",
+      "answer": "Winnipeg, Manitoba",
+      "goldChunkIds": [
+        "2wiki-55107ff1c3c6137b",
+        "2wiki-ddd2a84324061796"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-8b1947ec09998466",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-596f40b6281cb950",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-9bf79f0c693efef3",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-061d484fd18ddb65",
+        "2wiki-76e6e9d7fb5a11fb"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "dc6985ea096211ebbdafac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Which one was established first, Noerr or Korn Ferry?",
+      "answer": "Noerr",
+      "goldChunkIds": [
+        "2wiki-822f13252792fe60",
+        "2wiki-d1c17c51b6bf6046"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-822f13252792fe60",
+        "2wiki-5da98ee581890541",
+        "2wiki-d1c17c51b6bf6046",
+        "2wiki-c93aba3fe488130c",
+        "2wiki-0bf066cb33dd65b5",
+        "2wiki-8ce4a1ec36133b37",
+        "2wiki-77eea8f633ce8d5b",
+        "2wiki-319aa9ffc291b6a6",
+        "2wiki-af4dea9c3831a8d1",
+        "2wiki-ca7b7f9804640094"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "30ee74680bde11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the father of Eleonora Di Garzia Di Toledo born?",
+      "answer": "Villafranca del Bierzo",
+      "goldChunkIds": [
+        "2wiki-0f26aa6491bcf7c7",
+        "2wiki-eeeb4acd264811f0"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-eeeb4acd264811f0",
+        "2wiki-902d6a04da88d39f",
+        "2wiki-77fb189904047297",
+        "2wiki-cfad2a23a09e8d6c",
+        "2wiki-fc93144708ef2d11",
+        "2wiki-026c4030eff50dc2",
+        "2wiki-7c1dc5ebc7b2bf83",
+        "2wiki-e0d3cc8a8fdcef06",
+        "2wiki-7fa11781266a5a1c",
+        "2wiki-0f26aa6491bcf7c7"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "f491b33e0bda11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What is the award that the director of film The Last Night Of The Barbary Coast got?",
+      "answer": "Jean Hersholt Humanitarian Award",
+      "goldChunkIds": [
+        "2wiki-2d01156e85e429fe",
+        "2wiki-4db36182d3aabb13"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-596f40b6281cb950",
+        "2wiki-34b4744d9dc566df",
+        "2wiki-2d01156e85e429fe",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-64480925711a10d0",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-bfd9a516b6748f16",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-c710719c097bea5e"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "5b637e060bb011ebab90acde48001122",
+      "hop": "inference",
+      "question": "Who is Prince Nicolas, Duke Of \u00c5ngermanland's mother?",
+      "answer": "Princess Madeleine, Duchess of H\u00e4lsingland and G\u00e4strikland",
+      "goldChunkIds": [
+        "2wiki-2ea87dbc773e573d",
+        "2wiki-b5efec3d687db024"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-b5efec3d687db024",
+        "2wiki-1751033f2e220547",
+        "2wiki-bd5e872bf42a7f7d",
+        "2wiki-1eec02679c319277",
+        "2wiki-3ae6589fa1d7788e",
+        "2wiki-599e4b675afff6d0",
+        "2wiki-2ea87dbc773e573d",
+        "2wiki-52c569cb9f972a53",
+        "2wiki-851a0c452a80460b",
+        "2wiki-7b931ae4ef4f3d8b"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "1a2188840bb011ebab90acde48001122",
+      "hop": "inference",
+      "question": "Who is the paternal grandmother of Princess Augusta Of Waldeck-Pyrmont?",
+      "answer": "Princess Augusta of Schwarzburg-Sondershausen",
+      "goldChunkIds": [
+        "2wiki-6b7d4ec80abedd35",
+        "2wiki-d736167283335b02"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-d736167283335b02",
+        "2wiki-14dea7c0947cec69",
+        "2wiki-ae719ca02c0b6521",
+        "2wiki-43244de5e242415d",
+        "2wiki-de4a3084fbba1d78",
+        "2wiki-6b7d4ec80abedd35",
+        "2wiki-82241e6c84cb64e5",
+        "2wiki-891ffb9fed213748",
+        "2wiki-65a9932ff2c1a923",
+        "2wiki-9d62768f70996630"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "d1fd9cbe0bdc11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where does the director of film The Marquise Of O (Film) work at?",
+      "answer": "Cahiers du cin\u00e9ma",
+      "goldChunkIds": [
+        "2wiki-061d484fd18ddb65",
+        "2wiki-28a1cfb466c8a365"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-28a1cfb466c8a365",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-cc4245ac957eea12",
+        "2wiki-061d484fd18ddb65",
+        "2wiki-596f40b6281cb950",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-8c958ab7c1c4cd3c"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "909aa544086411ebbd5eac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film whose director is younger, Joe Palooka In Fighting Mad or Figaro-Ci, Figaro-L\u00e0?",
+      "answer": "Figaro-Ci, Figaro-L\u00e0",
+      "goldChunkIds": [
+        "2wiki-00687cb0123a7a22",
+        "2wiki-3fe0fe04f364a47e",
+        "2wiki-dc6bfac98d1294da",
+        "2wiki-e28a757639bf06c3"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-74ac10108d0695ec",
+        "2wiki-32f8c9b6e45eccc0",
+        "2wiki-00687cb0123a7a22",
+        "2wiki-db7facc65d7fa647",
+        "2wiki-dc6bfac98d1294da",
+        "2wiki-0025f743931d9409",
+        "2wiki-3fe0fe04f364a47e",
+        "2wiki-18b7e7d1ca48a464",
+        "2wiki-3fee7caf05e8c4d3",
+        "2wiki-e28a757639bf06c3"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "47806bc308c411ebbd8eac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Which film was released first, Ekam \u2013 Son Of Soil or Farber'S Nerve?",
+      "answer": "Farber'S Nerve",
+      "goldChunkIds": [
+        "2wiki-c5ed4c56c4b5d8fe",
+        "2wiki-f9883166fc595af9"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-c5ed4c56c4b5d8fe",
+        "2wiki-f9883166fc595af9",
+        "2wiki-9753020f95039203",
+        "2wiki-7121dd89504b471f",
+        "2wiki-3460253f3bb1a4e7",
+        "2wiki-9cb0ac5ca86965f4",
+        "2wiki-ff98682d027cbb80",
+        "2wiki-082494dd09096f85",
+        "2wiki-1b52615d2dede339",
+        "2wiki-a4bccc40fcbfb50d"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "f6e2b9280bdd11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Which country Mohammed Al-Modiahki's wife is from?",
+      "answer": "China",
+      "goldChunkIds": [
+        "2wiki-83af135d4d110b6a",
+        "2wiki-eda34ba66b94d4ea"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-e5218afc8e066977",
+        "2wiki-83af135d4d110b6a",
+        "2wiki-218123f8008047f1",
+        "2wiki-857e13b251a29261",
+        "2wiki-e145609a2853e697",
+        "2wiki-36c0357689e44bfe",
+        "2wiki-eda34ba66b94d4ea",
+        "2wiki-31f76390d2fc543d",
+        "2wiki-ea9d16222203542c",
+        "2wiki-84e81387df455f9a"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "ce5bfc90086c11ebbd61ac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Do both films: Gammat Jammat and Ready (2011 Film) have the directors from the same country?",
+      "answer": "yes",
+      "goldChunkIds": [
+        "2wiki-13596235230c12ba",
+        "2wiki-76e6e9d7fb5a11fb",
+        "2wiki-d4863e1035cd0250",
+        "2wiki-dd03a17b9adf4090"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-13596235230c12ba",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-8b1947ec09998466",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-596f40b6281cb950",
+        "2wiki-76e6e9d7fb5a11fb",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-9bf79f0c693efef3"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.25,
+        "hit@2": 1.0,
+        "recall@5": 0.25,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "e6688a7e0baf11ebab90acde48001122",
+      "hop": "inference",
+      "question": "Who is Philip Of Sicily's father?",
+      "answer": "Charles I of Naples",
+      "goldChunkIds": [
+        "2wiki-91fce0249835eacf",
+        "2wiki-f148b2c3c34a0418"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-91fce0249835eacf",
+        "2wiki-615d1e858204115a",
+        "2wiki-3550b507b2462e5e",
+        "2wiki-0745cba8d322e467",
+        "2wiki-c1453e5da20f5d10",
+        "2wiki-8cd56b49256969a7",
+        "2wiki-7218369181ed9303",
+        "2wiki-f814e323dd0d2bff",
+        "2wiki-ac6a1ae5cdc0e473",
+        "2wiki-672a2c5edcbdee99"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "3e3cd62a086211ebbd5dac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Who was born later, Gideon Johnson Pillow or Holm J\u00f8lsen?",
+      "answer": "Holm J\u00f8lsen",
+      "goldChunkIds": [
+        "2wiki-176fdc2517e5ad09",
+        "2wiki-8b4dda6e51e491bf"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-8b4dda6e51e491bf",
+        "2wiki-176fdc2517e5ad09",
+        "2wiki-18eb7dfb7bfb0ddc",
+        "2wiki-04e2f0d821b61d97",
+        "2wiki-bb5f7ce394739202",
+        "2wiki-0dde6834a481e857",
+        "2wiki-ff245185ad3c641f",
+        "2wiki-259525dd066fbda1",
+        "2wiki-b34b79528f0101b3",
+        "2wiki-f4d2d2a22d50179d"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "9b2ccd4e088b11ebbd6fac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director who died first, The Crime Doctor'S Courage or Vasantha Sena (1967 Film)?",
+      "answer": "The Crime Doctor'S Courage",
+      "goldChunkIds": [
+        "2wiki-510eb2abcf4a011f",
+        "2wiki-597c79f0c78f1cd7",
+        "2wiki-c978909978eff380",
+        "2wiki-e12580349eff10c1"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-e12580349eff10c1",
+        "2wiki-597c79f0c78f1cd7",
+        "2wiki-2aa387a7469ce0cc",
+        "2wiki-76e6e9d7fb5a11fb",
+        "2wiki-596f40b6281cb950",
+        "2wiki-fcb4b2f952fb29f4",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-c710719c097bea5e",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-bf7d2bf7146340b1"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "49ec1ade0bdd11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where did the director of film My Heidelberg, I Can Not Forget You die?",
+      "answer": "Argentina",
+      "goldChunkIds": [
+        "2wiki-3094ca609e330ea2",
+        "2wiki-a98f658ad30d82c5"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-3094ca609e330ea2",
+        "2wiki-d4b28b5ec99c8553",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-8b1947ec09998466",
+        "2wiki-cacf2806c7c9f362",
+        "2wiki-c199f9f4f2fef96b",
+        "2wiki-a98f658ad30d82c5",
+        "2wiki-7bb83dc21ac7efd1",
+        "2wiki-c31e8b848537ce8e",
+        "2wiki-981c47f776cb2e08"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "beda709d090e11ebbdadac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Which film was released earlier, Tiger Of The Seven Seas or My Wife'S Lodger?",
+      "answer": "My Wife'S Lodger",
+      "goldChunkIds": [
+        "2wiki-330cb4e6f136c26b",
+        "2wiki-9bcea0e5574114ac"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-9bcea0e5574114ac",
+        "2wiki-330cb4e6f136c26b",
+        "2wiki-24e8ef4cfc25a70e",
+        "2wiki-1a297fe33ae42327",
+        "2wiki-e65c311809167d36",
+        "2wiki-1009a7fa3493ec73",
+        "2wiki-ba946a2a15e275fa",
+        "2wiki-9dda589435431a28",
+        "2wiki-76eee2c4b0f8c54c",
+        "2wiki-a65ec15f802d1643"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "7d94382208d011ebbd95ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Do Alice Mary Dowd and Richard N. Palmer have the same nationality?",
+      "answer": "yes",
+      "goldChunkIds": [
+        "2wiki-7c11f533ac7eae9c",
+        "2wiki-efec584a78c075ac"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-7c11f533ac7eae9c",
+        "2wiki-efec584a78c075ac",
+        "2wiki-be0b53b5dcc0a077",
+        "2wiki-fb530481362de36c",
+        "2wiki-eb89ce431e3b1002",
+        "2wiki-73a0c672bf2a0271",
+        "2wiki-082494dd09096f85",
+        "2wiki-5e621ab4fb224a44",
+        "2wiki-596f40b6281cb950",
+        "2wiki-8c91683368551d60"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "e4e02a240bda11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Who is the father of the director of film Wonders Of The Sea 3D?",
+      "answer": "Jacques Cousteau",
+      "goldChunkIds": [
+        "2wiki-00a38ed5e7d3043b",
+        "2wiki-c9f22235510c32e3"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-00a38ed5e7d3043b",
+        "2wiki-3e150b0cf9f1fbe8",
+        "2wiki-596f40b6281cb950",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-c710719c097bea5e",
+        "2wiki-8b1947ec09998466",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-bfd9a516b6748f16",
+        "2wiki-4992a17a03beb69f"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "49a5c36b086111ebbd5dac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director died first, Le Guignolo or Knights Of The Range?",
+      "answer": "Knights Of The Range",
+      "goldChunkIds": [
+        "2wiki-0ce8991c442ea491",
+        "2wiki-7b03e650cf9b09bd",
+        "2wiki-97cab221bf33923c",
+        "2wiki-da6f952fd5eb161b"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-97cab221bf33923c",
+        "2wiki-7b03e650cf9b09bd",
+        "2wiki-624bb39ca2dc94de",
+        "2wiki-8b1947ec09998466",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-596f40b6281cb950",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-061d484fd18ddb65",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-c710719c097bea5e"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "fa58491e084b11ebbd56ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Who died later, Narc\u00eds Ventall\u00f3 or H. Verlan Andersen?",
+      "answer": "Narc\u00eds Ventall\u00f3",
+      "goldChunkIds": [
+        "2wiki-5c1383a52915301e",
+        "2wiki-e50faf505bc48748"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-5c1383a52915301e",
+        "2wiki-e50faf505bc48748",
+        "2wiki-ebecfbfd33e777b7",
+        "2wiki-1c7e903e347803eb",
+        "2wiki-163e6b4e7b58dad3",
+        "2wiki-6a3a6ba36b517999",
+        "2wiki-001aab3da33486eb",
+        "2wiki-81d81d2e895d2513",
+        "2wiki-2df7ad283f29bd2d",
+        "2wiki-e590d0861f5d9483"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "8223ad8e097811ebbdb0ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Which film was released first, The Beginning Or The End or Hold Back The Night?",
+      "answer": "The Beginning Or The End",
+      "goldChunkIds": [
+        "2wiki-6cdbfe5a1cb472b8",
+        "2wiki-955bc94a14aacec8"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-6cdbfe5a1cb472b8",
+        "2wiki-955bc94a14aacec8",
+        "2wiki-492db5d705d73db6",
+        "2wiki-488ddb7af5e6c3cc",
+        "2wiki-0fcb9056e14c2c18",
+        "2wiki-990de9a4e899a559",
+        "2wiki-8c0d9bf215fd80e6",
+        "2wiki-94cf0a25e41a794a",
+        "2wiki-6899ced7b1419a91",
+        "2wiki-282f7d92815a4468"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "8f8aaf0b088711ebbd6dac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Who is younger, Aneta Hlad\u00edkov\u00e1 or Ren\u00e9 Poupardin?",
+      "answer": "Aneta Hlad\u00edkov\u00e1",
+      "goldChunkIds": [
+        "2wiki-a27df26255a80a95",
+        "2wiki-cca1561f22f27428"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-a27df26255a80a95",
+        "2wiki-cca1561f22f27428",
+        "2wiki-1602d22bcdf3012a",
+        "2wiki-aec34fe856ef59b5",
+        "2wiki-792f4561db541e7b",
+        "2wiki-8e03b042ffbaad99",
+        "2wiki-b1330cff003783df",
+        "2wiki-403f816b3c89979e",
+        "2wiki-ae1686f051b90063",
+        "2wiki-6e39ce0ab83e62a7"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "c9b515020bda11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the place of death of Prince Christopher Of Greece And Denmark's father?",
+      "answer": "Thessaloniki",
+      "goldChunkIds": [
+        "2wiki-599e4b675afff6d0",
+        "2wiki-82241e6c84cb64e5"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-1751033f2e220547",
+        "2wiki-599e4b675afff6d0",
+        "2wiki-1eec02679c319277",
+        "2wiki-9fe715a6bd652e24",
+        "2wiki-851a0c452a80460b",
+        "2wiki-7b931ae4ef4f3d8b",
+        "2wiki-01ef0aab4bdce906",
+        "2wiki-a58b2cfc70d72a31",
+        "2wiki-52c569cb9f972a53",
+        "2wiki-9f10096e004c14ed"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "652d7dac0bdc11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What is the place of birth of the director of film Guilty Of Treason?",
+      "answer": "New York",
+      "goldChunkIds": [
+        "2wiki-9288011f51c5cc16",
+        "2wiki-ce86302627935108"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-ce86302627935108",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-596f40b6281cb950",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-9bf79f0c693efef3",
+        "2wiki-c710719c097bea5e"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2b7db0200bde11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where did Charles Stewart, 3Rd Duke Of Richmond's father graduate from?",
+      "answer": "University of Paris",
+      "goldChunkIds": [
+        "2wiki-0c4ba2bcd0858d73",
+        "2wiki-f4d2d2a22d50179d"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-cf8cee6692046c8a",
+        "2wiki-a0a2dfe16ff27a18",
+        "2wiki-f4d2d2a22d50179d",
+        "2wiki-0c4ba2bcd0858d73",
+        "2wiki-21b9ba0f400e5998",
+        "2wiki-f1cc406b8944cdd4",
+        "2wiki-36e443de949bbaf7",
+        "2wiki-3d3ec5f45200d2e3",
+        "2wiki-1813c503593445c9",
+        "2wiki-42c00e8d1794a4b7"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "437f3b9a0bdd11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What is the place of birth of the performer of song I Wish (Gabrielle Song)?",
+      "answer": "Hackney",
+      "goldChunkIds": [
+        "2wiki-5bee64d1bfe441aa",
+        "2wiki-ee097f3f75d60c38"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-747ce74e8bec2a49",
+        "2wiki-215ce10b5c3493ac",
+        "2wiki-ee097f3f75d60c38",
+        "2wiki-b34b79528f0101b3",
+        "2wiki-5bee64d1bfe441aa",
+        "2wiki-e42d2f204b109fc2",
+        "2wiki-c37b007d11ed3938",
+        "2wiki-ca6d8e4b4343a147",
+        "2wiki-c34d379220182627",
+        "2wiki-27f845f00982c678"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "37c6703a0bdc11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "When was the director of film Jinpa born?",
+      "answer": "1969",
+      "goldChunkIds": [
+        "2wiki-8b1947ec09998466",
+        "2wiki-981c47f776cb2e08"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-981c47f776cb2e08",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-061d484fd18ddb65",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-596f40b6281cb950",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-9bf79f0c693efef3",
+        "2wiki-8c958ab7c1c4cd3c"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "e7f8e98808a311ebbd7cac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film whose director is younger, Kalippava or A Couch In New York?",
+      "answer": "A Couch In New York",
+      "goldChunkIds": [
+        "2wiki-529d9f0c7e9c8fa6",
+        "2wiki-71077b0b8bf55e9f",
+        "2wiki-7202684d8f263a3c",
+        "2wiki-9bf79f0c693efef3"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-529d9f0c7e9c8fa6",
+        "2wiki-7202684d8f263a3c",
+        "2wiki-55107ff1c3c6137b",
+        "2wiki-9bf79f0c693efef3",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-04275a4bc748c260",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-596f40b6281cb950",
+        "2wiki-8c958ab7c1c4cd3c"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.75,
+        "hit@5": 1.0,
+        "recall@10": 0.75,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "618527ff089911ebbd77ac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director who died earlier, The Love Charm or The Constant Woman?",
+      "answer": "The Constant Woman",
+      "goldChunkIds": [
+        "2wiki-122e673b078f0d7b",
+        "2wiki-49d8285e947fd7b9",
+        "2wiki-962804c4b48a4e9f",
+        "2wiki-cd7de89c82fe8a4f"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-cd7de89c82fe8a4f",
+        "2wiki-962804c4b48a4e9f",
+        "2wiki-e68d572655a30a3a",
+        "2wiki-db7a7bd3416c17eb",
+        "2wiki-e02727e0fd91a2f1",
+        "2wiki-c31e8b848537ce8e",
+        "2wiki-49d8285e947fd7b9",
+        "2wiki-152b6aa20abd6839",
+        "2wiki-87db2b670da60f2c",
+        "2wiki-6857f476d659b2e8"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.75,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "86b7e74808e211ebbda4ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Which film came out earlier, Dis-Moi Qui Tuer or Under The Hawthorn Tree (Film)?",
+      "answer": "Dis-Moi Qui Tuer",
+      "goldChunkIds": [
+        "2wiki-5f0b835f8df5a248",
+        "2wiki-84161774bb20d2c6"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-84161774bb20d2c6",
+        "2wiki-1468dffd75904659",
+        "2wiki-5f0b835f8df5a248",
+        "2wiki-09d6969b2d6c6cdc",
+        "2wiki-fa212d54c3593f88",
+        "2wiki-59195cc9fcc0e566",
+        "2wiki-7627a5cf697c5e96",
+        "2wiki-529d9f0c7e9c8fa6",
+        "2wiki-6240bd4a73006858",
+        "2wiki-996f8be2ad4f99f2"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "68cb7bc00bdd11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the place of death of Tamatoa Vi's father?",
+      "answer": "Huahine",
+      "goldChunkIds": [
+        "2wiki-78df8eef18810c26",
+        "2wiki-ef19dce4259841ed"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-b7159a3ad6e1ede2",
+        "2wiki-78df8eef18810c26",
+        "2wiki-cfce58e7a9e0f352",
+        "2wiki-082b3877d8d605bf",
+        "2wiki-d4b28b5ec99c8553",
+        "2wiki-1987d22372dbd2e4",
+        "2wiki-e9c90e3568dd5564",
+        "2wiki-820022e83c56a44d",
+        "2wiki-fc91acf863b8b360",
+        "2wiki-ed70c275591897f4"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "74207b920bdd11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where did the director of film Old Man Drinking A Glass Of Beer die?",
+      "answer": "Brighton",
+      "goldChunkIds": [
+        "2wiki-c0eefe646dc2d10c",
+        "2wiki-d58762c4a5b91b3a"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-d58762c4a5b91b3a",
+        "2wiki-71cc34c4b9a3c9f3",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-7794de2bc1bd63d6",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-596f40b6281cb950",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-9bf79f0c693efef3"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "00c727580bde11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What is the date of death of Henry St John, 18Th Baron St John Of Bletso's father?",
+      "answer": "10 May 1912",
+      "goldChunkIds": [
+        "2wiki-3b555bbb27ccc18c",
+        "2wiki-5d49d01e75050c17"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-015047eb281ff94b",
+        "2wiki-ca9ce8dae02399ae",
+        "2wiki-ee5f398ec3374530",
+        "2wiki-5d49d01e75050c17",
+        "2wiki-2744238e5531385f",
+        "2wiki-bb37ffb06162fba6",
+        "2wiki-3b555bbb27ccc18c",
+        "2wiki-33b1e0550e8e2f75",
+        "2wiki-d7e55499662a0642",
+        "2wiki-577c3b397a462abc"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "4e84cd2d08bb11ebbd88ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Who is younger, Justin Paul or Helly Shah?",
+      "answer": "Helly Shah",
+      "goldChunkIds": [
+        "2wiki-57e7a44b0aaec86c",
+        "2wiki-b9e8d70501343177"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-b9e8d70501343177",
+        "2wiki-57e7a44b0aaec86c",
+        "2wiki-613832be2d4bee57",
+        "2wiki-352e05b63029565e",
+        "2wiki-14e61b15ccc7294a",
+        "2wiki-3b0388bbfb1dfae8",
+        "2wiki-11f00eaaf5aa5504",
+        "2wiki-4b65d9abf50aae25",
+        "2wiki-87db2b670da60f2c",
+        "2wiki-941acbf917ce112a"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "dc68effd08d811ebbd9cac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Who was born first out of Marco De Luigi and Fabio Maistro?",
+      "answer": "Marco De Luigi",
+      "goldChunkIds": [
+        "2wiki-48c4a77909d0c6a9",
+        "2wiki-6409723954b6e9e8"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-48c4a77909d0c6a9",
+        "2wiki-463442012f357e4c",
+        "2wiki-ae246b966d1b32ee",
+        "2wiki-d639fb81df8f0272",
+        "2wiki-6409723954b6e9e8",
+        "2wiki-2c9fe72f2b732767",
+        "2wiki-7e0364ac753ea761",
+        "2wiki-0bd457e6ce09de05",
+        "2wiki-e067684a97f2b359",
+        "2wiki-65e261b6955efe81"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "c21fb3ab08a711ebbd7fac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director who died earlier, Guns And Guitars or To The Victor?",
+      "answer": "Guns And Guitars",
+      "goldChunkIds": [
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-9353866d85803de7",
+        "2wiki-c3156247419a71a8",
+        "2wiki-d20f92420784fdfb"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-d20f92420784fdfb",
+        "2wiki-9353866d85803de7",
+        "2wiki-91f115fa0e4a7253",
+        "2wiki-3e150b0cf9f1fbe8",
+        "2wiki-8b1947ec09998466",
+        "2wiki-55107ff1c3c6137b",
+        "2wiki-7794de2bc1bd63d6",
+        "2wiki-596f40b6281cb950",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-c710719c097bea5e"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.75,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "33b0c274087211ebbd64ac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director who died later, His Last Haul or The Falcon In San Francisco?",
+      "answer": "The Falcon In San Francisco",
+      "goldChunkIds": [
+        "2wiki-0519e730aa669d2e",
+        "2wiki-b3621fbc556a7ade",
+        "2wiki-c1d61c3caebed894",
+        "2wiki-f47c1c93760e277a"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-fc42de8bddbd3c4f",
+        "2wiki-0519e730aa669d2e",
+        "2wiki-744a0808349f4461",
+        "2wiki-2ecc65c77871b770",
+        "2wiki-c1d61c3caebed894",
+        "2wiki-ca04c16571050833",
+        "2wiki-7214af90f47ffc81",
+        "2wiki-f47c1c93760e277a",
+        "2wiki-4089f1ef122b318d",
+        "2wiki-a2c885b479b1222b"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.25,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.75,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "77f41ab20bb011ebab90acde48001122",
+      "hop": "inference",
+      "question": "Who is Edward De Vere, 17Th Earl Of Oxford's paternal grandfather?",
+      "answer": "John de Vere, 15th Earl of Oxford",
+      "goldChunkIds": [
+        "2wiki-95f0f68abef3bffb",
+        "2wiki-c4d98f56e617ca01"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-b90acb880cccda68",
+        "2wiki-95f0f68abef3bffb",
+        "2wiki-33b1e0550e8e2f75",
+        "2wiki-eaaf9f23caefb559",
+        "2wiki-feec9a09cb169091",
+        "2wiki-1620d72fe02bece1",
+        "2wiki-a8ea8c51866eb68c",
+        "2wiki-4f892568597d2c56",
+        "2wiki-70d9145ad0c08003",
+        "2wiki-6c96fbf58ba8ba40"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "b1b78c480bdd11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the place of death of Alexander Carl Otto Westphal's father?",
+      "answer": "Kreuzlingen",
+      "goldChunkIds": [
+        "2wiki-808533a0ee47a008",
+        "2wiki-d4b28b5ec99c8553"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-808533a0ee47a008",
+        "2wiki-d4b28b5ec99c8553",
+        "2wiki-cacf2806c7c9f362",
+        "2wiki-3851abc5343c5900",
+        "2wiki-9711cfe0046b8671",
+        "2wiki-ace681b7c7ed4639",
+        "2wiki-3f9f12b8af1e6be2",
+        "2wiki-77ef8b4beb26055a",
+        "2wiki-fd10c93184a72df6",
+        "2wiki-c619f4c719a66aa9"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "09762e08087311ebbd66ac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director born earlier, Jayam Manade or Bulldog Drummond'S Revenge?",
+      "answer": "Bulldog Drummond'S Revenge",
+      "goldChunkIds": [
+        "2wiki-1c879a024c19963b",
+        "2wiki-852a1baadcc69a87",
+        "2wiki-9d26fc73ab6927f0",
+        "2wiki-bc02dee3452a8e0d"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-5e88ee100169b630",
+        "2wiki-852a1baadcc69a87",
+        "2wiki-bc02dee3452a8e0d",
+        "2wiki-6f75d43bf5d6b61c",
+        "2wiki-1c879a024c19963b",
+        "2wiki-9d13ab9a7ce4f2a5",
+        "2wiki-4eb3a48a0889d2dc",
+        "2wiki-9d26fc73ab6927f0",
+        "2wiki-4c2caa38e54d1af7",
+        "2wiki-510eb2abcf4a011f"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.25,
+        "hit@2": 1.0,
+        "recall@5": 0.75,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "f1145dc6084f11ebbd56ac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director who is older, The Gamecock (Film) or Monster A Go-Go?",
+      "answer": "Monster A Go-Go",
+      "goldChunkIds": [
+        "2wiki-3e67caa1c3571c30",
+        "2wiki-43c38627c51467ac",
+        "2wiki-5b28c39c5c8bcc2b",
+        "2wiki-82f6ebe15eacdbea"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-43c38627c51467ac",
+        "2wiki-f2c6a7ef7698a269",
+        "2wiki-9cb0ac5ca86965f4",
+        "2wiki-82f6ebe15eacdbea",
+        "2wiki-8100bd5c2a2adc9d",
+        "2wiki-5b28c39c5c8bcc2b",
+        "2wiki-3e67caa1c3571c30",
+        "2wiki-6666ccdad206ee12",
+        "2wiki-9580487b93d8248c",
+        "2wiki-73a0c672bf2a0271"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.25,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "3c68e44c0bdc11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the place of death of Alessandro Vitelli's father?",
+      "answer": "Florence",
+      "goldChunkIds": [
+        "2wiki-006f8b0b6549e750",
+        "2wiki-624bb39ca2dc94de"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-006f8b0b6549e750",
+        "2wiki-e067684a97f2b359",
+        "2wiki-624bb39ca2dc94de",
+        "2wiki-0bd457e6ce09de05",
+        "2wiki-e0d3cc8a8fdcef06",
+        "2wiki-77fb189904047297",
+        "2wiki-2c9fe72f2b732767",
+        "2wiki-7e0364ac753ea761",
+        "2wiki-d84ec0165ea01a0a",
+        "2wiki-65e261b6955efe81"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "027970120bdc11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the performer of song Bag Skyerne born?",
+      "answer": "\u00c5rhus",
+      "goldChunkIds": [
+        "2wiki-2ed474e5aa6319be",
+        "2wiki-6fd5e2bd3cd4a512"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-6fd5e2bd3cd4a512",
+        "2wiki-747ce74e8bec2a49",
+        "2wiki-215ce10b5c3493ac",
+        "2wiki-2ed474e5aa6319be",
+        "2wiki-996dd18688e7f1c4",
+        "2wiki-f4d2d2a22d50179d",
+        "2wiki-851a0c452a80460b",
+        "2wiki-7b931ae4ef4f3d8b",
+        "2wiki-1eec02679c319277",
+        "2wiki-9fe715a6bd652e24"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "eebc066c08c411ebbd8eac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Are both directors of films 16 To Life and Saved By The Belles from the same country?",
+      "answer": "yes",
+      "goldChunkIds": [
+        "2wiki-04275a4bc748c260",
+        "2wiki-588e5544e91c279e",
+        "2wiki-c6de000ce7d0dba3",
+        "2wiki-cf1b8079e25150d9"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-04275a4bc748c260",
+        "2wiki-cf1b8079e25150d9",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-76e6e9d7fb5a11fb",
+        "2wiki-596f40b6281cb950",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-9bf79f0c693efef3"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "94873b220bd911eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the mother of Francis Ii Of France born?",
+      "answer": "Florence",
+      "goldChunkIds": [
+        "2wiki-6dc637e793827539",
+        "2wiki-9ba77d4f8bf55f0d"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-9ba77d4f8bf55f0d",
+        "2wiki-86614283530994ef",
+        "2wiki-6dc637e793827539",
+        "2wiki-ad1a995d26e8429f",
+        "2wiki-f46e861779024fd5",
+        "2wiki-c32c2406b5978f38",
+        "2wiki-f487e70beffc7e3a",
+        "2wiki-a930284281ed8750",
+        "2wiki-615d1e858204115a",
+        "2wiki-66d092d35af006ff"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "20ddd33208ca11ebbd92ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Who was born later, Marc De Clerck or Wies\u0142aw Perszke?",
+      "answer": "Wies\u0142aw Perszke",
+      "goldChunkIds": [
+        "2wiki-9293cf4cda3e6d64",
+        "2wiki-fc64ae8a19fc3914"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-9293cf4cda3e6d64",
+        "2wiki-fc64ae8a19fc3914",
+        "2wiki-81d81d2e895d2513",
+        "2wiki-d5079086259d8540",
+        "2wiki-2880caddd76e67b1",
+        "2wiki-9f674ae001c7c572",
+        "2wiki-8e03b042ffbaad99",
+        "2wiki-48fcfb332ea06222",
+        "2wiki-bb5f7ce394739202",
+        "2wiki-39a7fc9c7b853454"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 1.0,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "26b866e6085c11ebbd5cac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director born later, Jesse James' Women or Ride Lonesome?",
+      "answer": "Ride Lonesome",
+      "goldChunkIds": [
+        "2wiki-0b2449da72884a66",
+        "2wiki-2e04cc7205025e94",
+        "2wiki-5b4b52cb72c48523",
+        "2wiki-d081de646e7c73ca"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-2e04cc7205025e94",
+        "2wiki-159bb31ed6868438",
+        "2wiki-a611988567dd3487",
+        "2wiki-0b2449da72884a66",
+        "2wiki-023c28f616a2fda4",
+        "2wiki-046bbde968ba2ed6",
+        "2wiki-c1e01d9f46d66c24",
+        "2wiki-79925ad38470fa5c",
+        "2wiki-af96ab7837218385",
+        "2wiki-8afd5b2e7a8337da"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.25,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "ece1bdae0bdb11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What nationality is the director of film Madeleine (1950 Film)?",
+      "answer": "British",
+      "goldChunkIds": [
+        "2wiki-64480925711a10d0",
+        "2wiki-6c865449573552f7"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-6c865449573552f7",
+        "2wiki-2ea87dbc773e573d",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-b5efec3d687db024",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-596f40b6281cb950",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-9bf79f0c693efef3"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "0a630db408c211ebbd8bac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director died first, Edge Of Doom or A Mother'S Secret?",
+      "answer": "A Mother'S Secret",
+      "goldChunkIds": [
+        "2wiki-67809411e47426ba",
+        "2wiki-7f8b9e897d17d362",
+        "2wiki-c00296ea9c28a577",
+        "2wiki-fcf8bf5d0d8e8cca"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-c00296ea9c28a577",
+        "2wiki-67809411e47426ba",
+        "2wiki-51eb6554b6e569d8",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-c199f9f4f2fef96b",
+        "2wiki-7f8b9e897d17d362",
+        "2wiki-7202684d8f263a3c",
+        "2wiki-bdaa8360016ce1fa",
+        "2wiki-dc6bfac98d1294da"
+      ],
+      "metrics": {
+        "recall@1": 0.25,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.75,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "6e5e9de109af11ebbdb0ac1f6bf848b6",
+      "hop": "comparison",
+      "question": "Which song was released earlier, 1990-Sick (Get 'Em All) or Who'S Laughing Now (Song)?",
+      "answer": "1990-Sick (Get 'Em All)",
+      "goldChunkIds": [
+        "2wiki-cf54c224369133f7",
+        "2wiki-d6ef096c5967189c"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-cf54c224369133f7",
+        "2wiki-99974fe9f6c11359",
+        "2wiki-0b5da026708bc081",
+        "2wiki-d6ef096c5967189c",
+        "2wiki-6ce8f47adf9333db",
+        "2wiki-77c016687cb9e3c7",
+        "2wiki-cf0f372963fbd365",
+        "2wiki-51bd5277c10e2c36",
+        "2wiki-1f5c4c2ff08f8504",
+        "2wiki-5bee64d1bfe441aa"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2fd031c00bde11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where did the director of film Desolation Angels (1995 Film) graduate from?",
+      "answer": "State University of New York at Purchase",
+      "goldChunkIds": [
+        "2wiki-9af9031d9552aee8",
+        "2wiki-acddddc8e794dd57"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-9af9031d9552aee8",
+        "2wiki-596f40b6281cb950",
+        "2wiki-3e150b0cf9f1fbe8",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-c710719c097bea5e",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-bfd9a516b6748f16",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-9bf79f0c693efef3"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "09b7d46a0bda11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "When did Richard Annesley, 2Nd Earl Annesley's father die?",
+      "answer": "2 September 1770",
+      "goldChunkIds": [
+        "2wiki-206470c620ce57b1",
+        "2wiki-b6440583cbf4a06a"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-d6bc737efc67b7d2",
+        "2wiki-23e1e1ad556b79cb",
+        "2wiki-b6440583cbf4a06a",
+        "2wiki-6a6bcc5d2662d7b8",
+        "2wiki-23b7554eb662b1e1",
+        "2wiki-53be01f4e00e9eec",
+        "2wiki-206470c620ce57b1",
+        "2wiki-afc21d5210c13f86",
+        "2wiki-613d774af7e77233",
+        "2wiki-3f42116fc5375a36"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "c5601df108a411ebbd7dac1f6bf848b6",
+      "hop": "bridge_comparison",
+      "question": "Which film has the director died earlier, Lemonade Joe or Bountiful Summer?",
+      "answer": "Bountiful Summer",
+      "goldChunkIds": [
+        "2wiki-2a70a1b117fc9bff",
+        "2wiki-2cd5ce67f19e1deb",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-578a9e3ce74f00d2"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-b73324f72b061d92",
+        "2wiki-578a9e3ce74f00d2",
+        "2wiki-2cd5ce67f19e1deb",
+        "2wiki-596f40b6281cb950",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-9bf79f0c693efef3",
+        "2wiki-4992a17a03beb69f",
+        "2wiki-c710719c097bea5e"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.25,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.75,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "61d1f6900bde11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What is the date of death of Conan Ii, Duke Of Brittany's mother?",
+      "answer": "1080",
+      "goldChunkIds": [
+        "2wiki-342775a38bbfa7ff",
+        "2wiki-d1219857c6178e35"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-5a9bcd0211d16237",
+        "2wiki-c32c2406b5978f38",
+        "2wiki-d1219857c6178e35",
+        "2wiki-8993175d65e0ce5e",
+        "2wiki-4dfac488e35701cd",
+        "2wiki-342775a38bbfa7ff",
+        "2wiki-bbfaf9fb981b5c43",
+        "2wiki-8bb01501412cdea2",
+        "2wiki-22473d5d79397cf8",
+        "2wiki-bde1beab59b0fa5f"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "c3c76b780bd911eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "When was the director of film Reykjav\u00edk-Rotterdam born?",
+      "answer": "30 June 1963",
+      "goldChunkIds": [
+        "2wiki-62663203bb4d0f59",
+        "2wiki-77ea7b7f2c2a57f5"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-77ea7b7f2c2a57f5",
+        "2wiki-ef44df41764e2f99",
+        "2wiki-55107ff1c3c6137b",
+        "2wiki-62663203bb4d0f59",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-04275a4bc748c260",
+        "2wiki-4992a17a03beb69f"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2e13ff240bde11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What is the place of birth of Eiludd Powys's father?",
+      "answer": "Wales",
+      "goldChunkIds": [
+        "2wiki-88e019b66dd2695f",
+        "2wiki-b666f6aac57724df"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-f7618d731ff75061",
+        "2wiki-88e019b66dd2695f",
+        "2wiki-b666f6aac57724df",
+        "2wiki-1748d1407f642f91",
+        "2wiki-686b00e8672ab0d8",
+        "2wiki-23959dc2df8e63c0",
+        "2wiki-96d1b400b28b4fe1",
+        "2wiki-12a6ecba97d2c285",
+        "2wiki-436e1a4f36e02f47",
+        "2wiki-89e3862f8f0ffb9a"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "c40d35580bda11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Where was the director of film At The End Of The Tunnel born?",
+      "answer": "Rosario",
+      "goldChunkIds": [
+        "2wiki-556d2df5e8609085",
+        "2wiki-61b36f487251b5bf"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-556d2df5e8609085",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-8b1947ec09998466",
+        "2wiki-c199f9f4f2fef96b",
+        "2wiki-7bb83dc21ac7efd1",
+        "2wiki-981c47f776cb2e08",
+        "2wiki-1b2ff3da335b4eac",
+        "2wiki-61b36f487251b5bf",
+        "2wiki-c31e8b848537ce8e",
+        "2wiki-197b00a9378b7d30"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "2cf578340bde11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "When was Ferdinand Iii Of Limburg Stirum's father born?",
+      "answer": "1701",
+      "goldChunkIds": [
+        "2wiki-2938559553d90756",
+        "2wiki-7cd0e5ca9f135113"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-7c35dde84047591d",
+        "2wiki-2938559553d90756",
+        "2wiki-7cd0e5ca9f135113",
+        "2wiki-0fffa47e6d6c1649",
+        "2wiki-cfb2595394c80c07",
+        "2wiki-b684bb37c3da5d7a",
+        "2wiki-98a17df32ac3aaf8",
+        "2wiki-afc21d5210c13f86",
+        "2wiki-f4d4a9ad9c4c018a",
+        "2wiki-2118735f6b7dd59f"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "79675c6e0bd911eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "Which country the director of film Ulzhan is from?",
+      "answer": "German",
+      "goldChunkIds": [
+        "2wiki-cab09ab58542fb0d",
+        "2wiki-ff245185ad3c641f"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-cab09ab58542fb0d",
+        "2wiki-8b1947ec09998466",
+        "2wiki-596f40b6281cb950",
+        "2wiki-8c958ab7c1c4cd3c",
+        "2wiki-ebef3f7e88ef5df8",
+        "2wiki-c710719c097bea5e",
+        "2wiki-c76229ad42398ad4",
+        "2wiki-bf7d2bf7146340b1",
+        "2wiki-bfd9a516b6748f16",
+        "2wiki-4992a17a03beb69f"
+      ],
+      "metrics": {
+        "recall@1": 0.5,
+        "hit@1": 1.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 0.5,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "30885e540bb011ebab90acde48001122",
+      "hop": "inference",
+      "question": "Who is Prince Franz De Paula Of Liechtenstein's paternal grandfather?",
+      "answer": "Franz Joseph I",
+      "goldChunkIds": [
+        "2wiki-10de6378031604fd",
+        "2wiki-a1d86dce07038817"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-378fc5787f7a2cb0",
+        "2wiki-7168a67417ebee4e",
+        "2wiki-c9784cf155ceb45a",
+        "2wiki-10de6378031604fd",
+        "2wiki-8539e49f60ab9040",
+        "2wiki-0b84ecfbcb7f3afe",
+        "2wiki-a1d86dce07038817",
+        "2wiki-c160f1ae32a3090a",
+        "2wiki-c5021a85233ede58",
+        "2wiki-077777aca444c408"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    },
+    {
+      "id": "6e4854a00bde11eba7f7acde48001122",
+      "hop": "compositional",
+      "question": "What is the place of birth of Samir Rifai's father?",
+      "answer": "Amman",
+      "goldChunkIds": [
+        "2wiki-b80eef5e5e865623",
+        "2wiki-de0d6c1c2e1ad8a1"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-d5648a097a6ad1a1",
+        "2wiki-e590d0861f5d9483",
+        "2wiki-dfbe16126558249b",
+        "2wiki-6c9f1b072bd02449",
+        "2wiki-ff98682d027cbb80",
+        "2wiki-936d0cfdf0e508bc",
+        "2wiki-81d81d2e895d2513",
+        "2wiki-e50faf505bc48748",
+        "2wiki-0ef9cacc7a058f35",
+        "2wiki-ed6acbffff7ff6f8"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.0,
+        "hit@2": 0.0,
+        "recall@5": 0.0,
+        "hit@5": 0.0,
+        "recall@10": 0.0,
+        "hit@10": 0.0
+      }
+    },
+    {
+      "id": "421b26d80bb011ebab90acde48001122",
+      "hop": "inference",
+      "question": "Who is the paternal grandmother of Archduchess Dolores Of Austria?",
+      "answer": "Princess Maria Immaculata of Bourbon-Two Sicilies",
+      "goldChunkIds": [
+        "2wiki-269b7c32c4f6630c",
+        "2wiki-4694b812ad7055cb"
+      ],
+      "retrievedChunkIds": [
+        "2wiki-d1721259931fac16",
+        "2wiki-269b7c32c4f6630c",
+        "2wiki-b92152cbfc148c5d",
+        "2wiki-a1ed94fd6a10a7e5",
+        "2wiki-f56bbff3161510cd",
+        "2wiki-6f41bf462d920214",
+        "2wiki-4694b812ad7055cb",
+        "2wiki-378fc5787f7a2cb0",
+        "2wiki-337bc56d90394c40",
+        "2wiki-902d6a04da88d39f"
+      ],
+      "metrics": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@2": 0.5,
+        "hit@2": 1.0,
+        "recall@5": 0.5,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0
+      }
+    }
+  ],
+  "skipped": []
+}

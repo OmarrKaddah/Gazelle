@@ -38,10 +38,11 @@ NER_STRATEGY = os.environ.get('NER_STRATEGY', 'gliner').lower() # valid values: 
 # Graph construction route
 GRAPH_ROUTE = os.environ.get('GRAPH_ROUTE', '1') # "1" = GLiNER + co-mention (classical baseline, kgBuild), "2" = full-LLM entities+rels+descriptions (graphExtract+graphBuild)
 GRAPH_EXTRACT_BACKEND = os.environ.get('GRAPH_EXTRACT_BACKEND', 'openrouter') # callLLM backend for Route 2 (ollama|groq|openrouter|gemini)
-GRAPH_EXTRACT_WORKERS = int(os.environ.get('GRAPH_EXTRACT_WORKERS', '6')) # parallel chunk extraction requests in Route 2
+GRAPH_EXTRACT_WORKERS = int(os.environ.get('GRAPH_EXTRACT_WORKERS', '12')) # parallel chunk extraction requests in Route 2
 
 # Chat API
-OLLAMA_CHAT_MODEL = os.environ.get('OLLAMA_CHAT_MODEL', 'llama3.1:8b')
+CHAT_DOMAIN = os.environ.get('CHAT_DOMAIN', 'compliance') # system-prompt framing: "compliance" (CBE/ADIB) | "general" (open-domain benchmark data)
+OLLAMA_CHAT_MODEL = os.environ.get('OLLAMA_CHAT_MODEL', 'granite4.1:8b')
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 GROQ_MODEL = os.environ.get('GROQ_MODEL', 'llama-3.3-70b-versatile')
 GROQ_API_KEY = os.environ.get('GROQ_API_KEY')
@@ -49,7 +50,7 @@ GROQ_API_KEY = os.environ.get('GROQ_API_KEY')
 # OpenRouter (for OpenIE triple extraction)
 OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
 OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY', '')
-OPENROUTER_MODEL = os.environ.get('OPENROUTER_MODEL', 'deepseek/deepseek-v4-flash')
+OPENROUTER_MODEL = os.environ.get('OPENROUTER_MODEL', 'meta-llama/llama-3.3-70b-instruct')
 
 # Google AI Studio (Gemini)
 GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions'

@@ -32,6 +32,13 @@ ENTITIES_EN = {
 
 ENTITIES_BY_LANG = {'ar': ENTITIES, 'en': ENTITIES_EN}
 
+# Open-domain English benchmark corpora extract against ENTITIES_EN, not the finance ontology.
+EN_CORPORA = {'musique', '2wiki', '2wikimultihopqa'}
+
+
+def ontologyFor(docName):
+    return ENTITIES_EN if docName in EN_CORPORA else ENTITIES
+
 RELATIONSHIPS = {
     'ISSUED_BY':      (['License', 'Document'],         ['RegulatoryBody', 'Person']),
     'GOVERNS':        (['Law', 'Article'],              ['BankingInstitution']),

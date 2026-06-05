@@ -465,11 +465,31 @@ The reason for the near-tie has a clean explanation: **triple edges are largely 
 
 This realisation reframes the structural ceiling: our gains from triples are capped at whatever within-chunk relational re-weighting they provide. To unlock real connectivity gains, the dropped "orphan" endpoints would need to become first-class entity nodes (a v8 not yet implemented — see §6 and HANDOFF).
 
+### v8 — Route 2: unified RELATED edge from full-LLM extraction (recall@5 = 0.485) — new best, closes most of the HippoRAG gap
+
+**Motivation.** §6 pins the ceiling on entity-layer *poverty*: GLiNER yields ~15k named-entity nodes and the kept triples don't bridge anywhere new (the bridging concepts are dropped as orphans). The fix predicted there — make the LLM the entity source so concepts become first-class nodes, expected 0.45–0.50 R@5 — is exactly Route 2. One llama-3.3-70b pass per chunk extracts entities **with descriptions** + relationships **with a predicate**, written as `(:Entity {description})-[:RELATED {predicate, description, weight}]->(:Entity)`. PPR walks `RELATED` + `SYNONYM`; co-mention and bare triples off.
+
+**Change.** Graph rebuilt on a fresh instance via the Route 2 pipeline (`graphExtract` → `graphBuild`). Extraction model `meta-llama/llama-3.3-70b-instruct` (OpenRouter, throughput-sorted); open-domain `ENTITIES_EN` ontology selected by `ontologyFor('musique')`. Retrieval knobs identical to v4/v7b (α=0.5, seedTopK=5, synonymWeight=1) so the delta is purely the relation layer.
+
+| Metric | v7b (prior best) | v8 | Δ (pts) |
+|---|---|---|---|
+| recall@1 | 0.184 | 0.270 | +8.6 |
+| recall@2 | 0.255 | 0.363 | +10.8 |
+| recall@5 | 0.364 | **0.485** | **+12.1** |
+| recall@10 | 0.487 | 0.648 | +16.1 |
+| hit@5 | 0.626 | 0.790 | +16.4 |
+
+**Observations.** Lands at **0.485**, inside the 0.45–0.50 band §6 predicted — confirming the diagnosis that the ceiling was *structural* (entity/edge poverty), not algorithmic. The mechanism is the one §6 named: LLM-extracted entities promote shared concepts to first-class nodes, giving PPR the cross-chunk bridges the GLiNER+triple graph lacked. Gap to the HippoRAG MuSiQue reference (0.519) shrinks from 0.155 (v7b) to **0.034** — most of it closed, but **not surpassed** (and HippoRAG's 2-hop-only figure is likely above its hop-averaged 0.519, so the true 2-hop gap may be slightly wider). Bonus: the unified `RELATED` edge is the *same* graph the global (Leiden) arm clusters — one construction serves both arms.
+
+**Caveat on the HippoRAG comparison.** Ours is the first-200 2-hop dev subset over a ~3,075-chunk pool; HippoRAG reports over its own subset/corpus construction. The internal v0→v8 progression is strictly apples-to-apples; the cross-system number is "competitive on our protocol," not a head-to-head win. A defensible claim needs their exact subset+corpus or an explicit protocol-delta statement.
+
 ---
 
 ## 6. The structural gap to HippoRAG
 
-After all versions, our best is **recall@5 = 0.364** (v4 and v7b tied). Paper baseline is 0.519. Gap = 16 points on average; likely larger if we could compare 2-hop-to-2-hop.
+> **Resolved by v8.** This section was written at the 0.364 ceiling; v8 (above) rebuilt the entity layer via full-LLM extraction and reached 0.485 — squarely in the 0.45–0.50 band predicted below. The diagnosis held: the gap was structural (entity/edge poverty), not algorithmic. Kept as written for the reasoning trail.
+
+At the pre–Route 2 ceiling, our best was **recall@5 = 0.364** (v4 and v7b tied). Paper baseline is 0.519. Gap = 16 points on average; likely larger if we could compare 2-hop-to-2-hop.
 
 The gap is structural, not algorithmic:
 
@@ -503,8 +523,40 @@ Two paths forward (deferred to HANDOFF):
 | v5 | synonym weight=10 | 0.182 | 0.250 | 0.359 | 0.475 | 0.616 | weight irrelevant |
 | v7 | triples only (no co-mention) | 0.167 | 0.235 | 0.331 | 0.409 | 0.480 | too sparse |
 | **v7b** | co-mention + triples | 0.184 | 0.255 | **0.364** | 0.487 | 0.626 | tied with v4 |
+| **v8** | Route 2 RELATED (full-LLM) | 0.270 | 0.363 | **0.485** | 0.648 | 0.790 | new best; closes most of HippoRAG gap |
 
-Reference: **HippoRAG paper R@5 ≈ 0.519** (averaged across hop counts).
+Reference: **HippoRAG paper R@5 ≈ 0.519** (averaged across hop counts). v8 reaches 0.485 — gap down to ~0.034, not surpassed.
+
+---
+
+## 7b. v8 on 2WikiMultiHopQA (recall@5 = 0.714)
+
+Same Route 2 construction and PPR config as the MuSiQue v8 run, on the first-200 2Wiki dev subset via the parallel `twowiki/` harness (`twowiki/loadChunks.py` + `twowiki/eval.py`, format-adapted: `context`/`supporting_facts` instead of `paragraphs`/`is_supporting`). Output: `twowiki/eval_results/v8_route2related_2wiki.json`.
+
+| Metric | 2Wiki v8 |
+|---|---|
+| recall@1 | 0.324 |
+| recall@2 | 0.535 |
+| recall@5 | 0.714 |
+| recall@10 | 0.834 |
+| hit@5 | 0.960 |
+
+**By question type (recall@5):** `comparison` **1.000**, `inference` 0.682, `compositional` 0.633, `bridge_comparison` **0.569**. The graph fully solves entity-comparison questions; multi-bridge (`bridge_comparison`) is the hardest type — a clean diagnostic of where the relation layer still falls short.
+
+### Cross-dataset placement vs the paper's retrieval baselines
+
+v8 (R@2 / R@5, ×100) against the BM25→RAPTOR baselines from the paper's table (Contriever-encoder column). **Caveat — not a strict head-to-head:** ours is the first-200 subset over a reduced candidate pool (~2–3k chunks vs the paper's full per-dataset corpus), which makes retrieval easier, and the encoder is BGE-M3. Treat as indicative placement, not a leaderboard result.
+
+| System | MuSiQue R@2 | MuSiQue R@5 | 2Wiki R@2 | 2Wiki R@5 |
+|---|---|---|---|---|
+| BM25 | 32.3 | 41.2 | 51.8 | 61.9 |
+| Contriever | 34.8 | 46.6 | 46.6 | 57.5 |
+| GTR | 37.4 | 49.1 | 60.2 | 67.9 |
+| RAPTOR | 35.7 | 45.3 | 46.3 | 53.8 |
+| RAPTOR (ColBERTv2) | 36.9 | 46.5 | 57.3 | 64.7 |
+| **Ours (BGE-M3 + Route 2 PPR)** | **36.3** | **48.5** | **53.5** | **71.4** |
+
+On our protocol, R@5 lands among the strong dense baselines on MuSiQue (≈ Contriever/ColBERTv2/GTR) and above every listed baseline on 2Wiki; R@2 is mid-pack on both datasets.
 
 ---
 

@@ -26,7 +26,9 @@ BACKENDS = {
         'url': OPENROUTER_URL,
         'model': OPENROUTER_MODEL,
         'headers': {'Authorization': f'Bearer {OPENROUTER_API_KEY}'},
-        'extra': {},
+        # sort providers by throughput so we don't land on a slow/overloaded backend
+        'extra': {'provider': {'sort': 'throughput'}},
+        'timeout': 90,
     },
     'gemini': {
         'url': GEMINI_URL,
@@ -64,7 +66,7 @@ def callLLM(prompt, backend='ollama'):
     }
     for attempt in range(6):
         try:
-            resp = requests.post(cfg['url'], json=payload, headers=cfg['headers'], timeout=600)
+            resp = requests.post(cfg['url'], json=payload, headers=cfg['headers'], timeout=cfg.get('timeout', 600))
         except requests.exceptions.RequestException as e:
             if attempt == 5:
                 print(f'[callLLM] {backend} network error, giving up after 6 attempts: {type(e).__name__}: {e}', flush=True)

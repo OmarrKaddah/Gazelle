@@ -1,16 +1,18 @@
 import json
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 from config import GRAPH_EXTRACT_BACKEND, GRAPH_EXTRACT_WORKERS
 from kgBuild import loadChunks
 from llmTriples import callLLM
-from ontology import ENTITIES
+from ontology import ontologyFor
 
 
-ENTITY_TYPE_GUIDE = "\n".join(f"- {name}: {desc}" for name, desc in ENTITIES.items())
+def buildEntityGuide(entities):
+    return "\n".join(f"- {name}: {desc}" for name, desc in entities.items())
 
-EXTRACT_PROMPT = '''You are building a knowledge graph from a financial/regulatory document passage (often Arabic).
+
+EXTRACT_PROMPT = '''You are building a knowledge graph from a document passage (a financial/regulatory text, often Arabic; or a general-knowledge English passage).
 
 Allowed entity types:
 {entityTypes}
@@ -30,13 +32,21 @@ PASSAGE:
 '''
 
 
-def extractElements(chunkText, backend=GRAPH_EXTRACT_BACKEND):
-    prompt = EXTRACT_PROMPT.format(entityTypes=ENTITY_TYPE_GUIDE, text=chunkText)
+def extractElements(chunkText, entityGuide, backend=GRAPH_EXTRACT_BACKEND):
+    prompt = EXTRACT_PROMPT.format(entityTypes=entityGuide, text=chunkText)
     return callLLM(prompt, backend=backend)
 
 
+def salvageJson(raw):
+    # llama sometimes wraps the object in ```fences``` or trails prose after it;
+    # take the outermost brace span. Truncated responses still fail loads (caller retries).
+    raw = raw.strip()
+    start, end = raw.find('{'), raw.rfind('}')
+    return raw[start:end + 1] if start != -1 and end > start else raw
+
+
 def parseElements(raw):
-    data = json.loads(raw)
+    data = json.loads(salvageJson(raw))
     entities = [
         (e['name'], e.get('type', ''), e.get('description', ''))
         for e in data.get('entities', [])
@@ -50,19 +60,49 @@ def parseElements(raw):
     return {'entities': entities, 'relationships': relationships}
 
 
-def extractChunk(chunk, backend):
-    elements = parseElements(extractElements(chunk['text'], backend))
-    return {'chunkId': chunk['chunkId'], **elements}
+def extractChunk(chunk, entityGuide, backend):
+    # bounded retry: a malformed/truncated response shouldn't kill the run, and provider
+    # routing means a retry often lands on a backend that returns clean JSON.
+    for attempt in range(3):
+        raw = extractElements(chunk['text'], entityGuide, backend)
+        try:
+            elements = parseElements(raw)
+            return {'chunkId': chunk['chunkId'], **elements}
+        except json.JSONDecodeError:
+            if attempt == 2:
+                print(f'  [warn] {chunk["chunkId"]}: unparseable JSON after 3 tries, storing empty', flush=True)
+                return {'chunkId': chunk['chunkId'], 'entities': [], 'relationships': []}
+
+
+def loadPartial(docName):
+    p = Path(f'extractions/{docName}_graph.json')
+    return json.loads(p.read_text(encoding='utf-8')) if p.exists() else []
 
 
 def extractDoc(docName, backend=GRAPH_EXTRACT_BACKEND):
     chunks = loadChunks(docName)
+    entityGuide = buildEntityGuide(ontologyFor(docName))
+    total = len(chunks)
+    results = loadPartial(docName)
+    done = {r['chunkId'] for r in results}
+    todo = [c for c in chunks if c['chunkId'] not in done]
+    print(f'  {len(done)} already done, {len(todo)} to extract', flush=True)
     with ThreadPoolExecutor(max_workers=GRAPH_EXTRACT_WORKERS) as pool:
-        return list(pool.map(lambda c: extractChunk(c, backend), chunks))
+        futures = [pool.submit(extractChunk, c, entityGuide, backend) for c in todo]
+        for fut in as_completed(futures):
+            results.append(fut.result())
+            if len(results) % 20 == 0:
+                dumpElements(results, docName)
+            r = results[-1]
+            print(f'  {len(results)}/{total}  {len(r["entities"])} ents, {len(r["relationships"])} rels', flush=True)
+    dumpElements(results, docName)
+    return results
 
 
 def dumpElements(results, docName):
+    # atomic write so a Ctrl-C mid-flush can never corrupt the resume checkpoint
     Path('extractions').mkdir(exist_ok=True)
-    Path(f'extractions/{docName}_graph.json').write_text(
-        json.dumps(results, ensure_ascii=False, indent=2), encoding='utf-8'
-    )
+    path = Path(f'extractions/{docName}_graph.json')
+    tmp = path.with_suffix('.json.tmp')
+    tmp.write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding='utf-8')
+    tmp.replace(path)
