@@ -2,6 +2,8 @@ import os
 import sys
 from pathlib import Path
 
+from runners import runGliner
+
 SRC = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src')
 if SRC not in sys.path:
     sys.path.insert(0, SRC)
@@ -51,7 +53,7 @@ def runOcr():
 
 def runParser():
     print("\n=== Parser ===")
-    for source in sorted(Path("Doc_Out").glob("*.md")):
+    for source in sorted(Path("Doc_Out").glob("*.md"))+sorted(Path("Documents").glob("*.docx")):
         docName = source.stem.lower()
         out = Path(f"parsed/{docName}.json")
         if out.exists():
@@ -156,4 +158,5 @@ if __name__ == '__main__':
     runLlm()
     runKg()
     runEntityEmbed()
+    runEmbed()
     runEntityAlign()
