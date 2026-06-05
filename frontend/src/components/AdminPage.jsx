@@ -61,7 +61,6 @@ export default function AdminPage({ user, onLogout, onEnterChat }) {
 
   return (
     <div className="flex flex-col h-full bg-cream overflow-hidden">
-      {/* Top bar */}
       <header className="flex items-center justify-between px-6 py-3.5 bg-cream-frame border-b border-cream-border flex-shrink-0">
         <div className="flex items-center gap-2.5">
           <LogoMark className="w-9 h-9" />
@@ -102,7 +101,6 @@ export default function AdminPage({ user, onLogout, onEnterChat }) {
         </div>
       </header>
 
-      {/* Body */}
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-2xl mx-auto px-6 py-10 animate-fadeIn">
           <h1 className="font-serif text-[28px] text-brand tracking-tight">Publish documents</h1>
@@ -111,7 +109,6 @@ export default function AdminPage({ user, onLogout, onEnterChat }) {
             Supports PDF, Word, images, and any other file type.
           </p>
 
-          {/* Upload zone */}
           <div
             onDragOver={(e) => {
               e.preventDefault();
@@ -147,7 +144,6 @@ export default function AdminPage({ user, onLogout, onEnterChat }) {
             />
           </div>
 
-          {/* Selected files */}
           {files.length > 0 && (
             <div className="mt-6">
               <div className="text-[11px] uppercase tracking-[0.16em] text-ink-faint font-semibold mb-2">
@@ -179,7 +175,6 @@ export default function AdminPage({ user, onLogout, onEnterChat }) {
             </div>
           )}
 
-          {/* Status messages */}
           {done != null && done > 0 && (
             <div className="mt-6 text-[13px] text-adib-deep bg-cream-deeper border border-adib-soft/50 rounded-lg px-4 py-3">
               {done} document{done > 1 ? 's' : ''} published and added to the graph.
@@ -201,11 +196,10 @@ export default function AdminPage({ user, onLogout, onEnterChat }) {
             </div>
           )}
 
-          {/* Actions */}
           <div className="mt-7 flex items-center justify-end gap-3">
             {publishing && (
               <span className="text-[12px] text-ink-faint">
-                Processing &amp; updating the graph — this can take a few minutes…
+                Processing and updating the graph, this can take a few minutes…
               </span>
             )}
             <button

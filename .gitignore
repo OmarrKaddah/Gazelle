@@ -146,20 +146,3 @@ WhatsApp Image *.png
 graphTraversal/datasets/
 graphTraversal/figures/
 
-# Classical NER / GLiNER training artifacts (regenerable)
-annotations/
-gazetteer/
-models/
-training/
-src/classical_NER/
-requirements_classical.txt
-requirements_gliner.txt
-
-# Pre-downloaded wheel caches (regenerable via pip)
-wheelhouse/
-wheelhouse_win/
-
-
-ocr_dataset/*
-classical_env/*
-gliner_env/*

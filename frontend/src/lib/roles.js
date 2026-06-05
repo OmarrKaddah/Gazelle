@@ -1,7 +1,5 @@
-// Role-based access control — single source of truth for the frontend.
-// Roles are assigned server-side (see src/auth.py) and arrive on the user
-// object as `user.role`. Keep all role checks routed through these helpers so
-// access rules stay centralized and easy to extend.
+// Roles come from the server (src/auth.py) on user.role. Route checks
+// through these helpers so they stay in one place.
 
 export const ROLES = {
   ADMIN: 'Admin',
@@ -18,7 +16,7 @@ export function isAdmin(user) {
   return hasRole(user, ROLES.ADMIN);
 }
 
-// Where a user should land immediately after logging in.
+// Where a user lands after logging in.
 export function defaultAreaForUser(user) {
   return isAdmin(user) ? 'admin' : 'main';
 }

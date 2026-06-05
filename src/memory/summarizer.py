@@ -1,4 +1,3 @@
-import json
 import uuid
 
 import httpx
@@ -8,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from config import OLLAMA_URL, OLLAMA_CHAT_MODEL
 from db.models import ChatMemory, Message
 from db.session import asyncSessionFactory
+from memory.assembler import estimateTokens
 
 
 SUMMARIZER_PROMPT = (
@@ -21,10 +21,6 @@ SUMMARIZER_PROMPT = (
 
 DEBOUNCE_TURNS = 6
 DEBOUNCE_TOKENS = 1000
-
-
-def estimateTokens(text):
-    return max(1, len(text.split()))
 
 
 async def loadMem(session: AsyncSession, chatId: uuid.UUID):
