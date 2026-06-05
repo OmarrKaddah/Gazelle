@@ -14,7 +14,7 @@ const TOOLS = [
   { id: 'graph', label: 'Graph Explorer', Icon: GraphIcon },
 ];
 
-export default function Sidebar({ open, onToggle, view, onViewChange, chatState, user, onLogout }) {
+export default function Sidebar({ open, onToggle, view, onViewChange, chatState, user, onLogout, isAdmin, onOpenAdmin }) {
   const { chats, currentChatId, setCurrentChatId, createChat, deleteChat } = chatState;
 
   const handleNewChat = () => {
@@ -61,13 +61,21 @@ export default function Sidebar({ open, onToggle, view, onViewChange, chatState,
             <t.Icon className="w-5 h-5" />
           </button>
         ))}
+        {isAdmin && (
+          <button
+            onClick={onOpenAdmin}
+            className="p-2 rounded-md text-ink-muted hover:bg-cream-deeper hover:text-ink transition"
+            title="Admin Console"
+          >
+            <SettingsIcon className="w-5 h-5" />
+          </button>
+        )}
       </aside>
     );
   }
 
   return (
     <aside className="w-72 bg-cream-frame border-r border-cream-border flex flex-col flex-shrink-0">
-      {/* Header */}
       <div className="px-4 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <LogoMark className="w-9 h-9" />
@@ -89,7 +97,6 @@ export default function Sidebar({ open, onToggle, view, onViewChange, chatState,
         </button>
       </div>
 
-      {/* New chat */}
       <div className="px-3">
         <button
           onClick={handleNewChat}
@@ -103,7 +110,6 @@ export default function Sidebar({ open, onToggle, view, onViewChange, chatState,
         </button>
       </div>
 
-      {/* Tools */}
       <nav className="px-3 mt-5">
         <SectionLabel>Tools</SectionLabel>
         <div className="space-y-0.5 mt-1">
@@ -116,10 +122,17 @@ export default function Sidebar({ open, onToggle, view, onViewChange, chatState,
               onClick={() => onViewChange(t.id)}
             />
           ))}
+          {isAdmin && (
+            <NavItem
+              Icon={SettingsIcon}
+              label="Admin Console"
+              active={false}
+              onClick={onOpenAdmin}
+            />
+          )}
         </div>
       </nav>
 
-      {/* Recent chats */}
       <div className="mt-5 flex-1 flex flex-col min-h-0">
         <div className="px-3">
           <SectionLabel>Recent</SectionLabel>
@@ -147,7 +160,6 @@ export default function Sidebar({ open, onToggle, view, onViewChange, chatState,
         </div>
       </div>
 
-      {/* User footer */}
       <UserFooter user={user} onLogout={onLogout} />
     </aside>
   );

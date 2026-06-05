@@ -147,7 +147,6 @@ export default function ChatView({ chatState }) {
     }
     messages = patchLast(messages, { streaming: false });
     updateChat(chat.id, { messages });
-    await refreshCurrentChat();
     await refreshChats();
     setStreaming(false);
   }

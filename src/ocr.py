@@ -123,47 +123,43 @@ def ocr(path: str) -> str:
             os.unlink(tempPath)
 
 
-def render_and_ocr(doc: pypdfium2.PdfDocument, render_scale: int, i: int) -> tuple[int, str]:
+def renderAndOcr(doc: pypdfium2.PdfDocument, scale: int, i: int) -> tuple[int, str]:
     tmp = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
     tmp.close()
     try:
-        doc[i].render(scale=render_scale, rotation=0).to_pil().save(tmp.name, "PNG")
+        doc[i].render(scale=scale, rotation=0).to_pil().save(tmp.name, "PNG")
         return i, ocr(tmp.name)
     finally:
         os.unlink(tmp.name)
 
 
-def process_pdf(path: str) -> list[dict]:
+def processPdf(path: str) -> list[dict]:
     doc = pypdfium2.PdfDocument(path)
-    render_scale = int(round(200 / 72))
-    n_pages = len(doc)
+    scale = int(round(200 / 72))
+    nPages = len(doc)
     results: dict[int, str] = {}
     with ThreadPoolExecutor(max_workers=OCR_PARALLEL_PAGES) as pool:
-        futures = {pool.submit(render_and_ocr, doc, render_scale, i): i for i in range(n_pages)}
+        futures = {pool.submit(renderAndOcr, doc, scale, i): i for i in range(nPages)}
         for future in as_completed(futures):
             idx, text = future.result()
             results[idx] = text
-            print(f"[page {idx + 1}/{n_pages}] done", flush=True)
-    return [{"page": i + 1, "markdown": results[i]} for i in range(n_pages)]
+            print(f"[page {idx + 1}/{nPages}] done", flush=True)
+    return [{"page": i + 1, "markdown": results[i]} for i in range(nPages)]
 
 
 def runOcrAndDump(imagePath: str) -> tuple[str, str]:
-    if imagePath.lower().endswith(".pdf"):
-        pages = process_pdf(imagePath)
-    else:
-        pages = [{"page": 1, "markdown": ocr(imagePath)}]
+    pages = processPdf(imagePath) if imagePath.lower().endswith(".pdf") else [{"page": 1, "markdown": ocr(imagePath)}]
 
     os.makedirs("Doc_Out", exist_ok=True)
     os.makedirs("output", exist_ok=True)
     stem = os.path.splitext(os.path.basename(imagePath))[0]
 
-    joined = "\n\n---\n\n".join(p["markdown"] for p in pages)
-    md_path = os.path.join("Doc_Out", f"{stem}.md")
-    with open(md_path, "w", encoding="utf-8") as f:
-        f.write(joined)
+    mdPath = os.path.join("Doc_Out", f"{stem}.md")
+    with open(mdPath, "w", encoding="utf-8") as f:
+        f.write("\n\n---\n\n".join(p["markdown"] for p in pages))
 
-    sidecar_path = os.path.join("output", f"{stem}.json")
-    with open(sidecar_path, "w", encoding="utf-8") as f:
+    sidecarPath = os.path.join("output", f"{stem}.json")
+    with open(sidecarPath, "w", encoding="utf-8") as f:
         json.dump(pages, f, ensure_ascii=False, indent=2)
 
-    return md_path, sidecar_path
+    return mdPath, sidecarPath

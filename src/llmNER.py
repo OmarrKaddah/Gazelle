@@ -9,6 +9,8 @@ from ontology import ENTITIES
 load_dotenv()
 OLLAMA_URL = os.getenv('OLLAMA_URL', 'http://localhost:11434/v1/chat/completions')
 OLLAMA_TEXT_MODEL = os.getenv('OLLAMA_TEXT_MODEL', 'qwen2.5:72b-instruct-q4_K_M')
+# Per-request timeout (seconds). Generous default for slow/CPU-bound local models.
+OLLAMA_TIMEOUT = int(os.getenv('OLLAMA_TIMEOUT', '600'))
 
 
 def loadChunks(docName):
@@ -57,7 +59,7 @@ def callOllamaForEntities(prompt):
             "temperature": 0,
             "response_format": {"type": "json_object"},
         },
-        timeout=120,
+        timeout=OLLAMA_TIMEOUT,
     )
     response.raise_for_status()
     return response.json()["choices"][0]["message"]["content"]

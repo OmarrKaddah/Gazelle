@@ -23,9 +23,7 @@ def verifyPassword(password: str, passwordHash: str):
 
 async def login(username: str, password: str, session: AsyncSession):
     user = await getUserByUsername(session, username)
-    if not user:
-        return None
-    if not verifyPassword(password, user.passwordHash):
+    if not user or not verifyPassword(password, user.passwordHash):
         return None
     token = secrets.token_urlsafe(32)
     await createSession(session, user.id, hashToken(token))
@@ -60,4 +58,10 @@ async def getCurrentUser(
     user = await userFromToken(creds.credentials, session)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
+    return user
+
+
+async def requireAdmin(user=Depends(getCurrentUser)):
+    if user["role"] != "Admin":
+        raise HTTPException(status_code=403, detail="Admin role required")
     return user

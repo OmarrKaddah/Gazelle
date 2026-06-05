@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Memory Test Playbook</title>
+<style>
+  :root {
+    --navy: #0a1f3d; --navy-2: #15315a;
+    --gold: #c9a44c; --gold-2: #e0b95a;
+    --cream: #faf6ec; --paper: #ffffff;
+    --ink: #0f1419; --muted: #6b7385;
+    --line: #e6e0cc;
+    --red: #b03a3a; --red-bg: #fbeaea;
+    --green: #2e8b57; --green-bg: #e6f4ec;
+    --amber: #b8860b; --amber-bg: #faf1d6;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    color: var(--ink); background: var(--cream);
+    line-height: 1.65; font-size: 16px;
+  }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13.5px; }
+  pre {
+    background: #0f1a2e; color: #e6e8ef;
+    padding: 16px 18px; border-radius: 10px;
+    overflow-x: auto; line-height: 1.55; margin: 12px 0;
+  }
+  code:not(pre code) {
+    background: #f3ecd1; padding: 2px 7px; border-radius: 4px;
+    color: var(--navy); font-size: 0.9em;
+  }
+  header.top {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--navy); color: var(--cream);
+    padding: 14px 28px; display: flex; align-items: center; gap: 22px;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.2);
+  }
+  header.top .brand { font-weight: 700; letter-spacing: 1.4px; font-size: 17px; }
+  header.top .brand span { color: var(--gold); }
+  header.top nav a {
+    color: var(--cream); opacity: 0.85; text-decoration: none;
+    font-size: 13px; margin-right: 18px;
+  }
+  header.top nav a:hover { opacity: 1; color: var(--gold); }
+  header.top .meta { margin-left: auto; font-size: 12px; opacity: 0.7; }
+
+  main { max-width: 1000px; margin: 0 auto; padding: 32px 28px 80px; }
+  section { margin: 0 0 56px; scroll-margin-top: 80px; }
+  h1 { font-size: 32px; margin: 0 0 8px; color: var(--navy); }
+  h2 {
+    font-size: 24px; margin: 0 0 14px; color: var(--navy);
+    padding-bottom: 8px; border-bottom: 3px solid var(--gold);
+  }
+  h3 { font-size: 18px; margin: 22px 0 8px; color: var(--navy-2); }
+  p, ul, ol { margin: 0 0 12px; }
+  ul, ol { padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  .lede { font-size: 17px; color: var(--muted); margin-bottom: 24px; max-width: 760px; }
+
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+    color: var(--cream); padding: 40px 32px; border-radius: 14px;
+    margin-bottom: 36px;
+  }
+  .hero .kicker {
+    color: var(--gold); font-size: 12px; letter-spacing: 2px;
+    font-weight: 700; text-transform: uppercase; margin-bottom: 10px;
+  }
+  .hero h1 { color: var(--cream); font-size: 36px; line-height: 1.15; margin-bottom: 12px; }
+  .hero p { opacity: 0.9; max-width: 720px; font-size: 16.5px; }
+
+  .grid { display: grid; gap: 16px; }
+  .grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 800px) {
+    .grid.cols-2, .grid.cols-3 { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 26px; }
+  }
+  .card {
+    background: var(--paper); border: 1px solid var(--line);
+    border-radius: 10px; padding: 18px 20px;
+  }
+  .card.green  { border-left: 4px solid var(--green); }
+  .card.gold   { border-left: 4px solid var(--gold); }
+  .card.navy   { border-left: 4px solid var(--navy); }
+  .card.amber  { border-left: 4px solid var(--amber); }
+  .card h4 { margin: 0 0 8px; font-size: 16px; color: var(--navy); }
+  .card .meta { color: var(--muted); font-size: 12.5px; margin-top: 6px; }
+
+  .step-card {
+    background: var(--paper); border: 1px solid var(--line);
+    border-radius: 10px; margin: 16px 0; padding: 18px 22px;
+    border-left: 4px solid var(--gold);
+  }
+  .step-card .num {
+    display: inline-block; background: var(--navy); color: var(--gold);
+    width: 32px; height: 32px; line-height: 32px;
+    text-align: center; border-radius: 50%;
+    font-weight: 700; font-size: 16px; margin-right: 10px;
+  }
+  .step-card h3 { display: inline; margin: 0; }
+  .step-card .body { margin-top: 14px; }
+
+  .callout {
+    border-left: 4px solid var(--gold); background: #fbf6e2;
+    padding: 14px 18px; border-radius: 6px; margin: 18px 0;
+  }
+  .callout.green { border-left-color: var(--green); background: var(--green-bg); }
+  .callout.amber { border-left-color: var(--amber); background: var(--amber-bg); }
+  .callout.navy { border-left-color: var(--navy); background: #eaf0fb; }
+  .callout strong { color: var(--navy); }
+
+  table {
+    border-collapse: collapse; width: 100%;
+    background: var(--paper); border: 1px solid var(--line);
+    border-radius: 10px; overflow: hidden; font-size: 14px;
+  }
+  th, td {
+    text-align: left; padding: 11px 14px;
+    border-bottom: 1px solid var(--line); vertical-align: top;
+  }
+  th {
+    background: #f3ecd1; color: var(--navy);
+    font-weight: 700; font-size: 12.5px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  tr:last-child td { border-bottom: none; }
+
+  .term-pass {
+    background: #061a14; color: #5ee094;
+    border-radius: 8px; padding: 14px 16px;
+    font-family: ui-monospace, monospace; font-size: 12.5px;
+    line-height: 1.55; overflow-x: auto; white-space: pre;
+  }
+  .term-pass .green { color: #5ee094; }
+  .term-pass .cyan { color: #7dd3fc; }
+  .term-pass .gold { color: #e0b95a; }
+  .term-pass .red { color: #ff7a7a; }
+  .term-pass .dim { color: #6b7385; }
+
+  details {
+    border: 1px solid var(--line); border-radius: 10px;
+    background: var(--paper); margin: 10px 0; padding: 14px 18px;
+  }
+  details summary {
+    cursor: pointer; font-weight: 700; color: var(--navy);
+    font-size: 15px; padding: 2px 0;
+  }
+  details summary::after {
+    content: "▸"; float: right; transition: transform 0.2s; color: var(--gold);
+  }
+  details[open] summary::after { transform: rotate(90deg); }
+  details[open] summary { margin-bottom: 12px; }
+
+  .tag {
+    display: inline-block; padding: 3px 10px; border-radius: 999px;
+    font-size: 11.5px; font-weight: 700; letter-spacing: 0.5px;
+    margin-right: 5px; margin-bottom: 4px; text-transform: uppercase;
+  }
+  .tag.green { background: var(--green-bg); color: var(--green); }
+  .tag.gold  { background: var(--gold); color: var(--navy); }
+  .tag.navy  { background: var(--navy); color: var(--cream); }
+
+  .footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 50px; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">GAZELLE <span>·</span> TEST GUIDE</div>
+  <nav>
+    <a href="#fast">Fast path</a>
+    <a href="#tools">Tools</a>
+    <a href="#tests">23 checks</a>
+    <a href="#inspect">Inspect</a>
+    <a href="#manual">Manual</a>
+  </nav>
+  <div class="meta">testing playbook</div>
+</header>
+
+<main>
+
+<!-- HERO -->
+<section>
+  <div class="hero">
+    <div class="kicker">Memory Subsystem · Testing Playbook</div>
+    <h1>How to verify the memory architecture works.</h1>
+    <p>You can prove all 23 invariants of the memory layer without Neo4j, without Ollama, and without ingested documents. Then once those are live, run the full multi-turn chat tests in the UI.</p>
+  </div>
+</section>
+
+<!-- ============ FAST PATH ============ -->
+<section id="fast">
+  <h2>1. The fast path — two double-clicks</h2>
+  <p class="lede">No Neo4j needed. No Ollama needed. Just PostgreSQL (which you already have from RUN.bat).</p>
+
+  <div class="grid cols-2">
+    <div class="card green">
+      <h4>① Double-click <code>TEST.bat</code></h4>
+      <p>Runs <code>test_memory.py</code> against your live PostgreSQL. Verifies all 23 memory invariants in about 5 seconds. Window stays open at the end.</p>
+      <p class="meta"><strong>What it tests:</strong> promoter regex, PII gate, explicit-wins rule, top-k filter, recent-messages order, assembler order &amp; budgets, citation roundtrip, cascade delete, watermark persistence.</p>
+    </div>
+    <div class="card gold">
+      <h4>② Double-click <code>INSPECT.bat</code></h4>
+      <p>Read-only viewer that dumps the contents of every memory table: <code>users</code>, <code>chats</code>, <code>messages</code>, <code>message_citations</code>, <code>chat_memory</code>, <code>user_memory</code>.</p>
+      <p class="meta"><strong>Use to:</strong> see what's actually been written after a manual chat session in the UI.</p>
+    </div>
+  </div>
+
+  <h3>Expected output from <code>TEST.bat</code></h3>
+  <div class="term-pass">
+<span class="cyan">== 0  Sanity: connect and find seed user 'omar' ==</span>
+  <span class="green">PASS</span>  connected; omar.id = c422941d-7a95-4521-9fff-fb39b066ebf8
+
+<span class="cyan">== 1  PROMOTER — regex allowlist on user statements ==</span>
+  <span class="green">PASS</span>  promoted from: 'always answer in Arabic'  (preference/language='Arabic', source=inferred, conf=0.75)
+  <span class="green">PASS</span>  promoted from: 'answer in english from now on'  (preference/language='english', source=inferred, conf=0.7)
+  <span class="green">PASS</span>  promoted from: 'I prefer concise answers'  (preference/verbosity='concise', source=inferred, conf=0.7)
+  <span class="green">PASS</span>  promoted from: 'my role is Compliance Analyst'  (profile/role='Compliance Analyst', source=inferred, conf=0.7)
+  <span class="green">PASS</span>  promoted from: 'always include page numbers in responses'  (instruction/always_include='page numbers', source=inferred, conf=0.7)
+  <span class="green">PASS</span>  promoted from: 'never mention internal codenames'  (instruction/never_include='mention', source=inferred, conf=0.7)
+
+<span class="cyan">== 2  PROMOTER — PII gate refuses long digit runs ==</span>
+  <span class="green">PASS</span>  PII gate blocked promotion when message contained a 10+ digit run
+  <span class="green">PASS</span>  containsPii() correctly flags 10+ digit run
+
+<span class="cyan">== 3  PROMOTER — explicit preference is never overridden ==</span>
+  <span class="green">PASS</span>  explicit preference 'Arabic' was NOT overridden by inferred 'English'
+
+<span class="cyan">== 4  REPO — loadUserMemoryForPrompt filters to preference + instruction ==</span>
+  <span class="green">PASS</span>  loadUserMemoryForPrompt returned only preference + instruction (got 3 rows)
+
+<span class="cyan">== 5  REPO — loadRecentMessages returns N newest, oldest first ==</span>
+  <span class="green">PASS</span>  returned last 4 messages, ordered oldest first
+
+<span class="cyan">== 6  ASSEMBLER — strict budgets and canonical order ==</span>
+  <span class="green">PASS</span>  system block present
+  <span class="green">PASS</span>  user mem in body
+  <span class="green">PASS</span>  chat summary in body
+  <span class="green">PASS</span>  history in body
+  <span class="green">PASS</span>  context in body
+  <span class="green">PASS</span>  reminder present
+  <span class="green">PASS</span>  question last
+
+<span class="cyan">== 7  CITATIONS — write + read per message ==</span>
+  <span class="green">PASS</span>  inserted 2 citations, ranks correct, retrievable by message
+
+<span class="cyan">== 8  CITATIONS — cascade on message delete ==</span>
+  <span class="green">PASS</span>  ON DELETE CASCADE removed citations when message deleted
+
+<span class="cyan">== 9  CHAT_MEMORY — watermark field is writable ==</span>
+  <span class="green">PASS</span>  chat_memory.lastSummarizedMessageId + summaryTokens persist
+
+<span class="cyan">== 10 CLEANUP ==</span>
+  <span class="green">PASS</span>  test data removed for user omar
+
+<span class="green">========== ALL 23 CHECKS PASSED ==========</span>
+  </div>
+  <p>If you see <code>ALL 23 CHECKS PASSED</code>, the memory plumbing works end-to-end.</p>
+</section>
+
+<!-- ============ TOOLS ============ -->
+<section id="tools">
+  <h2>2. The tools I added</h2>
+  <table>
+    <thead><tr><th>File</th><th>What it is</th><th>How to run</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><code>test_memory.py</code></td>
+        <td>Direct memory subsystem tests (23 checks).</td>
+        <td><code>python test_memory.py</code> · OR · double-click <code>TEST.bat</code></td>
+      </tr>
+      <tr>
+        <td><code>TEST.bat</code></td>
+        <td>Windows double-click wrapper for the above. Window pauses at end.</td>
+        <td>Double-click in Explorer.</td>
+      </tr>
+      <tr>
+        <td><code>INSPECT.bat</code></td>
+        <td>Read-only viewer that dumps each memory table to the console.</td>
+        <td>Double-click. Tries PostgreSQL 17/16/15 bin paths automatically.</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="callout">
+    <strong>One-time prerequisite.</strong> Before the first run, do <code>RUN.bat</code> once so the migrations apply and the demo users are seeded. After that, you can run <code>TEST.bat</code> and <code>INSPECT.bat</code> as many times as you like — they're idempotent and clean up after themselves.
+  </div>
+</section>
+
+<!-- ============ WHAT THE 23 CHECKS COVER ============ -->
+<section id="tests">
+  <h2>3. What each of the 23 checks proves</h2>
+  <div class="grid cols-2">
+    <div class="step-card">
+      <span class="num">0</span><h3>Sanity</h3>
+      <div class="body">Connects to the live database, finds the seeded <code>omar</code> user. If this fails, your DB isn't initialized — run <code>RUN.bat</code> once first.</div>
+    </div>
+    <div class="step-card">
+      <span class="num">1</span><h3>Promoter regex allowlist (6 patterns)</h3>
+      <div class="body">Each of the six promotion patterns recognises its trigger phrase and creates the right row in <code>user_memory</code> with the right <code>category</code>, <code>memoryKey</code>, <code>source='inferred'</code> and <code>confidence=0.7</code>.</div>
+    </div>
+    <div class="step-card">
+      <span class="num">2</span><h3>PII gate</h3>
+      <div class="body">When a user message contains a sequence of 10+ digits (account number, NID), the promoter refuses to extract anything from it. Also unit-tests <code>containsPii()</code> directly.</div>
+    </div>
+    <div class="step-card">
+      <span class="num">3</span><h3>Explicit always wins</h3>
+      <div class="body">If <code>language=Arabic</code> is set explicitly via the settings page (<code>source='explicit'</code>), the promoter cannot overwrite it from a chat phrase like "always answer in English". This protects user intent.</div>
+    </div>
+    <div class="step-card">
+      <span class="num">4</span><h3>Prompt-injection filter</h3>
+      <div class="body">When loading user memory for the prompt, only <code>preference</code> + <code>instruction</code> rows are returned. <code>profile</code> and <code>domain</code> stay out of the prompt (used for retrieval bias).</div>
+    </div>
+    <div class="step-card">
+      <span class="num">5</span><h3>Recent-messages order</h3>
+      <div class="body">Returns the last N messages in oldest-first order so the model sees a natural chronological window. Tested with 8 messages, asks for the last 4.</div>
+    </div>
+    <div class="step-card">
+      <span class="num">6</span><h3>Assembler structure (7 sub-checks)</h3>
+      <div class="body">The final prompt has all six blocks in canonical order: system → user mem → chat summary → recent turns → context → reminder → question. Each block is present and content is in the right slot.</div>
+    </div>
+    <div class="step-card">
+      <span class="num">7</span><h3>Citations roundtrip</h3>
+      <div class="body">Inserting 2 citations for a message persists them with correct ranks (1, 2) and they're retrievable by message id.</div>
+    </div>
+    <div class="step-card">
+      <span class="num">8</span><h3>Cascade delete</h3>
+      <div class="body">Deleting a message removes its citations automatically (FK <code>ON DELETE CASCADE</code>). No orphan rows in the audit trail.</div>
+    </div>
+    <div class="step-card">
+      <span class="num">9</span><h3>Watermark persistence</h3>
+      <div class="body">The new <code>lastSummarizedMessageId</code> and <code>summaryTokens</code> columns on <code>chat_memory</code> save and load correctly — proves the summarizer can be incremental.</div>
+    </div>
+    <div class="step-card">
+      <span class="num">10</span><h3>Cleanup</h3>
+      <div class="body">All test rows for <code>omar</code> are deleted at the end so the test is idempotent. Re-running it doesn't accumulate junk.</div>
+    </div>
+    <div class="step-card">
+      <span class="num">23</span><h3>Total assertions</h3>
+      <div class="body">11 sections, 23 individual checks. Sections 1 and 6 each contain multiple sub-checks.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ INSPECT ============ -->
+<section id="inspect">
+  <h2>4. Using INSPECT.bat after a chat</h2>
+  <p>After you've used the chat in the UI, run <code>INSPECT.bat</code> to see what was actually stored. Here's what you should expect to see, table by table:</p>
+
+  <details open>
+    <summary><code>messages</code> — every turn of every chat</summary>
+    <p>One row per user message + one row per assistant answer. Should show both roles. Look at <code>createdAt</code> to verify per-turn timing.</p>
+  </details>
+  <details>
+    <summary><code>message_citations</code> — provenance, NEW table</summary>
+    <p>For every assistant message, one row per retrieved chunk with its <code>chunkId</code>, <code>docName</code>, similarity <code>score</code>, and <code>rank</code>. This is your full audit trail of "which answer cited which chunk".</p>
+  </details>
+  <details>
+    <summary><code>chat_memory</code> — per-chat rolling summary</summary>
+    <p>One row per chat. Stays empty until the summarizer fires (≥6 new turns or ≥1000 new tokens). After that, <code>summary</code> contains the LLM-written recap, <code>summaryTokens</code> shows its size, and <code>lastSummarizedMessageId</code> marks the watermark.</p>
+  </details>
+  <details>
+    <summary><code>user_memory</code> — long-term preferences</summary>
+    <p>Rows only appear when:
+      <ul>
+        <li>You explicitly hit the <code>PUT /api/memory/user/{key}</code> endpoint (settings page, future UI) → <code>source='explicit'</code>, <code>confidence=1.0</code>.</li>
+        <li>You say a trigger phrase like "always answer in Arabic" in a chat and the promoter fires → <code>source='inferred'</code>, <code>confidence=0.7</code>, <code>evidenceChatId</code> points to that chat.</li>
+      </ul>
+    </p>
+  </details>
+</section>
+
+<!-- ============ MANUAL TESTS ============ -->
+<section id="manual">
+  <h2>5. Manual chat-UI tests (after Neo4j + Ollama are live)</h2>
+  <p class="lede">These are the user-visible behaviors. Run them once a real chat answer can be generated. They prove the memory layer is wired correctly all the way to the model.</p>
+
+  <div class="step-card">
+    <span class="num">A</span><h3>Multi-turn reference resolution</h3>
+    <div class="body">
+      <ol>
+        <li>Log in as <code>omar</code>.</li>
+        <li>Start a new chat. Ask: <em>"ما هي متطلبات الترخيص في الفصل الأول؟"</em></li>
+        <li>After the answer streams, ask: <em>"وماذا عن الفقرة الثانية؟"</em></li>
+        <li><strong>Expected:</strong> the model resolves "الفقرة الثانية" against the licensing topic, not as a brand-new question.</li>
+      </ol>
+      <p><strong>How to verify:</strong> the prompt logged in the FastAPI window should show "RECENT TURNS" with your prior Q/A; if it's missing, the wiring is broken.</p>
+    </div>
+  </div>
+
+  <div class="step-card">
+    <span class="num">B</span><h3>User preference promotion across chats</h3>
+    <div class="body">
+      <ol>
+        <li>In chat 1, ask: <em>"always answer in Arabic"</em>. Wait for the assistant reply.</li>
+        <li>Run <code>INSPECT.bat</code> → <code>user_memory</code> should have a row: <code>language='Arabic', source='inferred', evidenceChatId={chat1.id}</code>.</li>
+        <li>Click <strong>+ New chat</strong>. Ask any question in English.</li>
+        <li><strong>Expected:</strong> the model answers in Arabic, because the preference was injected at the top of the prompt.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="step-card">
+    <span class="num">C</span><h3>Citation persistence</h3>
+    <div class="body">
+      <ol>
+        <li>Ask any question that produces citations <code>[chunkId]</code> in the streamed answer.</li>
+        <li>Run <code>INSPECT.bat</code> → the <code>message_citations</code> table should list one row per cited chunk, with the same <code>chunkId</code> values, plus a rank and score.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="step-card">
+    <span class="num">D</span><h3>Summarizer debounce</h3>
+    <div class="body">
+      <ol>
+        <li>In one chat, ask 5 quick questions. After each, run <code>INSPECT.bat</code> on <code>chat_memory</code>.</li>
+        <li><strong>Expected after &lt;6 turns:</strong> <code>summary</code> is empty, <code>lastSummarizedMessageId</code> is null. (The debounce hasn't fired.)</li>
+        <li>Ask a 6th, then a 7th question.</li>
+        <li><strong>Expected:</strong> after the 6th or 7th, <code>summary</code> populates with an LLM-written recap, <code>lastSummarizedMessageId</code> points at the latest message, <code>summaryTokens</code> &gt; 0.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="step-card">
+    <span class="num">E</span><h3>Explicit-wins guarantee</h3>
+    <div class="body">
+      <ol>
+        <li>Manually insert an explicit preference: <code>PUT /api/memory/user/language</code> with <code>{ "memoryValue": "Arabic" }</code> using curl or Postman.</li>
+        <li>In a chat, say <em>"always answer in English"</em>.</li>
+        <li>Run <code>INSPECT.bat</code> → <code>user_memory.language</code> is still <code>Arabic</code> with <code>source='explicit'</code>. The promoter saw the explicit row and refused to touch it.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="step-card">
+    <span class="num">F</span><h3>Right-to-be-forgotten / cascade</h3>
+    <div class="body">
+      <ol>
+        <li>Note a chat id and its messages from <code>INSPECT.bat</code>.</li>
+        <li>Delete the chat via the UI (or <code>DELETE /api/chats/{id}</code>).</li>
+        <li><strong>Expected:</strong>
+          <ul>
+            <li><code>messages</code>, <code>message_citations</code>, <code>chat_memory</code> for that chat are gone (FK CASCADE).</li>
+            <li>Any <code>user_memory</code> row whose <code>evidenceChatId</code> pointed at it still exists, but the field is now NULL (FK SET NULL). The preference survives; its provenance is severed.</li>
+          </ul>
+        </li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TROUBLESHOOTING ============ -->
+<section>
+  <h2>6. If something doesn't pass</h2>
+  <table>
+    <thead><tr><th>Symptom</th><th>Most likely cause</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Test 0 fails — no <code>omar</code> user</td>
+        <td>DB isn't initialized</td>
+        <td>Run <code>RUN.bat</code> once. It applies migrations + seeds.</td>
+      </tr>
+      <tr>
+        <td>Test 5 fails — recent-messages order</td>
+        <td>Messages share a timestamp (rare in real use; only in artificial tests)</td>
+        <td>Test now commits between inserts to mimic real per-turn behavior. Should pass.</td>
+      </tr>
+      <tr>
+        <td>Manual test A fails — no multi-turn behavior</td>
+        <td>Server was started <em>before</em> the migration; old code path still cached</td>
+        <td>Stop the server window (Ctrl+C), then <code>RUN.bat</code> again.</td>
+      </tr>
+      <tr>
+        <td>Manual test B fails — preference not applied in new chat</td>
+        <td>Promoter ran but injection at prompt time isn't wired</td>
+        <td>Check the FastAPI window for <code>userMem=…</code> in the streaming log. If it shows <code>userMem=0</code>, no preferences were loaded.</td>
+      </tr>
+      <tr>
+        <td>Manual test D — summary stays empty after 10+ turns</td>
+        <td>Summarizer can't reach Ollama, or chat model isn't pulled</td>
+        <td>Check Ollama is running on <code>:11434</code> and <code>ollama list</code> includes a chat model. The summarizer always uses the local Ollama, not Groq.</td>
+      </tr>
+      <tr>
+        <td><code>INSPECT.bat</code> can't find <code>psql</code></td>
+        <td>PostgreSQL bin not on PATH</td>
+        <td>Edit <code>INSPECT.bat</code> and set <code>PSQL</code> to your psql.exe path manually.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============ END ============ -->
+<section>
+  <div class="callout green">
+    <strong>Bottom line.</strong> If <code>TEST.bat</code> shows <em>ALL 23 CHECKS PASSED</em>, the memory plumbing is fully verified. Once Neo4j + Ollama + ingested data are live, manual tests A-F prove the user-visible behaviors. Until then, the database-side tests give you all the confidence you need to ship this part of the system.
+  </div>
+</section>
+
+<div class="footer">
+  Memory testing playbook · single self-contained HTML
+</div>
+
+</main>
+</body>
+</html>
