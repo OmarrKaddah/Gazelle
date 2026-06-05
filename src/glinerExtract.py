@@ -1,6 +1,6 @@
 import json
-import os
 from pathlib import Path
+import torch
 from gliner import GLiNER
 from dotenv import load_dotenv
 from ontology import ENTITIES
@@ -8,13 +8,12 @@ from config import GLINER_MODEL, GLINER_THRESHOLD
 
 load_dotenv()
 
-THRESHOLD = float(os.getenv('GLINER_THRESHOLD', '0.5'))
-GLINER_MODEL = os.getenv('GLINER_MODEL', 'NAMAA-Space/gliner_arabic-v2.1')
 labels = list(ENTITIES.keys())
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-print(f"Loading GLiNER model: {GLINER_MODEL}", flush=True)
-model = GLiNER.from_pretrained(GLINER_MODEL)
-print(f"Model loaded. Threshold: {THRESHOLD}", flush=True)
+print(f"Loading GLiNER model: {GLINER_MODEL} on {device}", flush=True)
+model = GLiNER.from_pretrained(GLINER_MODEL).to(device)
+print(f"Model loaded. Threshold: {GLINER_THRESHOLD}", flush=True)
 
 
 def loadChunks(docName):
