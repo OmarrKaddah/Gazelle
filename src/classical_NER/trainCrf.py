@@ -29,12 +29,15 @@ def splitData(X, y, test_ratio=0.2, seed=42):
 
 
 def trainCrf(X_train, y_train):
-    print("[trainCrf] fitting CRF (lbfgs, c1=0.1, c2=0.1, max_iter=200)...")
+    print("[trainCrf] fitting CRF (lbfgs, c1=0.005, c2=0.005, max_iter=3000)...")
     crf = sklearn_crfsuite.CRF(
         algorithm='lbfgs',
-        c1=0.05,
-        c2=0.05,
-        max_iterations=500,
+        c1=0.005,
+        c2=0.005,
+        max_iterations=3000,
+        epsilon=1e-7,
+        delta=1e-7,
+        num_memories=15,
         all_possible_transitions=True,
         verbose=True,
     )

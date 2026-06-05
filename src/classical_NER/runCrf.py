@@ -97,17 +97,22 @@ if __name__ == '__main__':
     print("STEP 2 — load gazetteer")
     _, orgTriggers, moneyTriggers, monthNames = loadGazetteer()
 
+    docsArgs = [a for a in sys.argv if a.startswith('--docs=')]
+    if docsArgs:
+        docs = [d.strip() for d in docsArgs[0].split('=', 1)[1].split(',')]
+    else:
+        docs = sorted(p.stem for p in Path('chunks').glob('*.json')
+                      if not p.stem.startswith('wikiann') and not p.stem.startswith('anercorp'))
+
     print("=" * 50)
     print("STEP 3 — run inference on all documents")
-    bankDocs = sorted(p.stem for p in Path('chunks').glob('*.json')
-                      if not p.stem.startswith('wikiann') and not p.stem.startswith('anercorp'))
-    print(f"  found {len(bankDocs)} bank documents: {bankDocs}")
+    print(f"  found {len(docs)} documents: {docs}")
 
     all_entities = []
-    for docName in bankDocs:
+    for docName in docs:
         entities = runDoc(crf, docName, orgTriggers, moneyTriggers, monthNames, modelName)
         all_entities.extend(entities)
 
     print("=" * 50)
-    print(f"DONE — {len(all_entities)} total entities across {len(bankDocs)} documents")
+    print(f"DONE — {len(all_entities)} total entities across {len(docs)} documents")
     print("=" * 50)
