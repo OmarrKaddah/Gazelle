@@ -150,3 +150,6 @@ graphTraversal/figures/
 gliner_env/*
 *.json
 *.pkl
+
+classical_env/*
+ocr_dataset/*
