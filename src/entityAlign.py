@@ -3,7 +3,7 @@ import numpy as np
 from neo4j import GraphDatabase
 from embedding import embedTexts
 from ontology import RELATIONSHIPS
-from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, SIM_THRESHOLD, SKIP_SIM_TYPES
+from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, NEO4J_DB, SIM_THRESHOLD, SKIP_SIM_TYPES
 
 
 def normalizeArabic(text):
@@ -132,14 +132,14 @@ def mergeCluster(session, entities, group):
 
 def deduplicate(threshold=SIM_THRESHOLD):
     with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
-        with driver.session() as session:
+        with driver.session(database=NEO4J_DB) as session:
             entities = session.execute_read(loadEntities)
     print(f"Loaded {len(entities)} entities", flush=True)
     embeddings = embedTexts([e['name'] for e in entities])
     clusters = findClusters(entities, embeddings, threshold)
     print(f"Found {len(clusters)} duplicate clusters", flush=True)
     with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
-        with driver.session() as session:
+        with driver.session(database=NEO4J_DB) as session:
             for cluster in clusters:
                 mergeCluster(session, entities, cluster)
     print("Done", flush=True)

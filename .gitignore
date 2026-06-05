@@ -94,12 +94,36 @@ extractions/*
 !chunks/musique.json
 !extractions/musique_entities.json
 !extractions/musique_triples.json
+chunks/
+extractions/
+
+# =====================================================================
+# Project: eval results (regenerable; gold/ is hand-curated and kept)
+# =====================================================================
+eval/results.json
+
+# =====================================================================
+# Offline install cache
+# =====================================================================
+wheelhouse/
+wheelhouse_win/
+
+# Large model binaries
+models/
+*.bin
+*.vec
+
+# CAMeL Tools downloaded data
+.camel_tools/
 
 # =====================================================================
 # Misc
 # =====================================================================
 *.tmp
 *.bak
+*.pdf
+*.txt
+*.json
 plans/
 .ini
 
@@ -121,29 +145,4 @@ WhatsApp Image *.png
 # graphTraversal validation fixtures + generated figures (regenerable/downloadable)
 graphTraversal/datasets/
 graphTraversal/figures/
-
-# =====================================================================
-# Local-only — developer machine convenience, never push (keep on laptop)
-# =====================================================================
-# Windows launcher / helper scripts
-*.bat
-*.ps1
-bootstrap.py
-inspect_memory.py
-
-# Draft gitignore
-.gitignore.new
-
-# Local PostgreSQL data
-.pgdata/
-
-# Vite cache files
-frontend/vite.config.js.timestamp-*.mjs
-
-# Local docs / generated reports (HTML + Word) — not committed
-docs/*.html
-docs/*.docx
-
-# Local sample/test fixtures
-test_samples/
 
