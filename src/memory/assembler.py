@@ -1,8 +1,8 @@
-BUDGET_USER_MEM   = 80
-BUDGET_CHAT_SUMM  = 300
-BUDGET_HISTORY    = 600
-BUDGET_CONTEXT    = 1500
-BUDGET_QUESTION   = 200
+BUDGET_USER_MEM = 80
+BUDGET_CHAT_SUMM = 300
+BUDGET_HISTORY = 600
+BUDGET_CONTEXT = 1500
+BUDGET_QUESTION = 200
 
 
 def estimateTokens(text):
@@ -51,9 +51,12 @@ def assembleMessages(systemPrompt, userMemRows, chatSummary, recentTurns, contex
     questionText = truncateToBudget(question, BUDGET_QUESTION)
 
     sections = [systemPrompt]
-    if userMemText:  sections.append(userMemText)
-    if chatSummText: sections.append(chatSummText)
-    if historyText:  sections.append(historyText)
+    if userMemText:
+        sections.append(userMemText)
+    if chatSummText:
+        sections.append(chatSummText)
+    if historyText:
+        sections.append(historyText)
     sections.append(f"CONTEXT:\n{contextText}")
     sections.append(
         "---\nReminder: answer ONLY using the CONTEXT above. Cite [chunkId] for every claim. "

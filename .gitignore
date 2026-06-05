@@ -122,3 +122,28 @@ WhatsApp Image *.png
 graphTraversal/datasets/
 graphTraversal/figures/
 
+# =====================================================================
+# Local-only — developer machine convenience, never push (keep on laptop)
+# =====================================================================
+# Windows launcher / helper scripts
+*.bat
+*.ps1
+bootstrap.py
+inspect_memory.py
+
+# Draft gitignore
+.gitignore.new
+
+# Local PostgreSQL data
+.pgdata/
+
+# Vite cache files
+frontend/vite.config.js.timestamp-*.mjs
+
+# Local docs / generated reports (HTML + Word) — not committed
+docs/*.html
+docs/*.docx
+
+# Local sample/test fixtures
+test_samples/
+

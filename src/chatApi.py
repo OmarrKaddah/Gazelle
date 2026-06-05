@@ -265,28 +265,9 @@ async def publishDocumentsEndpoint(
     session: AsyncSession = Depends(getDbSession),
 ):
     payloads = [(f.filename, await f.read()) for f in files]
-    # Lazy import: ingest pulls in heavy OCR/NER/ML models. Importing it here
-    # (not at module top) keeps them out of API startup so the server boots
-    # light; they load on the first publish instead.
+    # Imported here, not at module top, so OCR/NER models stay out of startup.
     from ingest import ingestUploads
-    # Ingestion is blocking (OCR + LLM + Neo4j); run it off the event loop.
-    result = await asyncio.to_thread(ingestUploads, payloads)
-    await logAudit(
-        session, uuid.UUID(user["id"]), "documents.publish", "document",
-        ",".join(name for name, _ in payloads),
-    )
-    await session.commit()
-    return {"ok": True, **result}
-
-
-@app.post("/api/admin/documents/publish")
-async def publishDocumentsEndpoint(
-    files: list[UploadFile] = File(...),
-    user=Depends(requireAdmin),
-    session: AsyncSession = Depends(getDbSession),
-):
-    payloads = [(f.filename, await f.read()) for f in files]
-    # Pipeline is blocking (OCR / LLM / Neo4j) — run it off the event loop.
+    # Blocking pipeline (OCR, LLM, Neo4j); keep it off the event loop.
     result = await asyncio.to_thread(ingestUploads, payloads)
     await logAudit(
         session, uuid.UUID(user["id"]), "documents.publish", "document",

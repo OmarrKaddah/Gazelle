@@ -1,8 +1,7 @@
 import { authHeaders } from '../hooks/useAuth';
 
-// Upload documents and run the ingestion pipeline. Synchronous: the request
-// resolves once the backend has finished OCR/extraction and updated the graph,
-// so this can take a while for large documents.
+// Upload documents and run ingestion. The request only resolves once the
+// backend finishes OCR/extraction and updates the graph, so it can be slow.
 export async function publishDocuments(files) {
   const form = new FormData();
   files.forEach((f) => form.append('files', f));
@@ -11,11 +10,11 @@ export async function publishDocuments(files) {
   try {
     res = await fetch('/api/admin/documents/publish', {
       method: 'POST',
-      headers: authHeaders(), // do NOT set Content-Type; the browser sets the multipart boundary
+      headers: authHeaders(), // let the browser set the multipart Content-Type boundary
       body: form,
     });
   } catch {
-    return { ok: false, error: 'Network error — is the backend running?' };
+    return { ok: false, error: 'Network error. Is the backend running?' };
   }
 
   const raw = await res.text();

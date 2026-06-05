@@ -9,12 +9,12 @@ from db.session import asyncSessionFactory
 
 
 PATTERNS = [
-    (re.compile(r"always answer in (\w+)", re.IGNORECASE),               "preference",  "language"),
+    (re.compile(r"always answer in (\w+)", re.IGNORECASE), "preference", "language"),
     (re.compile(r"answer in (arabic|english|french|spanish)", re.IGNORECASE), "preference", "language"),
     (re.compile(r"prefer (concise|detailed|brief|verbose) answers?", re.IGNORECASE), "preference", "verbosity"),
     (re.compile(r"my (?:role|division|department) is ([^.\n]+)", re.IGNORECASE), "profile", "role"),
     (re.compile(r"always include (page numbers|article numbers|citations|sources)", re.IGNORECASE), "instruction", "always_include"),
-    (re.compile(r"never (mention|include|cite) ([^.\n]+)", re.IGNORECASE),       "instruction", "never_include"),
+    (re.compile(r"never (mention|include|cite) ([^.\n]+)", re.IGNORECASE), "instruction", "never_include"),
 ]
 
 PII_RX = re.compile(r"\b\d{10,}\b")

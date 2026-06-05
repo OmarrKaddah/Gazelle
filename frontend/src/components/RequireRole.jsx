@@ -1,11 +1,8 @@
 import React from 'react';
 import { hasRole } from '../lib/roles';
 
-// Route-protection wrapper. Renders its children only when the current user
-// holds `role`; otherwise shows a clean "not authorized" panel. This is a
-// defense-in-depth guard — the App-level routing already keeps non-admins out
-// of the Admin area, but wrapping the page means it can never render for the
-// wrong role even if routing changes later.
+// Renders children only if the user has `role`, else an access panel.
+// App-level routing already gates this, but the wrapper is a backstop.
 
 export default function RequireRole({ user, role, children }) {
   if (hasRole(user, role)) return children;

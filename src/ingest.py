@@ -16,7 +16,6 @@ from entityEmbedding import embedEntities
 from entityAlign import deduplicate
 from docConvert import docxToMarkdown, pdfPages
 
-# NER strategy mirrors run.py / runners/runAll.py
 NER_STRATEGY = os.getenv('NER_STRATEGY', 'hybrid').lower()
 if NER_STRATEGY == 'llm':
     from llmNER import extractEntities as extractEntitiesNER, dumpEntities as dumpEntitiesNER
@@ -39,9 +38,7 @@ DOCX_EXT = {'.docx'}
 TEXT_EXT = {'.md', '.txt'}
 SUPPORTED_EXT = IMAGE_EXT | PDF_EXT | DOCX_EXT | TEXT_EXT
 
-# A PDF yielding at least this many extractable characters is treated as a
-# digital (text-layer) PDF and read directly; below it, we assume a scanned
-# document and fall back to OCR.
+# Above this many extractable chars we treat the PDF as digital and skip OCR.
 PDF_TEXT_MIN_CHARS = 200
 
 log = logging.getLogger('gazelle.ingest')
@@ -59,8 +56,7 @@ def docNameFor(source):
     return source.stem.lower()
 
 
-# Write the page-structured sidecar (output/<stem>.json) that parseDoc reads
-# for markdown sources — same shape OCR produces: [{'page': N, 'markdown': ...}].
+# output/<stem>.json, same [{'page', 'markdown'}] shape OCR produces
 def writeSidecar(stem, pages):
     OUTPUT.mkdir(exist_ok=True)
     (OUTPUT / f'{stem}.json').write_text(
@@ -68,10 +64,7 @@ def writeSidecar(stem, pages):
     )
 
 
-# Parse a source file into ParsedElements, preferring the no-OCR path: digital
-# PDFs are read via their text layer, Word/plain-text directly, and OCR is used
-# only for images and scanned PDFs (no extractable text). All paths land on the
-# same output/<stem>.json sidecar that parseDoc consumes.
+# OCR only for images and scanned PDFs; digital PDFs, docx and text read directly.
 def parseSource(source):
     ext = source.suffix.lower()
     if ext in IMAGE_EXT:
@@ -82,7 +75,7 @@ def parseSource(source):
             log.info('pdf has text layer (%d pages): reading directly, no OCR', len(pages))
             writeSidecar(source.stem, pages)
         else:
-            log.info('pdf has no usable text layer: falling back to OCR')
+            log.info('pdf has no usable text layer, falling back to OCR')
             runOcrAndDump(str(source))
     elif ext in DOCX_EXT:
         writeSidecar(source.stem, [{'page': 1, 'markdown': docxToMarkdown(str(source))}])
@@ -93,10 +86,8 @@ def parseSource(source):
     return parseDoc(str(DOC_OUT / f'{source.stem}.md'))
 
 
-# Run the full per-document pipeline. Writes to Neo4j via the MERGE-based
-# writer (no clearDb), so existing graph data is preserved and new nodes /
-# relationships are added incrementally. Chunk embedding runs AFTER the KG
-# write so the Chunk nodes exist when their vectors are set.
+# Full pipeline for one doc. writeDoc merges into Neo4j (no clearDb), and
+# embedDoc runs after it so the Chunk nodes exist before we set their vectors.
 def ingestOne(source):
     docName = docNameFor(source)
     log.info('ingest start: %s -> doc=%s', source.name, docName)
@@ -123,10 +114,9 @@ def ingestOne(source):
     }
 
 
-# Entry point used by the API. payloads: list of (filename, bytes).
-# Saves every supported file, ingests each independently (a failure on one
-# file does not abort the batch), then runs the global entity-embed and
-# dedup passes once so new entities link to existing graph nodes.
+# API entry point. payloads is a list of (filename, bytes). One bad file
+# doesn't abort the batch; embed + dedup run once at the end so new entities
+# link against the existing graph.
 def ingestUploads(payloads):
     os.chdir(ROOT)
     results = []

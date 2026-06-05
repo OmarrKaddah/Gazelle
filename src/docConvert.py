@@ -4,9 +4,8 @@ from docx.text.paragraph import Paragraph
 from pypdf import PdfReader
 
 
-# Convert a .docx into markdown WITHOUT OCR — Word files already carry digital
-# text, so we read the document body in order and emit markdown the parser can
-# consume the same way it consumes OCR output (Doc_Out/*.md).
+# Word files already carry digital text, so we walk the body and emit the same
+# markdown the parser gets from OCR output, no OCR needed.
 
 def paragraphToMarkdown(para):
     text = para.text.strip()
@@ -47,10 +46,8 @@ def docxToMarkdown(path):
     return '\n\n'.join(parts)
 
 
-# Extract a digital PDF's text layer WITHOUT OCR, one entry per page in the
-# same shape the OCR sidecar uses ([{'page': N, 'markdown': ...}, ...]).
-# Returns [] for scanned/image PDFs with no extractable text so the caller can
-# fall back to OCR.
+# Pull a digital PDF's text layer, one entry per page. Returns [] for scanned
+# PDFs with no extractable text so the caller can fall back to OCR.
 def pdfPages(path):
     reader = PdfReader(path)
     pages = []
