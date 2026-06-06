@@ -95,8 +95,12 @@ gazetteer/
 
 # Trained model artifacts and classical NER subsystem (regenerable)
 src/models/
-src/classical_NER/
+src/classical_NER/models
+src/classical_NER/*.txt
+src/classical_NER/training
+train_data.json
 router/data/*.pkl
+*.pkl
 
 # NER annotation datasets
 annotations/
@@ -158,3 +162,6 @@ gazelle.db
 
 # Large benchmark datasets
 twowiki/data/
+
+wheelhouse/
+wheelhouse_win/
