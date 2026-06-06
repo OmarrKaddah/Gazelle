@@ -5,7 +5,8 @@ from pathlib import Path
 
 THRESHOLD = float(sys.argv[1]) if len(sys.argv) > 1 else 0.5
 
-
+##cbe chunks
+#TODO : chunk checker
 def loadChunks():
     chunks = {}
     for path in sorted(Path('chunks').glob('*.json')):
@@ -13,6 +14,15 @@ def loadChunks():
             chunks[chunk['chunkId']] = chunk
     return chunks
 
+
+# def loadEntities():
+#     byChunk = {}
+#     for path in sorted(Path('extractions').glob('*_entities.json')):
+#         for e in json.loads(path.read_text)
+#             if e.get('score') < THRESHOLD:
+#                 continue
+#             byChunk.setdefault(e['chunkId'], []).append(e)
+#     return byChunk
 
 def loadEntities():
     byChunk = {}

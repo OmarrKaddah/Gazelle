@@ -7,9 +7,9 @@ from camel_tools.tagger.default import DefaultTagger
 
 BASE_DIR = Path(__file__).resolve().parent
 
-print("[featureExtract] loading CAMeL POS tagger...")
+print("loading CAMeL POS tagger...")
 _tagger = DefaultTagger(MLEDisambiguator.pretrained('calima-msa-r13'), 'pos')
-print("[featureExtract] tagger ready")
+print("tagger ready")
 
 
 def parseAnnotationFile(path):
@@ -17,6 +17,8 @@ def parseAnnotationFile(path):
     out = []
     for task in raw:
         text = task['data']['text']
+        
+        
         source = task.get('annotations') or task.get('predictions') or [{}]
         result = source[0].get('result', [])
         spans = [
@@ -25,6 +27,7 @@ def parseAnnotationFile(path):
                 'end':   ann['value']['end'],
                 'type':  ann['value']['labels'][0],
             }
+            
             for ann in result
             if ann.get('type') == 'labels'
         ]
@@ -36,20 +39,23 @@ def loadAnnotations(includeWikiann=False, includeAnercorp=False):
     annDir = BASE_DIR.parent.parent / 'annotations'
 
     bankPath = annDir / 'corrected.json'
-    print(f"[loadAnnotations] bank: {bankPath}")
+    
+    print(f"bank: {bankPath}")
     tasks = parseAnnotationFile(bankPath)
     print(f"  {len(tasks)} tasks, {sum(len(a['spans']) for a in tasks)} spans")
 
     if includeWikiann:
         wikiPath = annDir / 'wikiann_base.json'
-        print(f"[loadAnnotations] wikiann: {wikiPath}")
+        print(f"wikiann: {wikiPath}")
+        
         wikiTasks = parseAnnotationFile(wikiPath)
         print(f"  {len(wikiTasks)} tasks, {sum(len(a['spans']) for a in wikiTasks)} spans")
+        
         tasks = wikiTasks + tasks
 
     if includeAnercorp:
         anerPath = annDir / 'anercorp_base.json'
-        print(f"[loadAnnotations] anercorp: {anerPath}")
+        print(f"anercorp: {anerPath}")
         anerTasks = parseAnnotationFile(anerPath)
         print(f"  {len(anerTasks)} tasks, {sum(len(a['spans']) for a in anerTasks)} spans")
         tasks = anerTasks + tasks
@@ -58,24 +64,31 @@ def loadAnnotations(includeWikiann=False, includeAnercorp=False):
     tasks = [t for t in tasks if isArabic(t['text'])]
     skipped = before - len(tasks)
     if skipped:
+        
         print(f"  skipped {skipped} non-Arabic chunks")
-    print(f"[loadAnnotations] total: {len(tasks)} tasks")
+        
+    print(f"total: {len(tasks)} tasks")
     return tasks
 
 
 # TODO: This is a basic gazetteer loader — expand trigger sets after reviewing bank documents
 def loadGazetteer():
     path = BASE_DIR.parent.parent / 'gazetteer' / 'gazetteer.json'
-    print(f"[loadGazetteer] reading {path}")
+    
+    print(f"reading {path}")
+    
     raw = json.loads(path.read_text(encoding='utf-8'))
     gazSets = {etype: set(forms) for etype, forms in raw.items()}
+    
     for etype, s in gazSets.items():
         print(f"  {etype}: {len(s)} entries")
+
+    # these were tuned on chapter_3 — might need expanding for other docs
     orgTriggers   = {'بنك', 'شركة', 'هيئة', 'وزارة', 'مؤسسة', 'صندوق', 'اتحاد', 'لجنة', 'إدارة', 'مجلس'}
     moneyTriggers = {'جنيه', 'دولار', 'يورو', 'مليار', 'مليون', 'ألف', 'جنيهاً', 'دولاراً'}
     monthNames    = {'يناير', 'فبراير', 'مارس', 'إبريل', 'أبريل', 'مايو', 'يونيو',
                      'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'}
-    print(f"[loadGazetteer] {len(orgTriggers)} org triggers, {len(moneyTriggers)} money triggers, {len(monthNames)} month names")
+    print(f"{len(orgTriggers)} org triggers, {len(moneyTriggers)} money triggers, {len(monthNames)} month names")
     return gazSets, orgTriggers, moneyTriggers, monthNames
 
 
@@ -98,7 +111,9 @@ def posTag(words):
 
 
 def bioAlign(tokens, spans):
+    # first token of a span gets B, continuations get I
     labels = ['O'] * len(tokens)
+    
     for span in spans:
         first = True
         for i, tok in enumerate(tokens):
@@ -115,6 +130,7 @@ def normalizeForLookup(word):
 
 
 def morphFeatures(word):
+    # longest prefixes first so we don't cut too early
     prep_prefixes = ('بال', 'لل', 'كال', 'وال', 'فال', 'بِال')
     prep_clitics  = ('بِ', 'لِ', 'كَ', 'وَ', 'ب', 'ل', 'ك', 'و', 'ف')
 
@@ -139,6 +155,7 @@ def morphFeatures(word):
 
 
 def scriptFeatures(word):
+    # arabic-indic digits are common in CBE regulatory docs
     arabic_digits  = set('٠١٢٣٤٥٦٧٨٩')
     western_digits = set('0123456789')
     clause_pattern = re.compile(r'^[\d٠-٩]+-[\d٠-٩]+(-[\d٠-٩]+)*$')
@@ -157,8 +174,10 @@ def charNgrams(word):
     feats = {}
     for i in range(len(word) - 1):
         feats[f'c2_{word[i:i+2]}'] = True
+        
     for i in range(len(word) - 2):
         feats[f'c3_{word[i:i+3]}'] = True
+        
     return feats
 
 
@@ -184,6 +203,7 @@ def tokenFeatures(tokens, pos, i, orgTriggers, moneyTriggers, monthNames):
         if j >= n: return '__END__'
         return pos[j] if pos[j] is not None else 'UNK'
 
+    # window features: ±2 words and POS tags
     feats = {
         'word':     word,
         'pos':      pos[i] if pos[i] is not None else 'UNK',
@@ -215,6 +235,7 @@ def extractChunk(text, spans, orgTriggers, moneyTriggers, monthNames):
     words  = [t['word'] for t in tokens]
     pos    = posTag(words)
     labels = bioAlign(tokens, spans)
+    
     return [
         (tokenFeatures(tokens, pos, i, orgTriggers, moneyTriggers, monthNames), labels[i])
         for i in range(len(tokens))
@@ -223,6 +244,7 @@ def extractChunk(text, spans, orgTriggers, moneyTriggers, monthNames):
 
 def dumpTraining(sequences):
     (BASE_DIR / 'training').mkdir(exist_ok=True)
+    
     out = [
         [[feats, label] for feats, label in seq]
         for seq in sequences
@@ -230,7 +252,7 @@ def dumpTraining(sequences):
     (BASE_DIR / 'training' / 'train_data.json').write_text(
         json.dumps(out, ensure_ascii=False, indent=2), encoding='utf-8'
     )
-    print(f"[dumpTraining] saved {len(sequences)} sequences -> training/train_data.json")
+    print(f"saved {len(sequences)} sequences -> training/train_data.json")
 
 
 if __name__ == '__main__':
@@ -241,34 +263,30 @@ if __name__ == '__main__':
     if includeWikiann:  sources.append('wikiann')
     if includeAnercorp: sources.append('anercorp')
 
-    print("=" * 50)
-    print("STEP 1 — load gazetteer")
     _, orgTriggers, moneyTriggers, monthNames = loadGazetteer()
 
-    print("=" * 50)
-    print(f"STEP 2 — load annotations ({' + '.join(sources)})")
+    print(f"loading annotations ({' + '.join(sources)})")
     annotations = loadAnnotations(includeWikiann, includeAnercorp)
 
-    print("=" * 50)
-    print("STEP 3 — extract features")
+    print("extracting features...")
     sequences = []
     for i, a in enumerate(annotations):
         seq = extractChunk(a['text'], a['spans'], orgTriggers, moneyTriggers, monthNames)
         sequences.append(seq)
+
         entity_tokens = sum(1 for _, label in seq if label != 'O')
         print(f"  chunk {i+1}/{len(annotations)} | {len(seq)} tokens | {entity_tokens} entity tokens | doc: {a['meta'].get('docName', '?')}")
 
-    print("=" * 50)
-    print("STEP 4 — dump training data")
     dumpTraining(sequences)
+
     total_tokens = sum(len(s) for s in sequences)
     label_counts = {}
     for seq in sequences:
         for _, label in seq:
             label_counts[label] = label_counts.get(label, 0) + 1
-    print(f"Total tokens: {total_tokens} across {len(sequences)} chunks")
-    print("Label distribution:")
+
+    print(f"total tokens: {total_tokens} across {len(sequences)} chunks")
+    print("label distribution:")
     for label, count in sorted(label_counts.items()):
         print(f"  {label}: {count}")
-    print("=" * 50)
-    print("featureExtract done")
+    print("done")

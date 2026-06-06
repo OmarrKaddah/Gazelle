@@ -37,14 +37,9 @@ def printReport(name, goldList, predList):
     predSet = toSpanSet(predList)
     p, r, f1, tp, fp, fn = computeF1(goldSet, predSet)
 
-    print(f"\n{'='*55}")
-    print(f"  {name}")
-    print(f"{'='*55}")
-    print(f"  {'':22} {'P':>7} {'R':>7} {'F1':>7} {'Support':>9}")
-    print(f"  {'-'*54}")
-    print(f"  {'span (boundary)':<22} {p:>7.4f} {r:>7.4f} {f1:>7.4f} {len(goldSet):>9}")
-    print(f"  {'-'*54}")
-    print(f"  gold: {len(goldSet)}  predicted: {len(predSet)}  TP: {tp}  FP: {fp}  FN: {fn}")
+    print(f"\n{name}")
+    print(f"  P={p:.4f}  R={r:.4f}  F1={f1:.4f}  support={len(goldSet)}")
+    print(f"  gold={len(goldSet)}  pred={len(predSet)}  TP={tp}  FP={fp}  FN={fn}")
 
 
 if __name__ == '__main__':
@@ -60,16 +55,16 @@ if __name__ == '__main__':
     modelName = modelArgs[0].split('=', 1)[1] if modelArgs else None
     runGliner = '--gliner' in sys.argv
 
-    print(f"[evalNer] loading gold from annotations/gold_{docName}.json")
+    print(f"loading gold from annotations/gold_{docName}.json")
     gold = loadGold(docName)
-    print(f"[evalNer] {len(gold)} gold spans")
+    print(f"{len(gold)} gold spans")
 
     if modelName:
-        print(f"[evalNer] loading {modelName} predictions")
+        print(f"loading {modelName} predictions")
         crf_pred = loadCrf(docName, modelName)
         printReport(f"{modelName}  —  {docName}", gold, crf_pred)
 
     if runGliner:
-        print(f"[evalNer] loading GLiNER predictions")
+        print(f"loading GLiNER predictions")
         gliner_pred = loadGliner(docName)
         printReport(f"GLiNER  —  {docName}", gold, gliner_pred)
