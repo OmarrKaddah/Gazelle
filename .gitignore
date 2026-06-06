@@ -152,3 +152,9 @@ sensemaking/config/
 viz/
 
 .venv*
+
+# SQLite database (binary, not mergeable)
+gazelle.db
+
+# Large benchmark datasets
+twowiki/data/
