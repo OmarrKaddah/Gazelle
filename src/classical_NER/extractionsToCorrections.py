@@ -53,7 +53,7 @@ def discoverDocNames():
             if chunkFile.exists():
                 docNames.append(docName)
             else:
-                print(f"[extractionsToCorrections] skipping {f.name} — no matching chunks/{docName}.json")
+                print(f"skipping {f.name} — no matching chunks/{docName}.json")
     return docNames
 
 
@@ -61,17 +61,17 @@ if __name__ == '__main__':
     if len(sys.argv) >= 2:
         docNames = sys.argv[1:]
     else:
-        print("[extractionsToCorrections] no args — scanning extractions/ folder")
+        print("no args — scanning extractions/")
         docNames = discoverDocNames()
         if not docNames:
-            print("[extractionsToCorrections] no matching extraction+chunk pairs found")
+            print("no matching extraction+chunk pairs found")
             sys.exit(1)
-        print(f"[extractionsToCorrections] found: {docNames}")
+        print(f"found: {docNames}")
 
     allAnnotations = []
 
     for docName in docNames:
-        print(f"[extractionsToCorrections] processing {docName}")
+        print(f"processing {docName}")
         chunkMap = loadChunks(docName)
         entities = loadEntities(docName)
 
@@ -93,4 +93,4 @@ if __name__ == '__main__':
     newTasks = [t for t in allAnnotations if t.get('meta', {}).get('chunkId') not in existingIds]
     merged = existing + newTasks
     outPath.write_text(json.dumps(merged, ensure_ascii=False, indent=2), encoding='utf-8')
-    print(f"[extractionsToCorrections] merged: {len(existing)} existing + {len(newTasks)} new = {len(merged)} total tasks")
+    print(f"merged: {len(existing)} existing + {len(newTasks)} new = {len(merged)} total tasks")

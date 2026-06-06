@@ -1,8 +1,5 @@
-import sys
-import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
-
 import json
+import os
 import re
 from pathlib import Path
 
@@ -17,51 +14,56 @@ def normalizeArabic(text):
 
 
 def loadExtractions():
-    entities = []
-    for path in sorted(Path('extractions').glob('*_entities.json')):
-        entities.extend(json.loads(path.read_text(encoding='utf-8')))
-    return entities
+    all_entities = []
+    for p in sorted(Path('extractions').glob('*_entities.json')):
+        all_entities.extend(json.loads(p.read_text(encoding='utf-8')))
+    return all_entities
 
 
 def buildGazetteer(entities, threshold):
     seen = {}
     for e in entities:
-        if e.get('score', 0) < threshold:
+        score = e.get('score', 0)
+        if score < threshold:
             continue
         etype = e.get('type', '').strip()
-        text = e.get('text', '').strip()
-        if not etype or not text:
+        raw = e.get('text', '').strip()
+        if not etype or not raw:
             continue
-        key = (etype, normalizeArabic(text))
+        key = (etype, normalizeArabic(raw))
         if key not in seen:
-            seen[key] = text
-    gazetteer = {}
+            seen[key] = raw
+
+    gaz = {}
     for (etype, _), surface in seen.items():
-        gazetteer.setdefault(etype, []).append(surface)
-    for etype in gazetteer:
-        gazetteer[etype] = sorted(set(gazetteer[etype]))
-    return gazetteer
+        gaz.setdefault(etype, []).append(surface)
+
+    for k in gaz:
+        gaz[k] = sorted(set(gaz[k]))
+
+    return gaz
 
 
-def dumpGazetteer(gazetteer):
+def dumpGazetteer(gaz):
     Path('gazetteer').mkdir(exist_ok=True)
-    Path('gazetteer/gazetteer.json').write_text(
-        json.dumps(gazetteer, ensure_ascii=False, indent=2),
-        encoding='utf-8',
-    )
+    out = Path('gazetteer/gazetteer.json')
+    out.write_text(json.dumps(gaz, ensure_ascii=False, indent=2), encoding='utf-8')
 
 
 if __name__ == '__main__':
-    print(f"Loading extractions (threshold={GAZETTEER_THRESHOLD})...")
+    thresh = GAZETTEER_THRESHOLD
+    print(f"threshold={thresh}, scanning extractions/...")
+
     entities = loadExtractions()
-    print(f"Total entities loaded: {len(entities)}")
+    print(f"got {len(entities)} entity spans")
 
-    gazetteer = buildGazetteer(entities, GAZETTEER_THRESHOLD)
+    gaz = buildGazetteer(entities, thresh)
 
-    total = sum(len(v) for v in gazetteer.values())
-    for etype, entries in sorted(gazetteer.items()):
+    for etype, entries in sorted(gaz.items()):
         print(f"  {etype}: {len(entries)} entries")
-    print(f"Total unique entries: {total}")
 
-    dumpGazetteer(gazetteer)
-    print("Saved -> gazetteer/gazetteer.json")
+    total = sum(len(v) for v in gaz.values())
+    print(f"total: {total}")
+
+    dumpGazetteer(gaz)
+    print("saved to gazetteer/gazetteer.json")
