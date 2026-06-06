@@ -157,6 +157,7 @@ nano .env
 Instead of running the full OCR→Parse→Chunk→NER→KG pipeline, download a pre-built graph dump:
 
 ```bash
+mkdir -p dumps
 # Download the graph dump
 # 📥 Download from:
 https://drive.google.com/drive/folders/14TZO9BMip4-8wX2tgVZ78EYoUlm5t7IU
@@ -164,7 +165,7 @@ https://drive.google.com/drive/folders/14TZO9BMip4-8wX2tgVZ78EYoUlm5t7IU
 # Place the file in: dumps/graph.jsonl
 # (Create the dumps/ directory if it doesn't exist)
 
-mkdir -p dumps
+
 # Copy/move downloaded file to: dumps/graph.jsonl
 
 # Restore the graph to Neo4j
@@ -923,7 +924,7 @@ python runSynonyms.py 0.85    # explicit threshold
 | `RRF_K`             | 60      | Reciprocal Rank Fusion constant                                       |
 | `OVERFETCH`         | 4       | Fetch k \* OVERFETCH before access-control filter                     |
 | `SYNONYM_THRESHOLD` | 0.85    | Cosine cutoff for SYNONYM edges                                       |
-| `ENTITY_WEIGHT`     | 0.6     | Path score = entity_weight _ entity_sim + (1-entity_weight) _ rel_sim |
+| `ENTITY_WEIGHT`     | 0.6     | Path score = entity*weight * entity*sim + (1-entity_weight) * rel_sim |
 
 ---
 
