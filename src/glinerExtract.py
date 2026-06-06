@@ -49,13 +49,7 @@ def extractFromChunk(chunk, lang):
 def extractEntities(docName, lang='ar'):
     chunks = loadChunks(docName)
     print(f"[gliner] {docName}: {len(chunks)} chunks", flush=True)
-    print(f"[gliner] {docName}: {len(chunks)} chunks", flush=True)
     entities = []
-    bar = tqdm(chunks, desc=f"{docName}", unit="chunk", file=sys.stdout)
-    for c in bar:
-        spans = extractFromChunk(c, lang)
-        entities.extend(spans)
-        bar.set_postfix(entities=len(entities))
     bar = tqdm(chunks, desc=f"{docName}", unit="chunk", file=sys.stdout)
     for c in bar:
         spans = extractFromChunk(c, lang)

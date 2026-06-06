@@ -77,23 +77,37 @@ def parseSource(source):
         raise ValueError(f'unsupported file type: {ext}')
     return parseDoc(str(DOC_OUT / f'{source.stem}.md'))
 
-def ingestOne(source):
-    docName = docNameFor(source)
-    log.info('ingest start: %s -> doc=%s', source.name, docName)
+def ingestOne(source, emit=None):
+    def tell(msg):
+        log.info(msg)
+        if emit:
+            emit(msg)
 
+    docName = docNameFor(source)
+    tell(f'[{source.name}] parsing')
     dumpParsed(parseSource(source), docName)
+
+    tell(f'[{source.name}] chunking')
     chunks = chunkDoc(loadParsed(docName))
     dumpChunks(chunks, docName)
+    tell(f'[{source.name}] {len(chunks)} chunks')
 
+    tell(f'[{source.name}] NER')
     dumpEntitiesNER(extractEntitiesNER(docName), docName)
+
+    tell(f'[{source.name}] LLM extraction')
     extractions = extractDoc(docName)
     dumpElements(extractions, docName)
+    relCount = sum(len(r['relationships']) for r in extractions)
+    tell(f'[{source.name}] {relCount} relationships extracted')
 
+    tell(f'[{source.name}] writing graph')
     buildGraph(docName)
+
+    tell(f'[{source.name}] embedding chunks')
     embedDoc(docName)
 
-    relCount = sum(len(r['relationships']) for r in extractions)
-    log.info('ingest done: doc=%s chunks=%d rels=%d', docName, len(chunks), relCount)
+    tell(f'[{source.name}] done — {len(chunks)} chunks, {relCount} rels')
     return {
         'file': source.name,
         'docName': docName,
@@ -103,31 +117,37 @@ def ingestOne(source):
     }
 
 
-
-def ingestUploads(payloads):
+def ingestUploads(payloads, emit=None):
     os.chdir(ROOT)
     results = []
     sources = []
 
     for filename, data in payloads:
-
         ext = Path(filename).suffix.lower()
         if ext not in SUPPORTED_EXT:
             log.warning('rejected unsupported upload: %s', filename)
+            if emit:
+                emit(f'[{filename}] rejected — unsupported type {ext}')
             results.append({'file': filename, 'status': 'rejected', 'error': f'unsupported type {ext}'})
             continue
         sources.append(saveUpload(filename, data))
+        if emit:
+            emit(f'[{filename}] saved')
 
     for source in sources:
-
         try:
-            results.append(ingestOne(source))
+            results.append(ingestOne(source, emit))
         except Exception as exc:
             log.exception('ingest failed: %s', source.name)
+            if emit:
+                emit(f'[{source.name}] FAILED — {exc}')
             results.append({'file': source.name, 'status': 'failed', 'error': str(exc)})
 
     if any(r['status'] == 'published' for r in results):
-        log.info('post-processing: entity embed')
+        if emit:
+            emit('embedding entities')
         embedEntities()
+        if emit:
+            emit('entity embedding done')
 
     return {'results': results}

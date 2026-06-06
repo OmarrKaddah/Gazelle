@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { LogoMark, UploadIcon, FileIcon, ChatIcon, XIcon } from './Icons';
 import { publishDocuments } from '../api/admin';
 
@@ -15,12 +15,19 @@ export default function AdminPage({ user, onLogout, onEnterChat }) {
   const [done, setDone] = useState(null);
   const [failures, setFailures] = useState([]);
   const [error, setError] = useState(null);
+  const [logs, setLogs] = useState([]);
   const inputRef = useRef(null);
+  const logEndRef = useRef(null);
+
+  useEffect(() => {
+    logEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [logs]);
 
   const resetStatus = () => {
     setDone(null);
     setFailures([]);
     setError(null);
+    setLogs([]);
   };
 
   const addFiles = (incoming) => {
@@ -44,7 +51,9 @@ export default function AdminPage({ user, onLogout, onEnterChat }) {
   const publish = async () => {
     setPublishing(true);
     resetStatus();
-    const res = await publishDocuments(files);
+    const res = await publishDocuments(files, {
+      onLog: (text) => setLogs((prev) => [...prev, text]),
+    });
     setPublishing(false);
     if (!res.ok) {
       setError(res.error);
@@ -171,6 +180,20 @@ export default function AdminPage({ user, onLogout, onEnterChat }) {
                     </button>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {logs.length > 0 && (
+            <div className="mt-6">
+              <div className="text-[11px] uppercase tracking-[0.16em] text-ink-faint font-semibold mb-2">
+                Pipeline log
+              </div>
+              <div className="bg-[#1a1a1a] rounded-xl px-4 py-3 max-h-56 overflow-y-auto font-mono text-[11.5px] leading-relaxed text-green-400 space-y-0.5">
+                {logs.map((line, i) => (
+                  <div key={i}>{line}</div>
+                ))}
+                <div ref={logEndRef} />
               </div>
             </div>
           )}

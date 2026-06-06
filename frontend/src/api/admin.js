@@ -1,8 +1,6 @@
 import { authHeaders } from '../hooks/useAuth';
 
-// Upload documents and run ingestion. The request only resolves once the
-// backend finishes OCR/extraction and updates the graph, so it can be slow.
-export async function publishDocuments(files) {
+export async function publishDocuments(files, { onLog, onDone } = {}) {
   const form = new FormData();
   files.forEach((f) => form.append('files', f));
 
@@ -10,23 +8,44 @@ export async function publishDocuments(files) {
   try {
     res = await fetch('/api/admin/documents/publish', {
       method: 'POST',
-      headers: authHeaders(), // let the browser set the multipart Content-Type boundary
+      headers: authHeaders(),
       body: form,
     });
   } catch {
     return { ok: false, error: 'Network error. Is the backend running?' };
   }
 
-  const raw = await res.text();
-  let data = {};
-  try {
-    data = raw ? JSON.parse(raw) : {};
-  } catch {
-    return { ok: false, error: 'Server error (invalid response)' };
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    let detail = `Publish failed (${res.status})`;
+    try { detail = JSON.parse(text).detail || detail; } catch { /* ignore */ }
+    return { ok: false, error: detail };
   }
 
-  if (!res.ok || !data.ok) {
-    return { ok: false, error: data.detail || data.error || `Publish failed (${res.status})` };
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buf = '';
+  let finalResult = null;
+
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, { stream: true });
+    const lines = buf.split('\n');
+    buf = lines.pop();
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      let evt;
+      try { evt = JSON.parse(line.slice(6)); } catch { continue; }
+      if (evt.type === 'log' && onLog) onLog(evt.text);
+      if (evt.type === 'done') {
+        finalResult = evt;
+        if (onDone) onDone(evt);
+      }
+    }
   }
-  return { ok: true, results: data.results || [] };
+
+  if (!finalResult) return { ok: false, error: 'No response from server' };
+  if (!finalResult.ok) return { ok: false, error: finalResult.error || 'Publish failed' };
+  return { ok: true, results: finalResult.results || [] };
 }

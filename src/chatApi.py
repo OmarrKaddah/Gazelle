@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+import queue
 import uuid
 
 import httpx
@@ -12,6 +13,7 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from neo4j import GraphDatabase
 from retriever import retrieve
+from localRetrieve import getLocalIndex
 from auth import bearer, getCurrentUser, login, logout, requireAdmin, userFromToken
 from docAccess import LEVELS
 from db.session import asyncSessionFactory, getDbSession, initDb
@@ -49,6 +51,7 @@ app = FastAPI(title="Gazelle API")
 @app.on_event("startup")
 async def onStartup():
     await initDb()
+    asyncio.create_task(asyncio.to_thread(getLocalIndex))
 
 
 
@@ -330,16 +333,46 @@ async def publishDocumentsEndpoint(
     session: AsyncSession = Depends(getDbSession),
 ):
     payloads = [(f.filename, await f.read()) for f in files]
-    # Imported here, not at module top, so OCR/NER models stay out of startup.
     from ingest import ingestUploads
-    # Blocking pipeline (OCR, LLM, Neo4j); keep it off the event loop.
-    result = await asyncio.to_thread(ingestUploads, payloads)
-    await logAudit(
-        session, uuid.UUID(user["id"]), "documents.publish", "document",
-        ",".join(name for name, _ in payloads),
-    )
-    await session.commit()
-    return {"ok": True, **result}
+
+    q: queue.Queue = queue.Queue()
+
+    def emit(msg):
+        q.put(("log", msg))
+
+    def runPipeline():
+        try:
+            result = ingestUploads(payloads, emit)
+            q.put(("done", result))
+        except Exception as exc:
+            q.put(("error", str(exc)))
+
+    async def generate():
+        loop = asyncio.get_event_loop()
+        fut = loop.run_in_executor(None, runPipeline)
+        while True:
+            try:
+                kind, payload = await loop.run_in_executor(None, lambda: q.get(timeout=0.2))
+            except Exception:
+                if fut.done():
+                    break
+                continue
+            if kind == "log":
+                yield "data: " + json.dumps({"type": "log", "text": payload}) + "\n\n"
+            elif kind == "done":
+                await logAudit(
+                    session, uuid.UUID(user["id"]), "documents.publish", "document",
+                    ",".join(name for name, _ in payloads),
+                )
+                await session.commit()
+                yield "data: " + json.dumps({"type": "done", "ok": True, **payload}) + "\n\n"
+                break
+            elif kind == "error":
+                yield "data: " + json.dumps({"type": "done", "ok": False, "error": payload}) + "\n\n"
+                break
+        await fut
+
+    return StreamingResponse(generate(), media_type="text/event-stream; charset=utf-8")
 
 
 def queryGraph(tx, search, entityType, limit):
