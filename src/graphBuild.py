@@ -111,7 +111,11 @@ def writeEntities(tx, entities):
         MERGE (ent:Entity {canonicalId: e.canonicalId})
         ON CREATE SET ent.canonicalName = e.canonicalName, ent.type = e.type,
                       ent.docName = e.docName, ent.description = e.description, ent.aliases = e.aliases
-        ON MATCH SET ent.description = e.description,
+        ON MATCH SET ent.description = CASE
+                       WHEN e.description IS NULL OR e.description = '' THEN ent.description
+                       WHEN ent.description IS NULL OR ent.description = '' THEN e.description
+                       ELSE ent.description + ' ' + e.description
+                     END,
                      ent.aliases = [a IN e.aliases WHERE NOT a IN ent.aliases] + ent.aliases
         WITH ent, e
         UNWIND e.chunkIds AS cid
@@ -128,7 +132,13 @@ def writeRelated(tx, edges):
         UNWIND $edges AS e
         MATCH (a:Entity {canonicalId: e.src}), (b:Entity {canonicalId: e.dst})
         MERGE (a)-[r:RELATED]->(b)
-        SET r.weight = e.weight, r.predicate = e.predicate, r.description = e.description
+        SET r.weight = coalesce(r.weight, 0) + e.weight,
+            r.predicate = e.predicate,
+            r.description = CASE
+              WHEN e.description IS NULL OR e.description = '' THEN r.description
+              WHEN r.description IS NULL OR r.description = '' THEN e.description
+              ELSE r.description + ' ' + e.description
+            END
         ''',
         edges=edges,
     )

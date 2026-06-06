@@ -9,11 +9,10 @@ load_dotenv()
 from config import CHUNKER_TYPE
 from ocr import runOcrAndDump
 from parser import parseDoc, dumpParsed, loadParsed
-from llmExtract import extractDoc, dumpExtractions
-from kgWriter import writeDoc
+from graphExtract import extractDoc, dumpElements
+from graphBuild import buildGraph
 from embedding import embedDoc
 from entityEmbedding import embedEntities
-from entityAlign import deduplicate
 
 NER_STRATEGY = os.getenv('NER_STRATEGY', 'hybrid').lower()
 if NER_STRATEGY == 'llm':
@@ -21,10 +20,11 @@ if NER_STRATEGY == 'llm':
 else:
     from glinerExtract import extractEntities as extractEntitiesNER, dumpEntities as dumpEntitiesNER
 
+from chunker import dumpChunks
 if CHUNKER_TYPE == 'semantic':
-    from semantic_chunker import chunkDoc, dumpChunks
+    from semantic_chunker import chunkDoc
 else:
-    from chunker import chunkDoc, dumpChunks
+    from chunker import chunkDoc
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCUMENTS = ROOT / 'Documents'
@@ -87,9 +87,9 @@ def ingestOne(source):
 
     dumpEntitiesNER(extractEntitiesNER(docName), docName)
     extractions = extractDoc(docName)
-    dumpExtractions(extractions, docName)
+    dumpElements(extractions, docName)
 
-    writeDoc(docName)
+    buildGraph(docName)
     embedDoc(docName)
 
     relCount = sum(len(r['relationships']) for r in extractions)
@@ -127,8 +127,7 @@ def ingestUploads(payloads):
             results.append({'file': source.name, 'status': 'failed', 'error': str(exc)})
 
     if any(r['status'] == 'published' for r in results):
-        log.info('post-processing: entity embed + dedup')
+        log.info('post-processing: entity embed')
         embedEntities()
-        deduplicate()
 
     return {'results': results}
