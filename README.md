@@ -7,26 +7,28 @@ Gazelle is a hallucination-resistant Retrieval-Augmented Generation (RAG) chatbo
 ## Table of Contents
 
 1. [Architecture Overview](#1-architecture-overview)
-2. [Prerequisites](#2-prerequisites)
-3. [External Models and Datasets](#3-external-models-and-datasets)
-4. [Installation](#4-installation)
-5. [Environment Variables](#5-environment-variables)
-6. [Database Setup](#6-database-setup)
-7. [Ingestion Pipeline](#7-ingestion-pipeline)
-8. [Graph Construction — Two Routes](#8-graph-construction--two-routes)
-9. [Classical NER Subsystem (CRF)](#9-classical-ner-subsystem-crf)
-10. [Graph Traversal and PPR Retrieval](#10-graph-traversal-and-ppr-retrieval)
-11. [Community Detection and Global Arm](#11-community-detection-and-global-arm)
-12. [Query-Focused Summarization](#12-query-focused-summarization)
-13. [Chat API](#13-chat-api)
-14. [Frontend](#14-frontend)
-15. [Access Control](#15-access-control)
-16. [Context Memory](#16-context-memory)
-17. [MuSiQue Benchmark Evaluation](#17-musique-benchmark-evaluation)
-18. [Sensemaking Benchmark (AP News)](#18-sensemaking-benchmark-ap-news)
-19. [Router Training](#19-router-training)
-20. [Project Layout](#20-project-layout)
-21. [Quick Start](#21-quick-start)
+2. [Quick Start](#2-quick-start)
+3. [Prerequisites](#3-prerequisites)
+4. [External Models and Datasets](#4-external-models-and-datasets)
+5. [Installation](#5-installation)
+6. [Environment Variables](#6-environment-variables)
+7. [Database Setup](#7-database-setup)
+8. [Ingestion Pipeline](#8-ingestion-pipeline)
+9. [OCR Preprocessing (Handwriting Detection)](#9-ocr-preprocessing-handwriting-detection)
+10. [Graph Construction — Two Routes](#10-graph-construction--two-routes)
+11. [Classical NER Subsystem (CRF)](#11-classical-ner-subsystem-crf)
+12. [Graph Traversal and PPR Retrieval](#12-graph-traversal-and-ppr-retrieval)
+13. [Community Detection and Global Arm](#13-community-detection-and-global-arm)
+14. [Query-Focused Summarization](#14-query-focused-summarization)
+15. [Chat API](#15-chat-api)
+16. [Frontend](#16-frontend)
+17. [Access Control](#17-access-control)
+18. [Context Memory](#18-context-memory)
+19. [MuSiQue Benchmark Evaluation](#19-musique-benchmark-evaluation)
+20. [Sensemaking Benchmark (AP News)](#20-sensemaking-benchmark-ap-news)
+21. [Router Training](#21-router-training)
+22. [Project Layout](#22-project-layout)
+23. [Testing and Coverage](#23-testing-and-coverage)
 
 ---
 
@@ -91,7 +93,203 @@ FRONTEND (frontend/, React + Vite + Tailwind + Cytoscape.js)
 
 ---
 
-## 2. Prerequisites
+## 2. Quick Start
+
+### Using Make commands (Recommended)
+
+The easiest way to get started. All commands below run from the **project root**.
+
+#### Step 1: Start required services
+
+**Neo4j and Ollama must be running before you proceed.**
+
+**Option A: Using Docker with Make** (simplest and recommended)
+
+```bash
+# Start all required services with one command
+make services-docker
+
+# Services will be available at:
+#   Neo4j:  http://localhost:7474 (user: neo4j, password: your_password)
+#   Ollama: localhost:11434
+
+# Database: SQLite is created automatically at ./gazelle.db
+
+# To stop services later:
+make services-stop
+```
+
+**Option B: Using Docker manually**
+
+```bash
+# Start Neo4j (accessible at http://localhost:7474)
+docker run -d \
+  -p 7687:7687 -p 7474:7474 \
+  -e NEO4J_AUTH=neo4j/your_password \
+  --name gazelle-neo4j \
+  neo4j:5-community
+
+# Start Ollama (keep this terminal open — it serves models on localhost:11434)
+docker run -d \
+  -p 11434:11434 \
+  --gpus=all \
+  --name gazelle-ollama \
+  ollama/ollama
+ollama serve
+```
+
+**Option C: Installed locally**
+
+- **Neo4j**: Download and start from https://neo4j.com/download/ (Community Edition recommended)
+- **Ollama**: Download and start from https://ollama.com/download/
+- **Database**: SQLite is created automatically when you run `make quick-start`
+
+#### Step 2: One-command setup and run
+
+```bash
+make quick-start
+```
+
+This single command:
+- Installs Python and frontend dependencies
+- Initializes SQLite database at `./gazelle.db`
+- Creates default seed users (omar, sara, ahmed, guest)
+- Configures `.env` from `.env.example` (edit it with your credentials)
+
+**Then:**
+
+```bash
+# 3. Place your documents in Documents/ directory
+
+# 4. Run the full ingestion pipeline (OCR → Parse → Chunk → NER → KG → Embed)
+make run-ingestion
+
+# 5. Add entity synonym edges
+make setup-synonyms
+
+# 6. (Optional) Detect communities and generate summaries
+make setup-communities
+
+# 7. Start the API server (in terminal A)
+make run-api
+# API available at http://localhost:8000
+
+# 8. Start the frontend (in terminal B)
+make run-frontend
+# Frontend available at http://localhost:5173
+```
+
+### Alternative: Restore graph from backup (skip full ingestion)
+
+If you have a pre-built graph dump, you can restore it instead of running the full ingestion pipeline:
+
+```bash
+# Restore from a previously saved graph dump
+make graph-restore DUMP=dumps/graph.jsonl
+
+# Then go straight to starting the servers
+make run-api        # Terminal A
+make run-frontend   # Terminal B
+```
+
+To save the current graph for later restoration:
+
+```bash
+make graph-dump
+# Saves to dumps/graph.jsonl
+```
+
+### All make targets at a glance
+
+Run `make help` to see complete documentation. Key targets:
+
+| Target | Purpose |
+|--------|---------|
+| **Setup & Services** | |
+| `make quick-start` | Install deps, setup DB, configure .env |
+| `make services-docker` | Start Neo4j and Ollama via Docker |
+| `make services-stop` | Stop all Docker services |
+| **Pipeline** | |
+| `make setup-ollama` | Download Ollama models |
+| `make run-ingestion` | Run full pipeline (OCR → Parse → Chunk → NER → KG → Embed) |
+| `make setup-synonyms` | Add entity synonym edges |
+| `make setup-communities` | Detect communities and generate summaries (Route 2) |
+| **Graph Backup/Restore** | |
+| `make graph-dump` | Backup current Neo4j graph to JSONL |
+| `make graph-restore DUMP=file.jsonl` | Restore graph from backup (alternative to pipeline) |
+| **Running** | |
+| `make run-api` | Start FastAPI server (http://localhost:8000) |
+| `make run-frontend` | Start Vite dev server (http://localhost:5173) |
+| `make build-frontend` | Build frontend for production |
+| **Testing** | |
+| `make test` | Run all unit tests |
+| `make test-all` | Run all tests with coverage |
+
+### Complete workflow summary
+
+Here's the full end-to-end setup in one place:
+
+```bash
+# Terminal 1: Start services (one-time setup)
+make services-docker
+# Services running: Neo4j, Ollama
+
+# Terminal 2: Setup and configure
+make quick-start
+# This installs everything and prepares the database
+
+# Edit .env with your API keys (OPENROUTER_API_KEY, GROQ_API_KEY, etc.)
+nano .env
+
+# Place your documents in Documents/ directory
+
+# Run the ingestion pipeline
+make run-ingestion
+
+# Add synonym edges and communities (optional)
+make setup-synonyms
+make setup-communities
+
+# Terminal 2 (split or new): Start API server
+make run-api
+# API available at http://localhost:8000
+
+# Terminal 3: Start frontend dev server
+make run-frontend
+# Frontend available at http://localhost:5173
+```
+
+### For returning users: Skip re-processing with graph restore
+
+If you already have a built graph (from a previous run or backup):
+
+```bash
+# Start services
+make services-docker
+
+# Restore the graph instead of re-running the pipeline
+make graph-restore DUMP=dumps/graph.jsonl
+
+# Start the servers
+make run-api       # Terminal 2
+make run-frontend  # Terminal 3
+```
+
+### Troubleshooting
+
+- **"Neo4j connection failed"**: Ensure Neo4j is running and `NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD` are set in `.env`
+  - If using Docker: `make services-docker` starts Neo4j with user `neo4j`, password `your_password`
+- **"gazelle.db not found"**: Run `make setup-db` to create and initialize the SQLite database
+- **"Ollama models not found"**: Run `make setup-ollama` (Ollama must be running)
+- **Port conflicts**: Default ports are 8000 (API), 5173 (frontend), 7687 (Neo4j), 11434 (Ollama)
+  - Change them in `.env` and frontend proxy config if needed
+- **Docker container already exists**: Run `make services-stop` then `make services-docker` to restart cleanly
+- **Can't connect to Docker daemon**: Ensure Docker Desktop is running (Windows/Mac) or Docker daemon is started (Linux)
+- **"Permission denied" on ./gazelle.db**: Ensure the project directory is writable by your user
+
+---
+
+## 3. Prerequisites
 
 ### System requirements
 
@@ -109,13 +307,14 @@ FRONTEND (frontend/, React + Vite + Tailwind + Cytoscape.js)
 |---------|---------|-----------|
 | **Ollama** | OCR model, embedding model, local chat/extract LLMs | https://ollama.com/download |
 | **Neo4j** | Graph database + vector index + fulltext index | https://neo4j.com/download/ |
-| **PostgreSQL** | Users, sessions, chats, messages, memory, audit log | https://www.postgresql.org/download/ |
+
+**Database:** SQLite (built-in, no additional setup required)
 
 Neo4j 5.x is required for the built-in vector index. Community Edition works; no paid plugins are required.
 
 ---
 
-## 3. External Models and Datasets
+## 4. External Models and Datasets
 
 ### 3.1 Ollama models
 
@@ -252,7 +451,7 @@ src/classical_NER/models/crf_wikiann.pkl    # wikiann only
 
 ---
 
-## 4. Installation
+## 5. Installation
 
 ### 4.1 Clone and set up Python environment
 
@@ -285,7 +484,7 @@ cd ..
 
 ---
 
-## 5. Environment Variables
+## 6. Environment Variables
 
 Create a `.env` file in the project root. All variables are read by `src/config.py` at startup.
 
@@ -353,7 +552,7 @@ OCR_PARALLEL_PAGES=1
 
 ---
 
-## 6. Database Setup
+## 7. Database Setup
 
 ### 6.1 Neo4j
 
@@ -382,44 +581,38 @@ Indexes:
   Fulltext: chunk_text     (on Chunk.text)
 ```
 
-### 6.2 PostgreSQL
+### 6.2 SQLite
+
+SQLite is the default database (airgapped build, no external dependencies). The database is automatically created and initialized with default users when you run:
 
 ```bash
-# Create the database
-createdb gazelle
-
-# Run all Alembic migrations (creates all tables)
-alembic upgrade head
+make setup-db
 ```
 
-Tables created: `users`, `user_sessions`, `chats`, `messages`, `chat_memory`, `user_memory`, `message_citations`, `audit_log`.
+This command creates `./gazelle.db` with the following tables:
+- `users` — authenticated user accounts with role and clearance level
+- `user_sessions` — session tokens and timestamps
+- `chats` — conversation records
+- `messages` — individual chat messages
+- `chat_memory` — rolling chat summaries
+- `user_memory` — persistent user preferences and notes
+- `message_citations` — chunk citations for each message
+- `audit_log` — activity audit trail
 
-To bootstrap an admin user (run once from repo root):
+#### Default seed users
 
-```python
-import asyncio, bcrypt, uuid
-import sys; sys.path.insert(0, 'src')
-from db.session import asyncSessionFactory
-from db.models import User
+The database is initialized with these accounts (change passwords on first login):
 
-async def createAdmin():
-    async with asyncSessionFactory() as s:
-        u = User(
-            id=uuid.uuid4(),
-            username='admin',
-            passwordHash=bcrypt.hashpw(b'changeme', bcrypt.gensalt()).decode(),
-            role='admin',
-            clearance='restricted',
-        )
-        s.add(u)
-        await s.commit()
-
-asyncio.run(createAdmin())
-```
+| Username | Role | Clearance | Password |
+|----------|------|-----------|----------|
+| `omar` | Admin | restricted | admin123 |
+| `sara` | Senior Compliance | confidential | compliance123 |
+| `ahmed` | Compliance Analyst | internal | staff123 |
+| `guest` | External | public | guest |
 
 ---
 
-## 7. Ingestion Pipeline
+## 8. Ingestion Pipeline
 
 Place source documents (PDFs, images) in the `Documents/` directory.
 
@@ -498,7 +691,84 @@ python runners/runAll.py Documents/ --skip-embed
 
 ---
 
-## 8. Graph Construction — Two Routes
+## 9. OCR Preprocessing (Handwriting Detection)
+
+**Optional preprocessing step** to improve OCR quality on documents with mixed handwritten and printed text.
+
+### Overview
+
+The preprocessing pipeline detects and removes handwritten regions from documents before OCR, which can improve Qwen3-VL's accuracy on printed text. This is particularly useful for:
+- Scanned official documents with handwritten annotations
+- Forms with handwritten entries mixed with printed fields
+- Documents with margin notes or stamps
+
+### Prerequisites
+
+Download the required datasets for training the handwriting detector:
+
+1. **Mendeley Handwriting Dataset** (primary dataset)
+   - Download from: https://data.mendeley.com/datasets/2h76672znt/1
+   - Extract to a directory on your system (e.g., `datasets/mendeley/`)
+
+2. **RVL-CDIP Test Dataset** (validation dataset)
+   - Download from: https://www.kaggle.com/datasets/pdavpoojan/the-rvlcdip-dataset-test
+   - Extract to a directory on your system (e.g., `datasets/rvl_cdip/`)
+
+### Setup and Training
+
+1. **Install preprocessing dependencies** (if not already installed):
+   ```bash
+   pip install opencv-python scikit-learn  # (already in requirements.txt)
+   ```
+
+2. **Run the preprocessing notebook**:
+   ```bash
+   # Open the notebook and update dataset paths
+   jupyter notebook preprocess_ocr.ipynb
+   ```
+
+3. **Configure dataset paths** in `preprocess_ocr.ipynb`:
+   - Update `MENDELEY_PATH` to point to your Mendeley dataset directory
+   - Update `RVLCDIP_PATH` to point to your RVL-CDIP dataset directory
+   - Run all cells to train the handwriting detector
+
+4. **Enable in the pipeline**:
+   - Set `HANDWRITING_PREPROCESSING=true` in `.env`
+   - Run the full pipeline — handwritten regions will be removed before OCR
+
+### How it works
+
+1. **Region Detection**: Analyzes document images to identify potential handwritten regions
+2. **Filtering**: Removes or masks detected handwritten areas
+3. **Reconstruction**: Preserves document structure while removing noise
+4. **OCR**: Qwen3-VL processes the cleaned document, focusing on printed text
+
+### Configuration
+
+In `.env`:
+```bash
+# Enable/disable handwriting preprocessing
+HANDWRITING_PREPROCESSING=true    # default: false
+
+# Path to trained handwriting detector model (optional)
+HANDWRITING_MODEL_PATH=./models/handwriting_detector.pkl
+```
+
+### Output
+
+Preprocessed documents are saved to `Doc_Out/` with the same structure as regular OCR output:
+- Raw OCR (before preprocessing): stored in pipeline logs if needed
+- Cleaned OCR (after preprocessing): the primary output used for parsing
+
+### Notes
+
+- Preprocessing adds ~30-60 seconds per page depending on image size and GPU availability
+- Disable preprocessing for documents that are purely printed or digital PDFs
+- Re-run training if you add new handwriting samples to your datasets
+
+---
+
+## 10. Graph Construction — Two Routes
 
 Select the route via the `GRAPH_ROUTE` env var (default: `2`). Both routes share the OCR → parse → chunk → embed pipeline.
 
@@ -555,7 +825,7 @@ python graphTraversal/runSynonyms.py 0.85      # explicit threshold
 
 ---
 
-## 9. Classical NER Subsystem (CRF)
+## 11. Classical NER Subsystem (CRF)
 
 A standalone Arabic NER pipeline using a CRF trained on gold-annotated CBE banking documents. This subsystem is in `src/classical_NER/`.
 
@@ -626,7 +896,7 @@ python runners/runNerBenchmark.py
 
 ---
 
-## 10. Graph Traversal and PPR Retrieval
+## 12. Graph Traversal and PPR Retrieval
 
 The `graphTraversal/` subsystem implements **Personalized PageRank (PPR)** over the entity graph, following the HippoRAG architecture. It replaces fixed-depth k-hop traversal with a global random-walk algorithm.
 
@@ -679,7 +949,7 @@ python runSynonyms.py 0.85    # explicit threshold
 
 ---
 
-## 11. Community Detection and Global Arm
+## 13. Community Detection and Global Arm
 
 ### 11.1 Leiden algorithm
 
@@ -727,7 +997,7 @@ python plotCommunities.py
 
 ---
 
-## 12. Query-Focused Summarization
+## 14. Query-Focused Summarization
 
 The global arm answers corpus-wide sensemaking questions using GraphRAG-style map-reduce over community summaries.
 
@@ -768,7 +1038,7 @@ python runners/runRouter.py
 
 ---
 
-## 13. Chat API
+## 15. Chat API
 
 ### 13.1 Start the API server
 
@@ -818,7 +1088,7 @@ The system prompt enforces: cite every claim with `[chunkId]`, refuse with a fix
 
 ---
 
-## 14. Frontend
+## 16. Frontend
 
 ### 14.1 Development server
 
@@ -857,7 +1127,7 @@ npm run build
 
 ---
 
-## 15. Access Control
+## 17. Access Control
 
 Documents are classified by sensitivity level in `src/docAccess.py`. Users carry a `clearance` field set at account creation. Retrieval is automatically filtered — users only receive chunks from documents at or below their clearance.
 
@@ -884,7 +1154,7 @@ Documents not listed default to `'internal'`. The `allowedDocs(userClearance)` f
 
 ---
 
-## 16. Context Memory
+## 18. Context Memory
 
 The memory system has four layers that are assembled into the LLM prompt for each turn.
 
@@ -905,7 +1175,7 @@ The memory system has four layers that are assembled into the LLM prompt for eac
 
 ---
 
-## 17. MuSiQue Benchmark Evaluation
+## 19. MuSiQue Benchmark Evaluation
 
 The `musique/` directory benchmarks the PPR retrieval upgrade against MuSiQue multi-hop QA (gold supporting paragraphs as ground truth).
 
@@ -952,7 +1222,7 @@ Full version log with design decisions in `docs/PROCESS.md`.
 
 ---
 
-## 18. Sensemaking Benchmark (AP News)
+## 20. Sensemaking Benchmark (AP News)
 
 End-to-end evaluation of the global arm against a vector-RAG baseline using Microsoft BenchmarkQED on the AP News corpus.
 
@@ -1001,7 +1271,7 @@ python sensemaking/answerSystems.py <out>/questions.json apnews
 
 ---
 
-## 19. Router Training
+## 21. Router Training
 
 The query router classifier is trained on a synthetic bilingual dataset (English + Arabic, local + global labels).
 
@@ -1030,7 +1300,7 @@ The holdout file `router/holdout_real.jsonl` is a scaffold. Hand-author 80–100
 
 ---
 
-## 20. Project Layout
+## 22. Project Layout
 
 ```
 Gazelle/
@@ -1139,44 +1409,136 @@ Gazelle/
 
 ---
 
-## 21. Quick Start
+## 23. Testing and Coverage
+
+### Running Tests
+
+The project includes unit tests, module integration tests, and end-to-end integration tests.
+
+#### Run all tests with coverage:
 
 ```bash
-# 1. Install Python dependencies
-pip install -r requirements.txt
-
-# 2. Install frontend dependencies
-cd frontend && npm install && cd ..
-
-# 3. Pull required Ollama models
-ollama pull qwen3-vl:8b-instruct-q4_K_M
-ollama pull bge-m3
-ollama pull granite4.1:8b
-
-# 4. Start services (Neo4j and PostgreSQL must already be running)
-ollama serve &
-
-# 5. Configure environment
-cp .env.example .env     # then edit .env with your credentials and API keys
-
-# 6. Create the database and run migrations
-createdb gazelle
-alembic upgrade head
-
-# 7. Place your documents in Documents/ and run ingestion
-python runners/runPipeline.py
-
-# 8. Add entity synonym edges
-python graphTraversal/runSynonyms.py
-
-# 9. (Optional) Detect communities and generate summaries
-python graphTraversal/runCommunities.py
-python runners/runCommunitySummary.py
-
-# 10. Start the API server
-python runners/runApi.py
-
-# 11. Start the frontend dev server
-cd frontend && npm run dev
-# Open http://localhost:5173
+make test-all
 ```
+
+This runs all tests (unit + module + integration) with coverage report and generates an HTML report.
+
+#### Run specific test suites:
+
+```bash
+# Unit tests only
+make test
+
+# Unit tests with coverage report
+make test-cov
+
+# Module integration tests
+make test-modules
+
+# End-to-end integration tests
+make test-integration
+
+# Specific test file
+make test-parser          # Parser tests
+make test-chunker         # Chunker tests
+make test-embedding       # Embedding tests
+make test-semantic        # Semantic chunker tests
+make test-gliner          # GLiNER NER tests
+make test-llm-ner         # LLM NER tests
+make test-config          # Config tests
+```
+
+### Viewing Coverage Reports
+
+After running tests with coverage, an HTML report is generated at:
+
+```
+htmlcov/index.html
+```
+
+#### Open the report in your browser:
+
+**Linux/Mac:**
+```bash
+# After running tests
+open htmlcov/index.html
+# Or use any web browser
+```
+
+**Windows:**
+```bash
+# After running tests
+start htmlcov/index.html
+# Or manually open htmlcov/index.html in your browser
+```
+
+#### Coverage report structure:
+
+```
+htmlcov/
+├── index.html              Main coverage overview
+├── status.json             Machine-readable coverage metrics
+└── [module_name].html      Per-module coverage details
+```
+
+### Understanding Coverage Reports
+
+The HTML report shows:
+
+| Column | Meaning |
+|--------|---------|
+| **Coverage** | Percentage of lines executed during tests |
+| **Statements** | Total lines of code |
+| **Missed** | Lines not executed (uncovered) |
+| **Branches** | Conditional branches (if/else, loops) |
+| **Partial** | Branches with partial coverage |
+
+### Key metrics to watch:
+
+- **Overall coverage**: Goal is 80%+ for critical modules
+- **Missed lines**: Click to see which lines aren't tested
+- **Branch coverage**: Ensure both sides of conditionals are tested
+
+### Example workflow:
+
+```bash
+# 1. Make code changes
+# 2. Run tests with coverage
+make test-all
+
+# 3. View the report
+open htmlcov/index.html
+
+# 4. Identify uncovered code
+# Look for red/pink lines in the HTML report
+
+# 5. Write additional tests for uncovered lines
+# 6. Re-run to verify improvement
+make test-all
+```
+
+### CI/Coverage Integration
+
+Coverage reports can be integrated with CI/CD pipelines:
+
+- **GitHub Actions**: Use `coverage.py` with artifacts
+- **GitLab CI**: Use `coverage` regex to extract metrics
+- **Coverage badges**: Generate and embed in README
+
+Example for GitHub:
+```yaml
+- name: Generate coverage report
+  run: make test-all
+  
+- name: Upload coverage
+  uses: codecov/codecov-action@v3
+  with:
+    files: ./coverage.xml
+```
+
+### Troubleshooting
+
+- **"No coverage data collected"**: Ensure `pytest` and `pytest-cov` are installed (`make install-test`)
+- **"htmlcov directory not found"**: Run tests again with `--cov-report=html` flag
+- **Coverage seems low**: Check if all test suites ran (`make test-all` runs all three: unit, module, integration)
+- **Slow coverage generation**: Large projects can take time; use `make test` for faster unit-test-only coverage
