@@ -5,6 +5,7 @@ import sys
 from config import (
     CHUNKER_TYPE, GRAPH_ROUTE, GRAPH_EXTRACT_BACKEND,
     EXTRACT_DIR, CORPUS_NAME, SYNONYM_THRESHOLD, COMMUNITY_RESOLUTION,
+    NER_STRATEGY,
 )
 
 # Consolidated orchestrator. Each stage is just its standalone per-stage runner
@@ -22,7 +23,7 @@ def runStage(script, *args):
 
 if __name__ == '__main__':
     print("=" * 70)
-    print(f"Gazelle pipeline | Route {GRAPH_ROUTE} | chunker={CHUNKER_TYPE} | extract={EXTRACT_DIR} | corpus={CORPUS_NAME}")
+    print(f"Gazelle pipeline | Route {GRAPH_ROUTE} | chunker={CHUNKER_TYPE} | ner={NER_STRATEGY} | extract={EXTRACT_DIR} | corpus={CORPUS_NAME}")
     print("=" * 70)
 
     # prep (skip-if-exists, fixed folders)
@@ -35,7 +36,10 @@ if __name__ == '__main__':
         runStage("runners/runGraphExtract.py")
         runStage("runners/runGraphBuild.py")
     else:
-        runStage("runners/runGliner.py")
+        if NER_STRATEGY == 'classical':
+            runStage("runners/runNerPipeline.py")
+        else:
+            runStage("runners/runGliner.py")
         runStage("runners/runKgBuild.py")
 
     # post-graph retrieval layers

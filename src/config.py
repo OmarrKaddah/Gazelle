@@ -67,7 +67,7 @@ PARALLEL_CHUNKS = int(os.environ.get('PARALLEL_CHUNKS', '4'))
 CHUNKER_TYPE = os.environ.get('CHUNKER_TYPE', 'semantic').lower() # valid values: "default" (src/chunker.py) or "semantic" (src/semantic_chunker.py)
 
 # Entity extraction (NER)
-NER_STRATEGY = os.environ.get('NER_STRATEGY', 'gliner').lower() # valid values: "gliner" (src/glinerExtract.py) or "llm" (src/llmNER.py)
+NER_STRATEGY = os.environ.get('NER_STRATEGY', 'gliner').lower() # valid values: "gliner" (src/glinerExtract.py), "llm" (src/llmNER.py), or "classical" (runners/runNerPipeline.py)
 
 # Graph construction route — GRAPH_ROUTE is set in the PROJECT SETUP block at the top of this file.
 GRAPH_EXTRACT_BACKEND = os.environ.get('GRAPH_EXTRACT_BACKEND', 'openrouter') # callLLM backend for Route 2 (ollama|groq|openrouter|gemini)
