@@ -67,7 +67,9 @@ def prepareImageForOcr(path: str) -> tuple[str, str | None]:
 def parse_local(path: str) -> str:
     with open(path, "rb") as f:
         b64 = base64.b64encode(f.read()).decode()
+
     response = requests.post(
+
         LLAMA_SERVER_URL,
         json={
             "model": "local",
@@ -89,9 +91,9 @@ def parse_local(path: str) -> str:
 
 
 def parse_ollama(path: str) -> str:
-    with open(path, "rb") as f:
+    with open(path, "rb") as f:       
         b64 = base64.b64encode(f.read()).decode()
-    response = requests.post(
+    response = requests.post(   
         OLLAMA_URL,
         json={
             "model": OLLAMA_VISION_MODEL,
@@ -120,7 +122,7 @@ def ocr(path: str) -> str:
         return parse_local(preparedPath)
     finally:
         if tempPath is not None and tempPath != path:
-            os.unlink(tempPath)
+            os.unlink(tempPath)         
 
 
 def renderAndOcr(doc: pypdfium2.PdfDocument, scale: int, i: int) -> tuple[int, str]:

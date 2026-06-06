@@ -21,15 +21,19 @@ else:
     from glinerExtract import extractEntities as extractEntitiesNER, dumpEntities as dumpEntitiesNER
 
 from chunker import dumpChunks
+
 if CHUNKER_TYPE == 'semantic':
     from semantic_chunker import chunkDoc
+
 else:
     from chunker import chunkDoc
+
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCUMENTS = ROOT / 'Documents'
 DOC_OUT = ROOT / 'Doc_Out'
 OUTPUT = ROOT / 'output'
+
 
 IMAGE_EXT = {'.jpg', '.jpeg', '.png', '.tif', '.tiff'}
 PDF_EXT = {'.pdf'}
@@ -40,19 +44,24 @@ SUPPORTED_EXT = IMAGE_EXT | PDF_EXT | DOCX_EXT | TEXT_EXT
 log = logging.getLogger('gazelle.ingest')
 
 
+
 def saveUpload(filename, data):
     DOCUMENTS.mkdir(exist_ok=True)
+
     dest = DOCUMENTS / Path(filename).name
+
     dest.write_bytes(data)
+
     log.info('saved upload: %s (%d bytes)', dest.name, len(data))
     return dest
 
 
-def docNameFor(source):
+def docNameFor(source):             
+
     return source.stem.lower()
 
 
-def writeSidecar(stem, pages):
+def writeSidecar(stem, pages):           
     OUTPUT.mkdir(exist_ok=True)
     (OUTPUT / f'{stem}.json').write_text(
         json.dumps(pages, ensure_ascii=False, indent=2), encoding='utf-8'

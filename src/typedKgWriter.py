@@ -11,14 +11,17 @@ def loadChunks(docName):
 
 
 def loadExtractions(docName):
+
     return json.loads(Path(f'extractions/{docName}.json').read_text(encoding='utf-8'))
 
 
 def isValidEntity(entity):
+
     return entity.get('canonicalId') and entity.get('type') in ENTITIES
 
 
 def buildTypeMap(extractions):
+    
     typeMap = {}
     for entry in extractions:
         for entity in entry['entities']:

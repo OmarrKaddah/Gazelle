@@ -11,7 +11,9 @@ def chat(messages, model=None, temperature=0, jsonOnly=False):
         'messages': messages,
         'temperature': temperature,
     }
+
     if jsonOnly:
+
         payload['response_format'] = {'type': 'json_object'}
     resp = _session.post(
         OPENROUTER_URL,
@@ -22,6 +24,6 @@ def chat(messages, model=None, temperature=0, jsonOnly=False):
         json=payload,
         timeout=120,
     )
-    if resp.status_code != 200:
+    if resp.status_code != 200:         
         raise RuntimeError(f'openrouter {resp.status_code}: {resp.text[:300]}')
     return resp.json()['choices'][0]['message']['content']

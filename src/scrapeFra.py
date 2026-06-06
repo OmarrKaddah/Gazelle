@@ -19,6 +19,7 @@ HEADERS = {'User-Agent': 'Mozilla/5.0 (Gazelle research crawler)'}
 def fetchHtml(url):
     resp = requests.get(url, headers=HEADERS, timeout=60)
     resp.raise_for_status()
+    
     return resp.text
 
 

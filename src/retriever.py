@@ -52,11 +52,13 @@ def vectorSearch(query, k, allowed):
             results = session.execute_read(vectorQuery, emb, k, allowed)
     print(f"[retriever] vectorSearch returned {len(results)} chunks", flush=True)
     for r in results:
+
         r['source'] = 'vector'
     return results
 
 
 def fusionSearch(query, k, allowed):
+
     emb = embedQuery(query)
     with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
         with driver.session(database=NEO4J_DB) as session:
@@ -68,11 +70,13 @@ def fusionSearch(query, k, allowed):
 def hybridRetrieve(query, k, clearance):
     allowed = allowedDocs(clearance)
     if not allowed:
+
         return {'seeds': [], 'chunks': [], 'pathEdges': []}
     fusionChunks = fusionSearch(query, k, allowed)
     graphResult = getLocalIndex().retrieve(query, k=k, allowedDocs=allowed)
     for c in graphResult['chunks']:
         c['source'] = 'graph'
+
     scores = {}
     items = {}
     for rank, c in enumerate(fusionChunks):
@@ -80,7 +84,7 @@ def hybridRetrieve(query, k, clearance):
         scores[cid] = scores.get(cid, 0) + 1.0 / (RRF_K + rank + 1)
         items[cid] = c
     for rank, c in enumerate(graphResult['chunks']):
-        cid = c['chunkId']
+        cid = c['chunkId']             
         scores[cid] = scores.get(cid, 0) + 1.0 / (RRF_K + rank + 1)
         if cid not in items:
             items[cid] = c
@@ -93,24 +97,27 @@ def graphRetrieve(query, k, clearance):
     # Local arm: PPR over the RELATED + SYNONYM entity graph (warm LocalIndex singleton).
     # Returns chunks (clearance-filtered) plus provenance (seeds + path edges) for the UI.
     allowed = allowedDocs(clearance)
-    if not allowed:
+    if not allowed:      
         return {'seeds': [], 'chunks': [], 'pathEdges': []}
     result = getLocalIndex().retrieve(query, k=k, allowedDocs=allowed)
-    for c in result['chunks']:
+    for c in result['chunks']:   
         c['source'] = 'graph'
     return result
 
 
 def retrieve(query, mode='vector', k=5, clearance='public'):
     allowed = allowedDocs(clearance)
+             
     if not allowed:
         return []
-    if mode == 'vector':
+    if mode == 'vector':        
         return vectorSearch(query, k, allowed)
-    if mode == 'fusion':
+    if mode == 'fusion':       
         return fusionSearch(query, k, allowed)
-    if mode == 'graph':
+    
+    if mode == 'graph':         
         return graphRetrieve(query, k, clearance)['chunks']
     if mode == 'hybrid':
         return hybridRetrieve(query, k, clearance)['chunks']
+    
     return []

@@ -11,8 +11,12 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def buildSnippet(strategy, docName):
+
+
     if strategy == 'llm':
+
         entityModule = 'llmNER'
+
     else:
         entityModule = 'glinerExtract'
 
@@ -44,7 +48,9 @@ print(json.dumps({{
 """
 
 
+
 def runStrategy(strategy, docName, env):
+    
     snippet = buildSnippet(strategy, docName)
     completed = subprocess.run(
         [sys.executable, '-c', snippet],

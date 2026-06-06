@@ -69,5 +69,6 @@ def chunkDoc(elements: List[ParsedElement], breakpoint_threshold_type: str = 'pe
                 accessLevel=elem.accessLevel,
             ))
             idx += 1
+            
 
     return chunks

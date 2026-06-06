@@ -10,11 +10,13 @@ from embedding import embedQuery
 
 SYNONYM_WEIGHT = 1.0
 ALPHA = 0.15
+
 SEED_TOPK = 5
 EPS = 1e-8
 
 
 def driver():
+
     return GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
 
 
@@ -32,6 +34,7 @@ def ppr(adjacency, seedVector, alpha=ALPHA, nIter=100, tol=1e-9):
         if np.linalg.norm(rNext - r, 1) < tol:
             return rNext
         r = rNext
+
     return r
 
 
@@ -77,6 +80,7 @@ class LocalIndex:
             data.extend((w, w))
 
         for r in related:
+
             addEdge(r['s'], r['t'], float(r['w'] or 1.0))
         for r in synonym:
             addEdge(r['s'], r['t'], SYNONYM_WEIGHT)
@@ -121,8 +125,10 @@ class LocalIndex:
         scores = ppr(self.adjacency, seedVec)
         chunkScore = defaultdict(float)
         chunkContribs = defaultdict(list)
+
         for i in np.where(scores > EPS)[0]:
             eid = self.idxToId[i]
+
             sc = float(scores[i])
             for cid in self.entityChunks.get(eid, ()):
                 if allowed is not None and self.chunkDoc.get(cid) not in allowed:
@@ -135,6 +141,7 @@ class LocalIndex:
         involved = {s[0] for s in seeds}
         chunks = []
         for cid, score in ranked:
+
             contribs = sorted(chunkContribs[cid], key=lambda x: -x[2])[:3]
             involved.update(e for e, _, _ in contribs)
             m = meta.get(cid, {})
@@ -152,6 +159,7 @@ class LocalIndex:
     def chunkMeta(self, chunkIds):
         if not chunkIds:
             return {}
+        
         with driver() as d, d.session() as s:
             rows = list(s.run(
                 'UNWIND $ids AS cid MATCH (c:Chunk {chunkId: cid}) '
@@ -160,6 +168,7 @@ class LocalIndex:
         return {r['chunkId']: dict(r) for r in rows}
 
     def pathEdges(self, entityIds):
+
         if not entityIds:
             return []
         with driver() as d, d.session() as s:
@@ -177,13 +186,14 @@ _lock = threading.Lock()
 def getLocalIndex():
     global _index
     if _index is None:
+
         with _lock:
             if _index is None:
                 _index = LocalIndex()
     return _index
 
 
-def reloadLocalIndex():
+def reloadLocalIndex():         
     global _index
     with _lock:
         _index = LocalIndex()

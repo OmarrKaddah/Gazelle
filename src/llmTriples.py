@@ -57,6 +57,9 @@ def buildBatchPrompt(passages):
 
 def callLLM(prompt, backend='ollama'):
     cfg = BACKENDS[backend]
+
+
+    
     payload = {
         'model': cfg['model'],
         'messages': [{'role': 'user', 'content': prompt}],

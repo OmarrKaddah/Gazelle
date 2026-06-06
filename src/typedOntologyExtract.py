@@ -15,7 +15,7 @@ load_dotenv()
 OLLAMA_URL = os.getenv('OLLAMA_URL', 'http://localhost:11434/v1/chat/completions')
 OLLAMA_TEXT_MODEL = os.getenv('OLLAMA_TEXT_MODEL', 'qwen2.5:72b-instruct-q4_K_M')
 PARALLEL_CHUNKS = int(os.getenv('OLLAMA_NUM_PARALLEL', '4'))
-
+OLLAMA_EXTRACT_MODEL = os.getenv('OLLAMA_EXTRACT_MODEL', OLLAMA_TEXT_MODEL)
 
 def slugify(text):
     return re.sub(r'\s+', '-', text.strip()).lower()
@@ -64,6 +64,7 @@ def canonicalizeEntities(rawEntities):
 
 
 def buildRelationshipSpec():
+     
     lines = [
         f"- {name}: {'|'.join(subjects)} -> {'|'.join(objects)}"
         for name, (subjects, objects) in RELATIONSHIPS.items()
@@ -72,9 +73,10 @@ def buildRelationshipSpec():
 
 
 def formatEntitiesForPrompt(entities):
+
     return "\n".join(
         f"- {e['canonicalId']} ({e['type']}) = {e['canonicalName']}"
-        for e in entities
+        for e in entities     
     )
 
 
@@ -103,7 +105,7 @@ OUTPUT — strictly this JSON shape, nothing else:
 
 TEXT:
 {text}
-"""
+"""            
 
 
 def buildPrompt(chunkText, entities):
@@ -112,6 +114,7 @@ def buildPrompt(chunkText, entities):
         entities=formatEntitiesForPrompt(entities) if entities else "(none)",
         text=chunkText,
     )
+
 
 
 def callOllama(prompt):
@@ -143,12 +146,13 @@ def stripChunkIds(entity):
 
 def extractDoc(docName):
     chunks = loadChunks(docName)
-    rawGliner = loadGlinerRaw(docName)
+    rawGliner = loadGlinerRaw(docName)       
+    
     canonical = canonicalizeEntities(rawGliner)
 
     entitiesByChunk = {}
     for ent in canonical:
-        for cid in ent['chunkIds']:
+        for cid in ent['chunkIds']:          
             entitiesByChunk.setdefault(cid, []).append(ent)
 
     results: list = [None] * len(chunks)
@@ -165,10 +169,13 @@ def extractDoc(docName):
     with ThreadPoolExecutor(max_workers=PARALLEL_CHUNKS) as pool:
         futures = {pool.submit(processChunk, i, c): i for i, c in enumerate(chunks)}
         done = 0
+               
         for fut in as_completed(futures):
             i, result = fut.result()
+                   
             results[i] = result
             done += 1
+                    
             print(
                 f"[{done}/{len(chunks)}] {chunks[i]['chunkId']}: "
                 f"{len(result['entities'])} ents, {len(result['relationships'])} rels",
@@ -178,7 +185,8 @@ def extractDoc(docName):
 
 
 def dumpExtractions(results, docName):
-    Path('extractions').mkdir(exist_ok=True)
+      
+    Path('extractions').mkdir(exist_ok=True)         
     Path(f'extractions/{docName}.json').write_text(
         json.dumps(results, ensure_ascii=False, indent=2),
         encoding='utf-8',
