@@ -11,6 +11,7 @@ import { useAuth } from './hooks/useAuth';
 import { ROLES, isAdmin, defaultAreaForUser } from './lib/roles';
 
 const VIEWS = { CHAT: 'chat', GRAPH: 'graph', PIPELINE: 'pipeline' };
+const AREAS = { MAIN: 'main', ADMIN: 'admin' };
 const SIDEBAR_KEY = 'gazelle.sidebar.open';
 
 export default function App() {

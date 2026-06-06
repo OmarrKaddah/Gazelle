@@ -5,13 +5,7 @@ import networkx as nx
 from leiden import leiden, modularity
 from clusterMetrics import nmi
 
-# Tier-1 algorithm validation against ground-truth communities, measured by NMI.
-# Three benchmarks:
-#   LFR      — synthetic, planted communities, swept over the mixing parameter mu.
-#   football — 115 college teams, 12 conferences = ground truth.
-#   email-Eu — 1005 people, 42 departments = ground truth.
-# networkx Louvain is the reference baseline throughout. networkx is used only to
-# build/generate graphs and as that baseline; the algorithm under test is ours.
+
 
 
 def adjacencyOf(G):
@@ -31,11 +25,9 @@ def labelsFromAttribute(G, attr):
     return [ids.setdefault(frozenset(G.nodes[u][attr]), len(ids)) for u in G.nodes]
 
 
-# ── LFR: NMI vs mu, averaged over realizations ───────────────────
 
 def lfrGraph(mu, seed):
-    # max_community is capped so no single community swallows the graph, and the
-    # degree is high enough that communities are dense and detectable.
+
     try:
         G = nx.LFR_benchmark_graph(
             n=500, tau1=3, tau2=1.5, mu=mu,
@@ -68,11 +60,10 @@ def runLFR(reps=5):
         print(f'  {mu:>5} {cell(ours):>16} {cell(louvain):>16} {len(ours):>5}', flush=True)
 
 
-# ── real-world labeled graphs ────────────────────────────────────
 
 def footballGraph():
     G = nx.read_gml('datasets/football.gml', label='id')
-    truth = [G.nodes[u]['value'] for u in G.nodes]   # conference id
+    truth = [G.nodes[u]['value'] for u in G.nodes]   
     return G, truth
 
 
@@ -103,12 +94,7 @@ def evaluate(name, G, truth):
     )
 
 
-# ── Leiden vs Louvain: the connected-communities guarantee ───────
-# NMI ties at the ceiling on easy graphs, so it doesn't show Leiden's real
-# advantage. The advantage is structural: Louvain can output communities that
-# are internally disconnected; Leiden's refinement makes that impossible. We
-# measure the defect directly — what fraction of each method's communities are
-# disconnected — plus modularity and runtime, on graphs large enough to expose it.
+
 
 def communitiesFromLabels(labels):
     groups = {}

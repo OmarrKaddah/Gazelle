@@ -2,7 +2,7 @@ from neo4j import GraphDatabase
 from embedding import embedQuery
 from docAccess import allowedDocs
 from localRetrieve import getLocalIndex
-from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, RRF_K, OVERFETCH
+from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, NEO4J_DB, RRF_K, OVERFETCH
 
 
 def vectorQuery(tx, queryEmbedding, k, allowed):
