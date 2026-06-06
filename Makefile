@@ -3,7 +3,7 @@ PIP ?= pip
 ALEMBIC ?= alembic
 NPM ?= npm
 
-.PHONY: help install install-frontend install-test migrate upgrade downgrade revision current history run-api run-frontend build-frontend py-compile eval test test-parser test-chunker test-embedding test-semantic test-gliner test-llm-ner test-config test-cov test-modules test-modules-parser test-modules-ner test-modules-embedding test-integration test-all clean
+.PHONY: help install install-frontend install-test migrate upgrade downgrade revision current history run-api run-frontend build-frontend py-compile eval test test-parser test-chunker test-embedding test-semantic test-gliner test-llm-ner test-config test-classical-ner test-cov test-modules test-modules-parser test-modules-ner test-modules-embedding test-modules-classical-ner test-integration test-all clean
 
 help:
 	@echo Available targets:
@@ -27,11 +27,13 @@ help:
 	@echo   test-gliner      Run GLiNER extraction unit tests only
 	@echo   test-llm-ner     Run LLM NER unit tests only
 	@echo   test-config      Run configuration unit tests only
+	@echo   test-classical-ner Run classical NER unit tests only
 	@echo   test-cov         Run tests with coverage report
 	@echo   test-modules     Run all module integration tests
 	@echo   test-modules-parser    Run parser-chunker integration tests only
 	@echo   test-modules-ner       Run NER pipeline integration tests only
 	@echo   test-modules-embedding Run embedding pipeline integration tests only
+	@echo   test-modules-classical-ner Run classical NER pipeline module tests only
 	@echo   test-integration Run all integration (end-to-end) tests
 	@echo   test-all         Run all tests (unit + module + integration) with coverage
 	@echo   eval             Run the retrieval evaluation harness
@@ -97,6 +99,9 @@ test-llm-ner:
 test-config:
 	$(PYTHON) -m pytest tests/unit-tests/test_config.py -v
 
+test-classical-ner:
+	$(PYTHON) -m pytest tests/unit-tests/test_classical_ner.py -v
+
 test-cov:
 	$(PYTHON) -m pytest tests/unit-tests --cov=src --cov-report=html --cov-report=term-missing
 
@@ -111,6 +116,9 @@ test-modules-ner:
 
 test-modules-embedding:
 	$(PYTHON) -m pytest tests/module-tests/test_embedding_pipeline_integration.py -v
+
+test-modules-classical-ner:
+	$(PYTHON) -m pytest tests/module-tests/test_classical_ner_pipeline.py -v
 
 test-integration:
 	$(PYTHON) -m pytest tests/integration-tests -v
