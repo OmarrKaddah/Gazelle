@@ -1,651 +1,1156 @@
-# Gazelle — ADIB Compliance RAG
+# Gazelle — Graph-Grounded RAG for Banking Compliance
 
-A graph-grounded, hallucination-resistant RAG system for Arabic banking and finance compliance documents. Ingests scanned regulatory PDFs and Word documents, extracts a knowledge graph plus vector embeddings, serves a streaming chat UI with citations, role-based access control, PostgreSQL-backed chat persistence, and a graph explorer.
-
----
-
-## Pipeline at a glance
-
-```
-Documents (.pdf, .docx, image)
-    │
-    ▼
-ocr.py            ─► Doc_Out/{doc}.md            human-readable markdown
-                  ─► output/{doc}.json           per-page sidecar
-    │
-    ▼
-parser.py         ─► parsed/{doc}.json           structured ParsedElement[]
-    │                                            (heading | paragraph | table | list)
-    ▼
-chunker.py        ─► chunks/{doc}.json           token-budgeted chunks (BGE-M3 tokenizer)
-    │                                            with sectionPath, pages, accessLevel
-    │
-    ├── glinerExtract.py  ─► extractions/{doc}_entities.json   raw GLiNER spans
-    │
-    └── llmExtract.py     ─► extractions/{doc}.json            canonical entities
-                                                                + LLM-extracted relationships
-    │
-    ▼
-kgWriter.py       ─► Neo4j: (:Document)-(:Chunk)-(:Entity)-{predicate}-(:Entity)
-    │
-    ▼
-embedding.py      ─► Neo4j: Chunk.embedding (BGE-M3 dense, 1024-dim)
-                    + chunk_text fulltext index for hybrid search
-    │
-    ▼
-retriever.py      ─► three modes (vector | hybrid | graph), filtered by user clearance
-    │
-    ▼
-chatApi.py        ─► FastAPI: /api/login, /api/chat (SSE streaming), /api/graph, /api/info
-    │
-    ▼
-frontend/         ─► React + Tailwind: chat with citations, graph explorer, RBAC login
-```
-
+Gazelle is a hallucination-resistant Retrieval-Augmented Generation (RAG) chatbot for Arabic banking compliance documents, built for Central Bank of Egypt (CBE) regulatory material at ADIB. It answers compliance questions with chunk-level citations grounded in a hybrid vector + knowledge-graph retrieval pipeline. Every answer traces back to a specific source document, page, and chunk — the system refuses to answer rather than fabricate.
 
 ---
 
-## Memory Architecture
+## Table of Contents
 
-Gazelle separates conversational memory into two clearly-scoped layers so
-follow-up questions work, user preferences carry across chats, and every
-remembered fact is auditable.
+1. [Architecture Overview](#1-architecture-overview)
+2. [Prerequisites](#2-prerequisites)
+3. [External Models and Datasets](#3-external-models-and-datasets)
+4. [Installation](#4-installation)
+5. [Environment Variables](#5-environment-variables)
+6. [Database Setup](#6-database-setup)
+7. [Ingestion Pipeline](#7-ingestion-pipeline)
+8. [Graph Construction — Two Routes](#8-graph-construction--two-routes)
+9. [Classical NER Subsystem (CRF)](#9-classical-ner-subsystem-crf)
+10. [Graph Traversal and PPR Retrieval](#10-graph-traversal-and-ppr-retrieval)
+11. [Community Detection and Global Arm](#11-community-detection-and-global-arm)
+12. [Query-Focused Summarization](#12-query-focused-summarization)
+13. [Chat API](#13-chat-api)
+14. [Frontend](#14-frontend)
+15. [Access Control](#15-access-control)
+16. [Context Memory](#16-context-memory)
+17. [MuSiQue Benchmark Evaluation](#17-musique-benchmark-evaluation)
+18. [Sensemaking Benchmark (AP News)](#18-sensemaking-benchmark-ap-news)
+19. [Router Training](#19-router-training)
+20. [Project Layout](#20-project-layout)
+21. [Quick Start](#21-quick-start)
 
-### The problem this fixes
+---
 
-The original system wrote to `chat_memory` and `user_memory` on every turn
-but **never read from them during inference**. Every chat call was
-stateless, so multi-turn questions like *"and what about article 5?"*
-could not resolve against prior turns. The "summary" field was rewritten
-on every turn with just the latest exchange, and the "extracted entities"
-field actually held chunk citation IDs under a misleading name.
+## 1. Architecture Overview
 
-### What changed
+```
+Documents/ (Arabic PDFs / scanned images)
+       |
+       v
+src/ocr.py          --> Doc_Out/*.md          (Qwen3-VL OCR, Arabic-aware)
+       |
+       v
+src/parser.py       --> parsed/*.json         (structure extraction: sections, articles)
+       |
+       v
+src/chunker.py  or  --> chunks/*.json         (token-bounded, section-aware chunks)
+src/semantic_chunker.py
+       |
+       +---> src/embedding.py                 (BGE-M3 --> Neo4j vector index)
+       |
+       +---> src/glinerExtract.py             --> extractions/*_entities.json
+       |          (GLiNER Arabic NER)
+       |                                         Route 1 (classical baseline)
+       |     -- OR --
+       |
+       +---> src/graphExtract.py             --> extractions/<EXTRACT_DIR>/*_graph.json
+       |          (LLM entities + relationships) Route 2 (deployed)
+       |
+       +---> src/kgBuild.py   (Route 1)      --> Neo4j: Entity + COOCCURS_WITH
+       |     src/graphBuild.py (Route 2)     --> Neo4j: Entity + RELATED{predicate,description}
+       |
+       +---> src/entityEmbedding.py          --> BGE-M3 embeddings on canonical entity names
+       +---> graphTraversal/synonyms.py      --> SYNONYM edges (cosine deduplication)
 
-- `message_citations` — new table. Every assistant answer now stores its
-  cited chunks with rank and similarity score, indexed per message.
-- `chat_memory` — extended with `summaryTokens` and
-  `lastSummarizedMessageId`. The summary is now an LLM-written rolling
-  recap of older turns, produced by a debounced background task. The
-  watermark column makes the summariser incremental, not quadratic.
-- `user_memory` — extended with `category`
-  (`preference | instruction | profile | domain`), `source`
-  (`explicit | promoted | inferred`), and `evidenceChatId`. Long-term
-  preferences are now consumed on every chat turn and carry a full
-  provenance trail.
-- `src/memory/` — new module with three responsibilities:
-  - `assembler.py` packs the LLM prompt with strict per-layer token
-    budgets in a canonical order.
-  - `summarizer.py` updates the chat summary asynchronously, only when
-    enough new turns or tokens have accumulated, with PII redaction in
-    the prompt.
-  - `promoter.py` lifts stable user statements (e.g. *"always answer in
-    Arabic"*) into `user_memory` from a small regex allowlist, with a
-    PII gate that refuses any text containing 10+ digit runs.
-- `src/chatApi.py` — the chat endpoint now loads user memory, chat
-  summary, and the last 4 messages, passes them to the assembler, and
-  writes citations synchronously while scheduling the summariser and
-  promoter as background tasks.
+RETRIEVAL (src/retriever.py)
+   vector  --> Neo4j vector index (chunk_embedding)
+   hybrid  --> vector + fulltext, RRF fused
+   graph   --> entity seed lookup --> Personalized PageRank --> scored chunks
 
-### Setup
+GLOBAL ARM (for sensemaking / corpus-wide queries)
+   graphTraversal/leiden.py    --> Leiden community detection over entity graph
+   src/community.py            --> persist hierarchy to Neo4j
+   src/communitySummary.py     --> LLM report per community
+   src/globalSearch.py         --> map-reduce over community summaries
 
-The migration applies automatically on the next startup:
+QUERY ROUTING (src/router.py)
+   local  --> specific fact/entity --> PPR retrieval
+   global --> themes/trends/comparisons --> community map-reduce
+
+CHAT API (src/chatApi.py, FastAPI)
+   POST /api/chat   --> retrieve chunks --> stream LLM answer with [chunkId] citations
+   GET  /api/graph  --> Neo4j entity/edge query for the graph explorer
+   Auth: bearer token, SHA-256 hashed in PostgreSQL
+
+FRONTEND (frontend/, React + Vite + Tailwind + Cytoscape.js)
+   Chat UI with streaming, citation display, chat history
+   Graph Explorer: Cytoscape.js force layout, entity search, hop expansion
+```
+
+---
+
+## 2. Prerequisites
+
+### System requirements
+
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| Python | 3.10 | 3.12 |
+| Node.js | 18 | 20+ |
+| RAM | 16 GB | 32 GB+ |
+| GPU VRAM | 8 GB (GLiNER + small LLM) | 24 GB+ (70B LLMs) |
+| Storage | 20 GB | 50 GB+ |
+
+### Required services
+
+| Service | Purpose | Reference |
+|---------|---------|-----------|
+| **Ollama** | OCR model, embedding model, local chat/extract LLMs | https://ollama.com/download |
+| **Neo4j** | Graph database + vector index + fulltext index | https://neo4j.com/download/ |
+| **PostgreSQL** | Users, sessions, chats, messages, memory, audit log | https://www.postgresql.org/download/ |
+
+Neo4j 5.x is required for the built-in vector index. Community Edition works; no paid plugins are required.
+
+---
+
+## 3. External Models and Datasets
+
+### 3.1 Ollama models
+
+Install Ollama, then pull the required models:
 
 ```bash
-alembic upgrade head
+# OCR — vision-language model for Arabic PDFs (required)
+ollama pull qwen3-vl:8b-instruct-q4_K_M
+
+# Embedding — multilingual, handles Arabic + English (required)
+ollama pull bge-m3
+
+# Chat / local LLM (choose one)
+ollama pull granite4.1:8b          # default, lighter
+ollama pull llama3.1:8b            # alternative
+ollama pull qwen2.5:72b-instruct-q4_K_M  # best quality, needs ~45 GB VRAM
 ```
 
-This adds the new table and columns and is fully reversible via
-`alembic downgrade -1`.
+### 3.2 HuggingFace models
 
-### Verifying the fix
+These download automatically on first use via the `transformers` and `gliner` libraries. To pre-download:
+
+**BGE-M3 embedding model** (~2.2 GB)
+```bash
+# Reference: https://huggingface.co/BAAI/bge-m3
+python -c "from transformers import AutoTokenizer; AutoTokenizer.from_pretrained('BAAI/bge-m3')"
+```
+
+**GLiNER Arabic NER model** (~300 MB)
+```bash
+# Arabic-specific (recommended for Arabic-only documents)
+# Reference: https://huggingface.co/NAMAA-Space/gliner_arabic-v2.1
+python -c "from gliner import GLiNER; GLiNER.from_pretrained('NAMAA-Space/gliner_arabic-v2.1')"
+
+# Multilingual alternative (mixed Arabic/English documents)
+# Reference: https://huggingface.co/urchade/gliner_multi-v2.1
+python -c "from gliner import GLiNER; GLiNER.from_pretrained('urchade/gliner_multi-v2.1')"
+```
+
+**CAMeL Tools Arabic POS tagger** (required for Classical CRF NER only)
+```bash
+pip install camel-tools
+# Download the CALIMA-MSA-r13 morphology database
+camel_data -i morphology-db-msa-r13
+# Reference: https://github.com/CAMeL-Lab/camel_tools
+```
+
+### 3.3 Datasets
+
+#### MuSiQue — multi-hop QA benchmark (required for PPR evaluation)
+
+Download from: https://github.com/stonybrooknlp/musique
+
+Place the files at:
+```
+musique/data/musique_ans_v1.0_dev.jsonl
+musique/data/musique_ans_v1.0_train.jsonl
+```
+
+#### WikiANN Arabic NER (optional — for CRF training augmentation)
+
+WikiANN is downloaded automatically from HuggingFace by the converter script. Run from the `src/classical_NER/` directory:
 
 ```bash
-python test_memory.py
+cd src/classical_NER
+
+# Install the datasets library if not already present
+pip install datasets
+
+# Convert the train split
+python convertWikiann.py train wikiann_train
+# Outputs:
+#   ../../chunks/wikiann_train.json
+#   annotations/wikiann_base.json
+#   annotations/gold_wikiann_train.json
+
+# Convert the test split
+python convertWikiann.py test wikiann_test
+# Outputs:
+#   ../../chunks/wikiann_test.json
+#   annotations/gold_wikiann_test.json
 ```
 
-The script runs 23 checks against your live PostgreSQL covering: the
-promoter regex allowlist, the PII gate, the explicit-wins guarantee,
-top-k user memory filtering, recent-message ordering, prompt assembly
-order and structure, citation roundtrip, cascade-delete behaviour, and
-chat-memory watermark persistence. All 23 are expected to pass.
+Reference: https://huggingface.co/datasets/unimelb-nlp/wikiann
 
-For deeper background see `docs/MEMORY_ARCHITECTURE.md` (the design) and
-`docs/DESIGN_RATIONALE.md` (why this design, and what alternatives were
-considered and rejected).
+#### ANERCorp Arabic NER (optional — for CRF training augmentation)
 
-### Files ignored on this branch
-
-To keep the repository clean, the following are excluded via
-`.gitignore`:
-
-- Pipeline-derived data: `Doc_Out/`, `output/`, `parsed/`, `chunks/`,
-  `extractions/`
-- Source corpus: `Documents/` (potentially confidential)
-- Local PostgreSQL data directory: `.pgdata/`
-- Editor / agent session caches: `.claude/`
-- Build outputs: `frontend/dist/`, `node_modules/`
-- Local developer helpers: `RUN.bat`, `INSPECT.bat`, `MIGRATE.bat`,
-  `bootstrap.py`, `inspect_memory.py`, PowerShell convenience scripts
-
-
-<<<<<<< HEAD
-=======
----
-
-## Admin Document Publishing
-
-A role-gated admin interface for uploading new source documents and ingesting
-them into the **live** knowledge graph **incrementally** — new documents,
-entities, and relationships are added without deleting or rebuilding the
-existing graph.
-
-### Frontend (Admin console)
-
-- Users with the `Admin` role are redirected to a dedicated **Admin Console**
-  on login; everyone else lands on the normal chat app. Role logic is
-  centralized in `frontend/src/lib/roles.js` and enforced by
-  `frontend/src/components/RequireRole.jsx`.
-- `frontend/src/components/AdminPage.jsx` — drag-and-drop upload UI, selected
-  file list, and a **Publish** button wired to the real backend with per-file
-  success/error reporting. A **Chat with Gazelle** button switches to the chat
-  UI; the sidebar gains an **Admin Console** item to return.
-- `frontend/src/api/admin.js` — multipart upload to the publish endpoint.
-- Modified: `App.jsx` (top-level area routing + admin login redirect),
-  `Sidebar.jsx` (admin-only nav item), `Icons.jsx` (upload / file icons).
-
-### Backend (publish endpoint + incremental ingestion)
-
-- `POST /api/admin/documents/publish` (`src/chatApi.py`) — multipart upload,
-  protected by the new `requireAdmin` dependency in `src/auth.py`
-  (**server-side** role enforcement, not just the UI). Saves files to
-  `Documents/`, runs ingestion off the event loop, and writes an audit log.
-- `src/ingest.py` — the incremental orchestrator. Runs the existing pipeline
-  stages per uploaded document and writes to Neo4j with the **MERGE-based**
-  writer (`kgWriter.writeDoc`) — **no `clearDb`**, so existing graph data is
-  preserved. Existing entity nodes are reused; relationships and aliases are
-  de-duplicated. The global entity-embed and `deduplicate()` passes run once at
-  the end so new entities link into the existing graph.
-- `src/docConvert.py` — no-OCR readers: digital PDFs are read via their text
-  layer (`pypdf`), Word via paragraph/table extraction. Only images and scanned
-  PDFs (no text layer) fall back to the OCR vision model. Every path produces
-  the same `output/{doc}.json` sidecar the parser consumes.
-
-### Supported upload types
-
-| Type            | Ingestion path              | Needs vision model? |
-| --------------- | --------------------------- | ------------------- |
-| Digital PDF     | text layer via `pypdf`      | no                  |
-| Scanned PDF     | OCR fallback                | yes                 |
-| Word (`.docx`)  | paragraph / table extract   | no                  |
-| Images (`.png`, `.jpg`, …) | OCR              | yes                 |
-| Text (`.md`, `.txt`)       | passthrough      | no                  |
-
-### Deployment helpers
-
-- `runners/createDb.py` — creates the PostgreSQL `gazelle` database from
-  `DATABASE_URL` (no `psql` required).
-- `runners/pullModels.py` — pulls every Ollama model the pipeline uses, read
-  from `.env` so it stays in sync with the app.
-- `docs/BANK_SETUP.md` — full server deployment checklist.
-
-### Relevant `.env` settings
+ANERCorp must be downloaded manually. Request the dataset from the original authors:
 
 ```
-OLLAMA_VISION_MODEL   # OCR of scanned PDFs / images (e.g. qwen3-vl:8b-instruct-q4_K_M)
-OLLAMA_EXTRACT_MODEL  # relationship extraction (defaults to OLLAMA_TEXT_MODEL)
-OLLAMA_TIMEOUT        # per-request timeout in seconds for local models (default 600)
-NER_STRATEGY          # llm | gliner | hybrid
-CHUNKER_TYPE          # default (no model) | semantic (downloads BGE-M3 from HF)
+http://curtis.ml.cmu.edu/w/courses/index.php/ANERcorp
 ```
 
+The dataset is a plain-text CoNLL-format file (one token + BIO tag per line, blank lines between sentences). Once you have `ANERCorp.txt`, run from the `src/classical_NER/` directory:
 
----
+```bash
+cd src/classical_NER
 
->>>>>>> main
-## Tech stack
+# Convert the training portion
+python convertAnercorp.py /path/to/ANERCorp.txt anercorp
+# Outputs:
+#   ../../chunks/anercorp.json
+#   annotations/anercorp_base.json
+#   annotations/gold_anercorp.json
 
-- **OCR**: Qwen3-VL via Ollama (or llama-server)
-- **Word**: docling
-- **Tokenizer**: BGE-M3 (chunk sizing)
-- **NER**: GLiNER `NAMAA-Space/gliner_arabic-v2.1` by default, with optional LLM-only or hybrid modes via `.env`
-- **Relation extraction**: any LLM via Ollama (default `qwen2.5:72b-instruct-q4_K_M`) or Groq Cloud
-- **Graph DB**: Neo4j (vector + fulltext indexes on Chunk; relationship graph on Entity)
-- **Embeddings**: BGE-M3 dense (1024-dim, fp16) — stored on Chunk nodes
-- **API**: FastAPI + uvicorn, SSE streaming
-- **Persistence**: PostgreSQL + async SQLAlchemy + Alembic for users, chats, messages, chat memory, and user memory
-- **Frontend**: Vite + React + Tailwind, cytoscape.js for graph viz
-- **Auth**: PostgreSQL-backed seeded users with bcrypt passwords and bearer token sessions
-
----
-
-## Repository layout
-
+# Convert a held-out test portion (if you split the file manually)
+python convertAnercorp.py /path/to/ANERCorp_test.txt anercorp_test
+# Outputs:
+#   annotations/gold_anercorp_test.json
 ```
-Graph/
-├── src/                ← module code (importable Python)
-├── src/db/             ← async SQLAlchemy models, sessions, and repositories
-├── runners/            ← scripts (one per pipeline stage + benchmark runner)
-├── alembic/            ← database migration environment and versions
-├── eval/               ← retrieval evaluation harness
-├── frontend/           ← React + Vite SPA
-├── streamlit/          ← read-only internal dashboard (Streamlit)
-├── Documents/          ← source PDFs, images, docx
-├── Doc_Out/            ← OCR markdown output
-├── output/             ← OCR per-page JSON sidecars
-├── parsed/             ← structured ParsedElement lists
-├── chunks/             ← token-budgeted chunks
-├── extractions/        ← entities + relationships (GLiNER or LLM + LLM)
-├── gold/               ← gold-set annotations (manual)
-├── .env                ← Neo4j creds, PostgreSQL URL, Groq API key, BGE-M3 path, NER/LLM strategy
-├── .env-example        ← sanitized example config
-├── .env-example        ← template for local development
-├── Modelfile           ← Ollama Modelfile (vision model)
-├── requirements.txt
-├── CLAUDE.md           ← coding conventions for Claude Code
-└── README.md           ← you are here
+
+#### AP News corpus (optional — for sensemaking evaluation only)
+
+```bash
+# Requires benchmark-qed in a separate venv (see Section 18)
+.venv-qed/Scripts/benchmark-qed.exe data download AP_news sensemaking/data/ap_news
+```
+
+### 3.4 Generated model files (not included — generate with commands below)
+
+| File | Size | How to generate |
+|------|------|----------------|
+| `src/classical_NER/models/crf.pkl` | ~5 MB | `python src/classical_NER/trainCrf.py` |
+| `src/classical_NER/models/crf_combined.pkl` | ~5 MB | Train with `includeWikiann=True, includeAnercorp=True` |
+| `src/classical_NER/gazetteer/gazetteer.json` | <1 MB | `python src/classical_NER/buildGazetteer.py` |
+| `src/classical_NER/training/train_data.json` | ~10 MB | `python src/classical_NER/featureExtract.py` |
+
+Pre-trained CRF variants already present in the repo (small enough to commit):
+```
+src/classical_NER/models/crf_bank.pkl       # trained on banking annotations only
+src/classical_NER/models/crf_anercorp.pkl   # anercorp only
+src/classical_NER/models/crf_wikiann.pkl    # wikiann only
 ```
 
 ---
 
-## Files
+## 4. Installation
 
-### Pipeline modules (`src/`)
+### 4.1 Clone and set up Python environment
 
-#### `src/ocr.py` — Stage 1: OCR
+```bash
+git clone <repo-url>
+cd Gazelle
 
-Renders PDF pages with `pypdfium2`, sends each page image to Qwen3-VL (Ollama or llama-server) with a carefully tuned Arabic prompt. Preserves Arabic-Indic numerals, detects tables as markdown, handles signature blocks. `process_pdf()` runs pages in parallel via `ThreadPoolExecutor`. `runOcrAndDump()` is the convenience entry point used by the runner — writes both `Doc_Out/{stem}.md` and `output/{stem}.json` (per-page sidecar that the parser later uses to recover page numbers).
+# Create and activate a virtual environment (Python 3.12 recommended)
+python -m venv .venv
+source .venv/bin/activate       # Linux / Mac
+# .venv\Scripts\activate        # Windows
 
-#### `src/parser.py` — Stage 2: Structuring
-
-Converts OCR markdown OR a Word document into a unified `ParsedElement` list. Two paths:
-
-- **Markdown** (from OCR): reads `output/{doc}.json`, splits each page into blocks, classifies (`heading | table | paragraph | list`).
-- **Word docx**: uses docling's `DocumentConverter`, walks `SectionHeaderItem` / `TableItem` / `ListItem` / `TextItem` natively for richer structure.
-
-Maintains a heading stack so every element inherits a `sectionPath` like `["Chapter 3", "Article 5"]`. Tables stay atomic. Provenance fields: `docName`, `sectionPath`, `page`, `elementType`, `text`, `elementId`, `accessLevel`. Output: `parsed/{doc}.json`.
-
-#### `src/chunker.py` — Stage 3: Chunking
-
-Section-aware packing with overlap. Walks elements in order, groups consecutive elements with the same `sectionPath`, packs them until adding the next element would exceed the token budget (default 600, measured by BGE-M3 tokenizer). When flushing, the last element of the previous chunk carries into the next as **overlap** (preserves meaning across split sections). Tables are atomic — never split, always their own chunk. Heading-only elements are skipped (their text already lives in `sectionPath`). The leaf section heading is **prepended to chunk text** for embedding context. Output: `chunks/{doc}.json`.
-
-#### `src/glinerExtract.py` — Stage 4a: NER
-
-Loads the Arabic GLiNER model `NAMAA-Space/gliner_arabic-v2.1` once at module import. Pulls labels from `ontology.ENTITIES.keys()` (single source of truth). For each chunk, runs `model.predict_entities()` with threshold 0.5; emits one entity record per detected span with `chunkId`, char offsets, type, and confidence score. Output: `extractions/{doc}_entities.json` (raw spans, no deduplication).
-
-#### `src/llmExtract.py` — Stage 4b: Relationship extraction
-
-Two-step:
-
-1. **`canonicalizeEntities()`** — deterministic. Groups GLiNER spans by `(text, type)`, generates kebab-case canonical IDs (`{slugified-text}-{type-lower}`), preserves chunkId provenance. No LLM call here.
-2. **`extractRelationships()`** — LLM call. For each chunk, sends a focused prompt: ontology relationship spec + direction rules + the canonical entities present in this chunk + the chunk text. The LLM returns only relationships, not entities. Strict JSON output via `response_format: {type: "json_object"}`.
-
-Parallelized via `ThreadPoolExecutor` (`PARALLEL_CHUNKS = 4`; needs `OLLAMA_NUM_PARALLEL=4` on the Ollama server). Output: `extractions/{doc}.json` (per-chunk entity list + relationships).
-
-`OLLAMA_URL`, `OLLAMA_TEXT_MODEL`, and `OLLAMA_NUM_PARALLEL` are configurable through `.env`.
-
-#### `src/kgWriter.py` — Stage 5: Knowledge graph
-
-Idempotent MERGE writes into Neo4j. Schema:
-
-```
-(:Document {docName})
-(:Chunk {chunkId, docName, sectionPath, pages, text, accessLevel}) -[:PART_OF]-> (:Document)
-(:Entity {canonicalId, canonicalName, type, aliases})              -[:MENTIONED_IN]-> (:Chunk)
-(:Entity) -[<PREDICATE> {chunkIds}]-> (:Entity)        # ISSUED_BY, GOVERNS, AMENDS, …
-```
-
-`mergeChunk` MERGEs on chunkId (creates relationship to Document). `mergeEntityWithMention` MERGEs entity, dedupes aliases via Cypher `REDUCE`, and creates the MENTIONED_IN edge in the same transaction. `mergeRelationship` interpolates the predicate as the edge type (safe — predicate is filtered against the ontology), dedupes chunkIds. **`buildTypeMap` + `isValidRelationship`** validate that subject/object types match the schema (e.g., `BankingInstitution APPLIES_TO RegulatoryBody` is rejected at write time).
-
-Unique constraints created on `Document.docName`, `Chunk.chunkId`, `Entity.canonicalId`.
-
-#### `src/embedding.py` — Stage 6: Vector embeddings
-
-Loads `BGEM3FlagModel` once (path from `BGE_M3_PATH` env var, defaults to HF id). Encodes chunk text in batches of 16 with fp16. Creates a 1024-dim vector index `chunk_embedding` on `Chunk.embedding` and a Lucene fulltext index `chunk_text` on `Chunk.text` for hybrid search. `embedQuery()` is also exposed — used by the retriever to embed user questions at request time.
-
-#### `src/retriever.py` — Stage 7: Retrieval (3 modes)
-
-All modes pre-filter chunks by `node.docName IN $allowed` before scoring. The allowed list comes from the user's clearance via `docAccess.allowedDocs(clearance)` — chunks the user can't see never reach the LLM.
-
-- **`vectorSearch(query, k, allowed)`** — pure semantic. Embeds the query, calls `db.index.vector.queryNodes` with overfetch (4×K) so RBAC filtering doesn't undershoot, then takes top K.
-- **`hybridSearch(query, k, allowed)`** — RRF fusion of vector + Neo4j fulltext (Lucene BM25). Score = Σ 1/(60 + rank) across both rankings. Standard reciprocal rank fusion.
-- **`graphSearch(query, k, hops, allowed)`** — vector-finds K seed chunks, traverses `(:Entity)-[*1..hops]-(:Entity)` from entities mentioned in those seeds (excluding `MENTIONED_IN` edges), pulls back chunks where the expanded entities are mentioned. Neighbors ranked by entity overlap count.
-
-Top-level `retrieve(query, mode, k, hops, clearance)` dispatches.
-
-#### `src/chatApi.py` — FastAPI server
-
-Endpoints:
-
-- `POST /api/login` — username/password against PostgreSQL users → returns bearer token
-- `POST /api/logout` — invalidates token in PostgreSQL session storage
-- `GET /api/me` — returns current user
-- `GET /api/info` — providers (Ollama / Groq) with availability + access levels
-- `POST /api/retrieve` — runs retriever, returns chunks (gated by clearance)
-- `POST /api/chat` — runs retriever **then** streams LLM tokens via Server-Sent Events. First event is `{type:"citations", citations:[...]}`, subsequent are `{type:"token", text:"..."}`, final is `{type:"done"}`. The backend also persists the user message, assistant message, and per-chat memory in PostgreSQL.
-- `GET /api/chats` — list the authenticated user's chats
-- `POST /api/chats` — create a new chat for the authenticated user
-- `GET /api/chats/{chatId}` — load a chat and its messages
-- `PATCH /api/chats/{chatId}` — rename a chat
-- `DELETE /api/chats/{chatId}` — delete a chat
-- `GET /api/chats/{chatId}/memory` / `PUT /api/chats/{chatId}/memory` — manage chat memory
-- `GET /api/memory/user` / `PUT /api/memory/user/{memoryKey}` — manage long-term per-user memory
-- `GET /api/graph` — returns Cytoscape-shaped JSON for the graph explorer; supports `?search=`, `?type=`, `?seed=`, `?hops=` query params.
-
-Provider routing: `PROVIDERS` dict supports both `ollama` (no auth) and `groq` (Bearer key from `GROQ_API_KEY`). Per-request `provider` field selects.
-
-LLM grounding is enforced via a **system message** (`SYSTEM_PROMPT`) with strict rules: cite every claim by chunkId, refuse with an exact bilingual sentence when context is insufficient, no general-knowledge fallback.
-
-If `frontend/dist/` exists, it's mounted at `/` for production serving.
-
-### Configuration & domain (`src/`)
-
-#### `src/ontology.py` — Entity & relationship vocabulary (v0)
-
-11 entity types (`Person`, `BankingInstitution`, `RegulatoryBody`, `Law`, `Article`, `License`, `Document`, `FinancialInstrument`, `RegulatoryRequirement`, `MonetaryAmount`, `Date`) and 9 relationship types with `(allowedSubjectTypes, allowedObjectTypes)` tuples. **Single source of truth** — GLiNER labels, LLM prompt, and KG validation all import from here. Edit this file to iterate the ontology.
-
-#### `src/docAccess.py` — Access-level taxonomy
-
-Defines `LEVELS = ['public', 'internal', 'confidential', 'restricted']` (rank-ordered). `DOC_ACCESS` maps `docName → level` (defaults to `internal` if not listed). `allowedDocs(clearance)` returns the list of docs visible at a given clearance level. Mock data marks `gazma2` confidential and `table_ar` restricted for testing.
-
-#### `src/auth.py` — Authentication
-
-Async authentication backed by PostgreSQL. The seed users (`omar` / `sara` / `ahmed` / `guest`) are inserted by the initial Alembic migration with bcrypt password hashes. `user_sessions` stores bearer token hashes, so auth survives server restarts. `getCurrentUser()` is a FastAPI `Depends(...)` that reads `Authorization: Bearer <token>` and returns the current user object — applied to every protected endpoint.
-
-### Runners (`runners/`)
-
-Each runner is a thin script that imports `_bootstrap` (adds `src/` to `sys.path` and chdirs to project root), then sets a `docName` or other input variable at the top, then calls the relevant module function.
-
-| Runner            | Input                                  | Output                                         |
-| ----------------- | -------------------------------------- | ---------------------------------------------- |
-| `runOcr.py`       | `imagePath = "Documents/x.pdf"`        | `Doc_Out/x.md`, `output/x.json`                |
-| `runParser.py`    | `source = "Doc_Out/x.md"` (or `.docx`) | `parsed/x.json`                                |
-| `runChunker.py`   | `docName = "x"`                        | `chunks/x.json`                                |
-| `runGliner.py`    | `docName = "x"`                        | `extractions/x_entities.json`                  |
-| `runLlm.py`       | `docName = "x"`                        | `extractions/x.json`                           |
-| `runKg.py`        | `docName = "x"`                        | Neo4j writes                                   |
-| `runEmbed.py`     | `docName = "x"`                        | `Chunk.embedding` populated in Neo4j           |
-| `runRetrieve.py`  | CLI args: `query mode k hops`          | prints retrieved chunks (clearance=restricted) |
-| `runApi.py`       | —                                      | starts uvicorn `:8000` with reload             |
-| `sampleChunks.py` | —                                      | seeds `gold/sample.json` for hand-annotation   |
-
-#### `runners/_bootstrap.py`
-
-Three lines: prepends `src/` to `sys.path`, chdirs to project root. Imported (not called) at the top of every runner so all the in-tree imports and relative paths just work.
-
-### Frontend (`frontend/`)
-
-Vite + React + Tailwind SPA, ADIB navy + gold + cream theme.
-
-| File                               | Purpose                                                                                                                                                                                                                                                                                                                            |
-| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `package.json`                     | Deps: react, vite, tailwind, cytoscape, cytoscape-fcose, react-cytoscapejs                                                                                                                                                                                                                                                         |
-| `vite.config.js`                   | Dev server on `:5173`, proxies `/api` → `:8000`                                                                                                                                                                                                                                                                                    |
-| `tailwind.config.js`               | Custom palette: `brand` (navy), `gold`, `cream`, `ink` + keyframes                                                                                                                                                                                                                                                                 |
-| `postcss.config.js`                | Tailwind + autoprefixer                                                                                                                                                                                                                                                                                                            |
-| `index.html`                       | Inter + Fraunces + JetBrains Mono fonts via Google Fonts                                                                                                                                                                                                                                                                           |
-| `src/main.jsx`                     | React entry point                                                                                                                                                                                                                                                                                                                  |
-| `src/index.css`                    | Tailwind import + scrollbar styling, streaming caret animation, citation-flash highlight                                                                                                                                                                                                                                           |
-| `src/App.jsx`                      | Top-level: gates on auth → renders `Login` or `Sidebar` + main content. View routing (chat / graph). ⌘N keyboard shortcut for new chat.                                                                                                                                                                                            |
-| `src/components/Login.jsx`         | Login screen with mock-user shortcut buttons (autofill).                                                                                                                                                                                                                                                                           |
-| `src/components/Sidebar.jsx`       | Collapsible sidebar (260px / 56px). New-chat button, Tools nav (Chat / Graph Explorer), Recent chats list (hover-delete), user footer with role + clearance badge + sign-out menu.                                                                                                                                                 |
-| `src/components/ChatView.jsx`      | TopBar showing model, Welcome screen with suggestions, message list with inline `[chunkId]` citations rendered as clickable superscript pills (jump + flash the source card), Composer with mode pills + settings popover (k, hops, provider toggle Ollama/Groq), SSE streaming with token-by-token render and gold pulsing caret. |
-| `src/components/GraphExplorer.jsx` | Cytoscape canvas with `fcose` layout. Search bar + refresh button up top, color-coded entity-type legend (collapsible), click-to-select with all-other-faded effect, slide-in inspector panel with "Expand neighbors" button. Custom Cytoscape stylesheet for ADIB palette.                                                        |
-| `src/components/Icons.jsx`         | All SVG icons including the gazelle-silhouette logo mark (gold on navy).                                                                                                                                                                                                                                                           |
-| `src/hooks/useChats.js`            | Per-user conversation history loaded from `/api/chats` and `/api/chats/{chatId}`.                                                                                                                                                                                                                                                  |
-| `src/hooks/useAuth.js`             | Token + user persisted to `localStorage`. `authHeaders()` helper used by every protected fetch. Verifies token on mount.                                                                                                                                                                                                           |
-
-### Eval (`eval/`)
-
-#### `eval/queries.json`
-
-Hand-curated gold queries with `id`, `query`, `type` (`single-hop` / `multi-hop` / `multi-step`), `relevantChunks` (chunkIds you'd want surfaced), and `expectedAnswer`. Seeded with 5 starter queries for ADIB compliance topics; you fill in `relevantChunks` after eyeballing what the retriever returns.
-
-#### `eval/runEval.py`
-
-Runs all three retrieval modes against every annotated query. Computes `Recall@K`, `Precision@K`, `MRR` per query per mode, plus averages. Prints a side-by-side table with a multi-hop subset broken out separately (where graph mode should outperform vector). Saves `eval/results.json`. Run from project root: `python eval\runEval.py`.
-
-#### `eval/README.md`
-
-Explains methodology for evaluating each layer (retrieval / extraction / end-to-end), the three IR metrics and how to read them, suggested workflow for building the gold set, and pointers to RAGAS for end-to-end RAG eval.
-
-### Data directories
-
-- **`Documents/`** — source PDFs, Word docs, scanned images. Input to OCR.
-- **`Doc_Out/`** — OCR-extracted markdown, one file per source. Human-readable.
-- **`output/`** — OCR per-page JSON sidecars `[{page, markdown}]`. Used by parser to recover page numbers.
-- **`parsed/`** — `ParsedElement[]` per doc. Structured normalized form, the parser's output.
-- **`chunks/`** — token-budgeted chunks per doc. The unit of retrieval.
-- **`extractions/`** — `{doc}_entities.json` (raw GLiNER spans) and `{doc}.json` (canonical entities + LLM relationships).
-- **`gold/`** — manual annotations (entity & relationship gold set, optional retrieval gold).
-
-### Top-level config files
-
-- **`.env`** — `NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD`, `DATABASE_URL`, `GROQ_API_KEY` (optional), `GROQ_MODEL`, `OLLAMA_TEXT_MODEL`, `BGE_M3_PATH`.
-- **`.env-example`** — starter template for local setup.
-- **`alembic/`** — async SQLAlchemy/Alembic migrations.
-- **`requirements.txt`** — Python deps.
-- **`.env-example`** — sanitized example config for NER, Ollama, Neo4j, embeddings, and pipeline flags.
-- **`Modelfile`** — Ollama Modelfile for the vision model used by OCR.
-- **`CLAUDE.md`** — coding conventions for Claude Code (camelCase functions, no defensive code, etc.).
-
----
-
-## Running end-to-end
-
-### Prerequisites
-
-```powershell
-# Python (in your conda env)
 pip install -r requirements.txt
+```
 
-# Or use the Makefile shortcut
-make install
+### 4.2 Additional dependencies for the Classical NER subsystem
 
-# Copy the example env and fill in your secrets
-copy .env-example .env
+```bash
+pip install sklearn-crfsuite seqeval camel-tools
+camel_data -i morphology-db-msa-r13
+```
 
-# PostgreSQL must be running locally or reachable by DATABASE_URL
-# Example: postgresql+asyncpg://postgres:postgres@localhost:5432/gazelle
+### 4.3 Frontend
 
-# Run the initial database migration and seed users
-alembic upgrade head
-
-# Or use the Makefile shortcut
-make upgrade
-
-# Frontend
+```bash
 cd frontend
 npm install
 cd ..
-
-# Or use the Makefile shortcut
-make install-frontend
-
-# Local services
-ollama serve                               # in its own terminal
-# Neo4j running on bolt://localhost:7687
-
-# .env populated with at least:
-#   NEO4J_URI=bolt://localhost:7687
-#   NEO4J_USER=neo4j
-#   NEO4J_PASSWORD=...
-#   DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/gazelle
-#   BGE_M3_PATH=C:/Users/.../bge-m3/snapshots/<hash>
-```
-
-### Database and migration commands
-
-Use these while developing the PostgreSQL layer:
-
-```powershell
-# Apply all migrations
-alembic upgrade head
-
-# Makefile shortcut
-make upgrade
-
-# Roll back one migration
-alembic downgrade -1
-
-# Makefile shortcut
-make downgrade
-
-# Create a new migration after model changes
-alembic revision --autogenerate -m "describe the change"
-
-# Makefile shortcut
-make migrate MSG="describe the change"
-
-# Inspect current migration state
-alembic current
-
-# Makefile shortcut
-make current
-
-# Show migration history
-alembic history
-
-# Makefile shortcut
-make history
-```
-
-The initial migration seeds the four login users, so there is no separate seed command to run.
-
-### Per-document ingestion (run once per source doc)
-
-```powershell
-# Edit the imagePath in runners/runOcr.py to point at the PDF, then:
-python runners\runOcr.py        # OCR
-python runners\runParser.py     # structure
-python runners\runChunker.py    # chunk
-python runners\runGliner.py     # NER
-python runners\runLlm.py        # relations
-python runners\runKg.py         # write to Neo4j
-python runners\runEmbed.py      # embeddings + indexes
-```
-
-### Makefile shortcuts
-
-```powershell
-# Install Python deps
-make install
-
-# Install frontend deps
-make install-frontend
-
-# Run the API
-make run-api
-
-# Run the frontend dev server
-make run-frontend
-
-# Build the frontend
-make build-frontend
-
-# Quick backend syntax check
-make py-compile
-
-# Run the evaluation harness
-make eval
-
-# Clean common build artifacts
-make clean
-
-# Optional: compare gliner / llm / hybrid NER strategies on the same chunk file
-python runners\runNerBenchmark.py chapter_3 --output ner_benchmark.json
-```
-
-### Serve
-
-```powershell
-# Terminal A
-python runners\runApi.py        # FastAPI :8000
-
-# Terminal B
-cd frontend
-npm run dev                     # Vite :5173 with /api proxy
-```
-
-You can also run the same services with the Makefile:
-
-```powershell
-# Terminal A
-make run-api
-
-# Terminal B
-make run-frontend
-```
-
-Open http://localhost:5173 → log in (any mock user) → start chatting.
-
-### Streamlit dashboard
-
-The repo also includes a separate read-only internal dashboard in `streamlit/` that reuses the same FastAPI backend.
-
-```powershell
-pip install -r requirements.txt
-streamlit run streamlit\app.py
-```
-
-Set `GAZELLE_API_URL` if the API is not running on `http://localhost:8000`.
-
-### Evaluate
-
-```powershell
-# After ingesting a doc and populating eval/queries.json with relevantChunks
-python eval\runEval.py
-
-# Or
-make eval
 ```
 
 ---
 
-## Pipeline order summary (what depends on what)
+## 5. Environment Variables
+
+Create a `.env` file in the project root. All variables are read by `src/config.py` at startup.
+
+```env
+# ── Neo4j (required) ──────────────────────────────────────────────
+NEO4J_URI=bolt://localhost:7687
+NEO4J_USER=neo4j
+NEO4J_PASSWORD=your_password
+NEO4J_DB=neo4j
+
+# ── PostgreSQL (required) ─────────────────────────────────────────
+DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/gazelle
+
+# ── Ollama (local inference) ──────────────────────────────────────
+OLLAMA_URL=http://localhost:11434/v1/chat/completions
+OLLAMA_EMBED_URL=http://localhost:11434/api/embed
+OLLAMA_VISION_MODEL=qwen3-vl:8b-instruct-q4_K_M
+OLLAMA_EMBED_MODEL=bge-m3
+OLLAMA_CHAT_MODEL=granite4.1:8b
+OLLAMA_EXTRACT_MODEL=granite4.1:8b
+
+# ── Groq (optional cloud chat fallback) ──────────────────────────
+GROQ_API_KEY=your_groq_key
+GROQ_MODEL=llama-3.3-70b-versatile
+
+# ── OpenRouter (required for Route 2 LLM graph extraction) ───────
+OPENROUTER_API_KEY=your_openrouter_key
+OPENROUTER_MODEL=meta-llama/llama-3.3-70b-instruct
+
+# ── Gemini (optional extraction backend) ─────────────────────────
+GEMINI_API_KEY=your_gemini_key
+GEMINI_MODEL=gemini-2.0-flash
+
+# ── Embedding model ───────────────────────────────────────────────
+BGE_M3_PATH=BAAI/bge-m3
+
+# ── Pipeline configuration ────────────────────────────────────────
+GRAPH_ROUTE=2                    # 1=GLiNER classical, 2=LLM full graph (default)
+EXTRACT_DIR=extractions_cbe      # directory for extraction JSONs
+CORPUS_NAME=cbe                  # tags Neo4j :Community nodes
+
+# ── NER strategy ─────────────────────────────────────────────────
+NER_STRATEGY=gliner              # gliner | llm
+GLINER_MODEL=NAMAA-Space/gliner_arabic-v2.1
+GLINER_THRESHOLD=0.7
+
+# ── Chunker type ─────────────────────────────────────────────────
+CHUNKER_TYPE=semantic            # default | semantic
+
+# ── Graph extraction workers ─────────────────────────────────────
+GRAPH_EXTRACT_WORKERS=12
+GRAPH_EXTRACT_BACKEND=openrouter # ollama | groq | openrouter | gemini
+
+# ── Retrieval tuning ─────────────────────────────────────────────
+LOCAL_COMENTION_EDGES=0          # 1 to walk COOCCURS_WITH in graph mode (Route 1)
+
+# ── Community detection ──────────────────────────────────────────
+COMMUNITY_RESOLUTION=1.0
+SYNONYM_THRESHOLD=0.85
+
+# ── OCR ──────────────────────────────────────────────────────────
+OCR_PROVIDER=ollama
+OCR_PARALLEL_PAGES=1
+```
+
+---
+
+## 6. Database Setup
+
+### 6.1 Neo4j
+
+Start Neo4j (Community Edition or Enterprise, version 5.x). The pipeline automatically creates all constraints and indexes on first write — no manual schema setup is needed.
+
+The graph schema created:
 
 ```
-runOcr      ─►  Doc_Out/, output/
-runParser   ─►  parsed/                         (needs output/ sidecar)
-runChunker  ─►  chunks/                         (needs parsed/)
-runGliner   ─►  extractions/_entities.json     (needs chunks/, uses GLiNER or hybrid path)
-runNerBenchmark ─► timing/results for gliner | llm | hybrid
-runLlm      ─►  extractions/.json              (needs chunks/ AND extractions/_entities.json)
-runKg       ─►  Neo4j                          (needs chunks/ AND extractions/.json)
-runEmbed    ─►  Neo4j Chunk.embedding          (needs Neo4j chunks already written by runKg)
-runApi      ─►  serves frontend                (needs Neo4j + ollama running)
+Nodes:
+  (:Chunk  {chunkId, docName, text, sectionPath, pages, accessLevel})
+  (:Entity {canonicalId, canonicalName, type, aliases, docName, description})
+  (:Document {docName})
+  (:Community {id, level, corpus, title, summary, rating})
+
+Relationships:
+  (Chunk)  -[:BELONGS_TO]->  (Document)
+  (Entity) -[:MENTIONED_IN]-> (Chunk)
+  (Entity) -[:COOCCURS_WITH {count}]->   (Entity)   -- Route 1
+  (Entity) -[:RELATED {predicate, description, weight}]-> (Entity)  -- Route 2
+  (Entity) -[:SYNONYM {cosine}]->   (Entity)
+  (Entity) -[:IN_COMMUNITY {level}]-> (Community)
+  (Community) -[:PARENT]-> (Community)
+
+Indexes:
+  Vector: chunk_embedding  (dim=1024, on Chunk nodes)
+  Fulltext: chunk_text     (on Chunk.text)
 ```
 
-If any stage is skipped, downstream stages fail silently or with empty results — re-run from the earliest missing step.
+### 6.2 PostgreSQL
 
-### Useful development commands
+```bash
+# Create the database
+createdb gazelle
 
-```powershell
-# Backend syntax check after edits
-python -m py_compile src\chatApi.py src\auth.py src\db\models.py src\db\session.py
+# Run all Alembic migrations (creates all tables)
+alembic upgrade head
+```
 
-# Run the API server
-python runners\runApi.py
+Tables created: `users`, `user_sessions`, `chats`, `messages`, `chat_memory`, `user_memory`, `message_citations`, `audit_log`.
 
-# Build the frontend for production validation
+To bootstrap an admin user (run once from repo root):
+
+```python
+import asyncio, bcrypt, uuid
+import sys; sys.path.insert(0, 'src')
+from db.session import asyncSessionFactory
+from db.models import User
+
+async def createAdmin():
+    async with asyncSessionFactory() as s:
+        u = User(
+            id=uuid.uuid4(),
+            username='admin',
+            passwordHash=bcrypt.hashpw(b'changeme', bcrypt.gensalt()).decode(),
+            role='admin',
+            clearance='restricted',
+        )
+        s.add(u)
+        await s.commit()
+
+asyncio.run(createAdmin())
+```
+
+---
+
+## 7. Ingestion Pipeline
+
+Place source documents (PDFs, images) in the `Documents/` directory.
+
+### 7.1 Full pipeline (all stages, skip-if-exists)
+
+```bash
+python run.py
+```
+
+Runs: OCR → Parse → Chunk → Embed → Entity extraction → KG write → Entity embed. Skips any stage whose output already exists.
+
+### 7.2 Individual stages
+
+All runners must be executed from the **project root**. Each runner imports `_bootstrap.py` which adds `src/` to `sys.path` automatically.
+
+```bash
+# Stage 1 — OCR: PDFs/images --> Doc_Out/*.md
+python runners/runOcr.py
+
+# Stage 2 — Parse: Doc_Out/*.md --> parsed/*.json
+python runners/runParser.py
+
+# Stage 3 — Chunk: parsed/*.json --> chunks/*.json
+python runners/runChunker.py
+
+# Stage 4 — Embed chunks: chunks/*.json --> Neo4j vector index
+python runners/runEmbed.py
+
+# Stage 5a — Entity extraction, Route 1 (GLiNER)
+python runners/runGliner.py
+# Output: extractions/<docName>_entities.json
+
+# Stage 5b — Entity extraction, Route 2 (LLM)
+python runners/runGraphExtract.py
+# Output: <EXTRACT_DIR>/<docName>_graph.json
+
+# Stage 6a — KG build, Route 1: Entity layer + COOCCURS_WITH
+python runners/runKgBuild.py
+
+# Stage 6b — KG build, Route 2: Entity + RELATED edges
+python runners/runGraphBuild.py
+
+# Stage 7 — Entity embeddings (BGE-M3 on canonical entity names)
+python runners/runEntityEmbed.py
+```
+
+### 7.3 Batch processor (single file or directory)
+
+```bash
+# Process all files in Documents/
+python runners/runAll.py Documents/
+
+# Process a single file
+python runners/runAll.py Documents/chapter_1.pdf
+
+# Skip Neo4j write (run extraction only)
+python runners/runAll.py Documents/ --skip-kg
+
+# Skip embedding
+python runners/runAll.py Documents/ --skip-embed
+```
+
+### 7.4 Output directories
+
+| Directory | Stage | Contents |
+|-----------|-------|----------|
+| `Doc_Out/` | OCR | Markdown text per document |
+| `parsed/` | Parser | Structured JSON (sections, elements, page numbers) |
+| `chunks/` | Chunker | Token-bounded chunk arrays with `chunkId` |
+| `extractions/` | NER/LLM | Entity spans (`*_entities.json`) and relation data |
+| `extractions_cbe/` | Route 2 | LLM graph extractions (`*_graph.json`) |
+
+---
+
+## 8. Graph Construction — Two Routes
+
+Select the route via the `GRAPH_ROUTE` env var (default: `2`). Both routes share the OCR → parse → chunk → embed pipeline.
+
+### Route 1 — Classical (GLiNER baseline)
+
+Extracts named entities with GLiNER and builds co-mention edges between entities that appear in the same chunk.
+
+- **Builds:** `(:Entity)` nodes + `COOCCURS_WITH {count}` edges
+- **Use when:** Fast local baseline, no API cost, no cloud dependency
+- **Cannot feed:** Community summarization (no relationship descriptions)
+
+```bash
+export GRAPH_ROUTE=1
+python runners/runGliner.py
+python runners/runKgBuild.py
+python runners/runEntityEmbed.py
+```
+
+### Route 2 — LLM (deployed, default)
+
+A single LLM pass per chunk extracts entities, relationships, and natural-language descriptions of both. Produces a semantically richer graph that feeds both local PPR retrieval and the global community arm.
+
+- **Builds:** `(:Entity {description})` + `RELATED {predicate, description, weight}` edges
+- **Requires:** OpenRouter (or Groq/Ollama) API key
+- **Cost:** Paid API calls — use `GRAPH_EXTRACT_WORKERS` to control parallelism
+
+```bash
+export GRAPH_ROUTE=2
+python runners/runGraphExtract.py   # LLM extraction per chunk (checkpoint-resumable)
+python runners/runGraphBuild.py     # write to Neo4j
+python runners/runEntityEmbed.py    # embed entity names
+
+# Add SYNONYM edges (identity bridges between near-duplicate entities)
+python graphTraversal/runSynonyms.py           # uses SYNONYM_THRESHOLD from config
+python graphTraversal/runSynonyms.py 0.85      # explicit threshold
+```
+
+---
+
+## 9. Classical NER Subsystem (CRF)
+
+A standalone Arabic NER pipeline using a CRF trained on gold-annotated CBE banking documents. This subsystem is in `src/classical_NER/` and is separate from the main GLiNER/LLM pipeline.
+
+### 9.1 Full CRF pipeline
+
+```
+chunks/*.json
+    |
+    v  Initial pre-annotation (GLiNER)
+python runners/runGliner.py
+    |
+    v  Convert to Label Studio import format
+python src/classical_NER/convertToLabelStudio.py
+    --> annotations/ls_import.json
+    |
+    v  [Human annotation in Label Studio — accept/correct/add/delete spans]
+    --> annotations/corrected.json
+    |
+    v  Build entity gazetteer from high-confidence annotations
+python src/classical_NER/buildGazetteer.py
+    --> src/classical_NER/gazetteer/gazetteer.json
+    |
+    v  Feature extraction (CAMeL Tools POS tagger + BIO alignment)
+python src/classical_NER/featureExtract.py
+    --> src/classical_NER/training/train_data.json
+    |
+    v  CRF training (80/20 split, L-BFGS, sklearn-crfsuite)
+python src/classical_NER/trainCrf.py
+    --> src/classical_NER/models/crf.pkl
+    |
+    v  Inference on new chunks
+python src/classical_NER/runCrf.py
+    --> extractions/crf/<docName>_crf_entities.json
+```
+
+### 9.2 CRF feature groups
+
+Each Arabic token is represented by six feature groups:
+
+| Group | Features |
+|-------|---------|
+| Surface + context | `word`, `w-1`, `w+1`, `is_first` |
+| POS tags | `pos`, `p-2`, `p-1`, `p+1`, `p+2` (CALIMA-MSA-r13) |
+| Morphological | `has_def_art` (ال prefix), `has_prep_clitic`, `stem` |
+| Script | `is_arabic_num`, `is_western_num`, `contains_latin`, `is_clause_ref` |
+| Character n-grams | All bigrams and trigrams over token surface |
+| Domain triggers | `is_org_trigger`, `in_money_trigger`, `in_month`, `prev_is_org_trigger` |
+
+### 9.3 Training with external datasets
+
+To include WikiANN and/or ANERCorp in training, edit the `loadAnnotations` call in `featureExtract.py`:
+
+```python
+tasks = loadAnnotations(includeWikiann=True, includeAnercorp=True)
+```
+
+### 9.4 Entity types
+
+11 types defined in `src/ontology.py`: `Person`, `BankingInstitution`, `RegulatoryBody`, `Law`, `Article`, `License`, `Document`, `FinancialInstrument`, `RegulatoryRequirement`, `MonetaryAmount`, `Date`.
+
+### 9.5 Evaluate NER
+
+```bash
+python runners/runNerBenchmark.py
+```
+
+---
+
+## 10. Graph Traversal and PPR Retrieval
+
+The `graphTraversal/` subsystem implements **Personalized PageRank (PPR)** over the entity graph, following the HippoRAG architecture. It replaces fixed-depth k-hop traversal with a global random-walk algorithm.
+
+### 10.1 How PPR retrieval works
+
+1. **Embed** the query using BGE-M3
+2. **Seed** — find the top-K most similar entity nodes by cosine similarity; these form the teleport (restart) distribution
+3. **PPR walk** — run power iteration: `r_{t+1} = (1 - alpha) * M^T * r_t + alpha * seed`. Mass flows through `RELATED`, `COOCCURS_WITH`, and `SYNONYM` edges
+4. **Project** — map entity PPR scores onto chunks via `MENTIONED_IN` edges; aggregate per chunk
+5. **Return** top-K chunks ranked by accumulated mass
+
+### 10.2 Standalone PPR commands
+
+```bash
+cd graphTraversal
+
+# Run PPR retrieval for a test query
+python runRetrieve.py
+
+# Full PPR probe (times a batch of queries, reports recall)
+python runProbe.py
+
+# Inspect which entities get seeded for a query
+python runSeed.py
+
+# Generate synonym (SYNONYM) edges for entity alignment
+python runSynonyms.py
+python runSynonyms.py 0.85    # explicit threshold
+```
+
+### 10.3 Edge layers
+
+| Edge type | Enabled by | Notes |
+|-----------|-----------|-------|
+| `RELATED` | `useRelated=True` (default) | LLM-extracted semantic relations — Route 2 |
+| `COOCCURS_WITH` | `useCoMention=True` | Co-mention within chunk — Route 1 |
+| `SYNONYM` | `includeSynonyms=True` | Entity alignment bridges — both routes |
+| `TRIPLE` | `useTriples=True` | Bare OpenIE triples — deprecated |
+
+### 10.4 PPR hyperparameters (`src/config.py`)
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| PPR `alpha` | 0.5 | Teleport probability (restart rate) |
+| `SEED_K` | 8 | Entity seeds per query |
+| `RRF_K` | 60 | Reciprocal Rank Fusion constant |
+| `OVERFETCH` | 4 | Fetch k * OVERFETCH before access-control filter |
+| `SYNONYM_THRESHOLD` | 0.85 | Cosine cutoff for SYNONYM edges |
+| `ENTITY_WEIGHT` | 0.6 | Path score = entity_weight * entity_sim + (1-entity_weight) * rel_sim |
+
+---
+
+## 11. Community Detection and Global Arm
+
+### 11.1 Leiden algorithm
+
+`graphTraversal/leiden.py` implements Leiden community detection (Traag, Waltman & van Eck, 2019) from scratch. It runs three passes per level:
+
+1. **Local move** — Louvain-style greedy modularity maximization
+2. **Refinement** — splits communities into internally connected sub-communities (the step Louvain lacks; guarantees no disconnected communities)
+3. **Aggregation** — collapse sub-communities to super-nodes, repeat on the smaller graph
+
+Each level produces a coarser partition. `leidenHierarchy()` returns all levels finest-to-root. Level 0 (root) = fewest, broadest communities — the default answering level for the global arm.
+
+### 11.2 Running community detection
+
+**Prerequisite:** Route 2 graph must be built (entities with `RELATED` edges in Neo4j).
+
+```bash
+# Detect communities over the full corpus (all entities in the DB)
+python graphTraversal/runCommunities.py
+
+# Specific documents only (comma-separated docNames)
+python graphTraversal/runCommunities.py chapter_1,chapter_2,chapter_3
+
+# Custom Leiden resolution (higher = more, smaller communities)
+python graphTraversal/runCommunities.py ALL 1.5
+
+# Custom corpus name tag on the written :Community nodes
+python graphTraversal/runCommunities.py ALL 1.0 my_corpus
+```
+
+### 11.3 Validate community detection
+
+```bash
+cd graphTraversal
+
+# Unit tests for Leiden and persistence builders
+python testLeiden.py
+python testCommunity.py
+
+# Validate on standard benchmark graphs (Cora, football, email)
+python validateLeiden.py
+
+# Plot community structure
+python plotCommunities.py
+```
+
+---
+
+## 12. Query-Focused Summarization
+
+The global arm answers corpus-wide sensemaking questions using GraphRAG-style map-reduce over community summaries.
+
+### 12.1 Generate community summary reports
+
+Run after community detection has built the `(:Community)` skeleton:
+
+```bash
+# Generate LLM reports for all communities in the corpus
+python runners/runCommunitySummary.py
+
+# Explicit corpus and backend
+python runners/runCommunitySummary.py cbe openrouter
+```
+
+Each community node gets: `title`, `summary`, `rating` (0–10), `rating_explanation`, and `findings[]` (each with `[Data: Entities (...); Relationships (...)]` inline citations).
+
+### 12.2 How global answering works at query time
+
+`src/globalSearch.py` runs:
+
+1. **Map** — for each root-level (C0) community summary, call the LLM to extract relevant key points and a helpfulness score (0–100). Zero-score points are dropped.
+2. **Reduce** — synthesize the top-40 scored points into a final prose answer, preserving all data citations.
+
+### 12.3 Query routing
+
+`src/router.py` classifies each query before retrieval:
+
+| Classification | Trigger | Handled by |
+|----------------|---------|------------|
+| `local` | Specific fact, entity, number, date | PPR retrieval |
+| `global` | Themes, trends, comparisons, "across documents" | Community map-reduce |
+
+```bash
+# Test the router standalone
+python runners/runRouter.py
+```
+
+---
+
+## 13. Chat API
+
+### 13.1 Start the API server
+
+```bash
+python runners/runApi.py
+# Starts on http://localhost:8000
+```
+
+### 13.2 API endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/auth/login` | Login — returns bearer token |
+| `POST` | `/api/auth/logout` | Invalidate session token |
+| `POST` | `/api/chat` | Send a query, stream the LLM answer |
+| `GET` | `/api/chats` | List the authenticated user's chats |
+| `POST` | `/api/chats` | Create a new chat |
+| `DELETE` | `/api/chats/{id}` | Delete a chat |
+| `GET` | `/api/chats/{id}/messages` | Get all messages in a chat |
+| `GET` | `/api/graph` | Query Neo4j for the graph explorer |
+| `GET` | `/api/memory/user` | Get the user's persistent memory entries |
+| `PUT` | `/api/memory/user/{key}` | Set a user memory entry |
+
+### 13.3 Chat request body
+
+```json
+{
+  "query": "ما هي متطلبات كفاية رأس المال؟",
+  "chatId": "optional-uuid",
+  "mode": "hybrid",
+  "k": 5,
+  "hops": 1,
+  "provider": "ollama"
+}
+```
+
+| Field | Values | Description |
+|-------|--------|-------------|
+| `mode` | `vector`, `hybrid`, `graph` | Retrieval strategy |
+| `k` | integer | Number of chunks to retrieve |
+| `hops` | integer | Traversal depth for k-hop graph mode |
+| `provider` | `ollama`, `groq` | LLM backend for answer generation |
+
+### 13.4 System prompt and grounding
+
+The system prompt enforces: cite every claim with `[chunkId]`, refuse with a fixed sentence if context is insufficient, temperature always 0. The LLM physically cannot answer without retrieved chunks — hallucination resistance is structural, not relying on the model to self-police.
+
+---
+
+## 14. Frontend
+
+### 14.1 Development server
+
+```bash
+cd frontend
+npm run dev
+# Open http://localhost:5173
+# API requests are proxied to localhost:8000
+```
+
+### 14.2 Production build
+
+```bash
 cd frontend
 npm run build
+# Build output: frontend/dist/
+# FastAPI serves these automatically when runApi.py starts
+```
 
-# Start the frontend dev server
-npm run dev
+### 14.3 Tech stack
 
-# Run the evaluation harness
-python eval\runEval.py
+| Package | Purpose |
+|---------|---------|
+| React 18 | UI framework |
+| Vite 5 | Build tool + dev server |
+| Tailwind CSS 3 | Styling |
+| Cytoscape.js 3 | Graph explorer visualization |
+| cytoscape-fcose | Force-directed graph layout |
+| react-cytoscapejs | React wrapper for Cytoscape |
+
+### 14.4 Features
+
+- **Chat UI** — streaming responses with inline `[chunkId]` citation chips linked to source chunks
+- **Chat history** — persistent across sessions (stored in PostgreSQL)
+- **Graph Explorer** — interactive force-directed visualization of the entity graph; search entities by name, expand neighborhoods by hop count
+
+---
+
+## 15. Access Control
+
+Documents are classified by sensitivity level in `src/docAccess.py`. Users carry a `clearance` field set at account creation. Retrieval is automatically filtered — users only receive chunks from documents at or below their clearance.
+
+### Clearance levels (ascending)
+
+```
+public < internal < confidential < restricted
+```
+
+### Configuring document access
+
+Edit `DOC_ACCESS` in `src/docAccess.py`:
+
+```python
+DOC_ACCESS = {
+    'chapter_1': 'internal',
+    'chapter_2': 'internal',
+    'phase_1_document': 'confidential',
+    'board_minutes': 'restricted',
+}
+```
+
+Documents not listed default to `'internal'`. The `allowedDocs(userClearance)` function returns the list of documents a given user may access; this list is passed to every retrieval query.
+
+---
+
+## 16. Context Memory
+
+The memory system has four layers that are assembled into the LLM prompt for each turn.
+
+| Layer | Storage | Lifetime | Token budget |
+|-------|---------|----------|-------------|
+| Retrieved context | Neo4j chunks | Per turn | 1500 |
+| Chat memory (rolling summary) | PostgreSQL `chat_memory` | Per chat session | 300 |
+| User memory (persistent preferences) | PostgreSQL `user_memory` | Across all chats | 80 |
+| Recent turn history | PostgreSQL `messages` | Last N turns | 600 |
+
+### Chat memory
+
+`src/memory/summarizer.py` updates the rolling summary after each assistant turn, but only when the debounce threshold is reached (6 new turns OR 1000 new tokens). The LLM is given the previous summary + new exchanges and produces an updated summary. PII (10+ digit sequences) is redacted before storage.
+
+### User memory
+
+`src/memory/promoter.py` scans each user message for patterns like `"always answer in Arabic"` or `"my role is compliance analyst"` and promotes matched facts to `user_memory`. These are injected at the top of every subsequent prompt.
+
+---
+
+## 17. MuSiQue Benchmark Evaluation
+
+The `musique/` directory benchmarks the PPR retrieval upgrade against MuSiQue multi-hop QA (gold supporting paragraphs as ground truth).
+
+### 17.1 Setup
+
+```bash
+# Place MuSiQue data (see Section 3.3), then:
+cd musique
+python loadChunks.py
+# --> chunks/musique.json
+
+python ../runners/runEmbed.py musique
+# --> embeds musique chunks into Neo4j vector index
+```
+
+### 17.2 Build the MuSiQue entity graph (Route 2)
+
+```bash
+python ../runners/runGraphExtract.py musique
+python ../runners/runGraphBuild.py musique
+python ../runners/runEntityEmbed.py
+python ../graphTraversal/runSynonyms.py musique 0.85
+```
+
+### 17.3 Run evaluation
+
+```bash
+cd musique
+python eval.py
+# Output: musique/eval_results/v<N>_<label>.json
+```
+
+Each run writes a versioned JSON with full config, per-question results, and recall@K (K = 1, 2, 5, 10).
+
+### 17.4 Results summary
+
+| Version | Retriever | recall@5 | recall@10 |
+|---------|-----------|----------|-----------|
+| v0 (baseline) | k-hop (k=2) | 0.285 | 0.331 |
+| v4 / v7b (best) | PPR, alpha=0.5, seedTopK=5 | **0.364** | 0.419 |
+| v8 | PPR + Route 2 RELATED edges | in progress | — |
+
+Full version log with design decisions in `docs/PROCESS.md`.
+
+---
+
+## 18. Sensemaking Benchmark (AP News)
+
+End-to-end evaluation of the global arm against a vector-RAG baseline using Microsoft BenchmarkQED on the AP News corpus.
+
+### 18.1 Set up the isolated BenchmarkQED environment
+
+```bash
+python -m venv .venv-qed
+# Activate:
+source .venv-qed/bin/activate      # Linux / Mac
+# .venv-qed\Scripts\activate       # Windows
+
+pip install benchmark-qed
+# Reference: https://github.com/microsoft/benchmark-qed
+```
+
+### 18.2 Full pipeline
+
+```bash
+# 0. Download AP News corpus (LIMIT=50 in loadApNews.py for a quick slice)
+.venv-qed/Scripts/benchmark-qed.exe data download AP_news sensemaking/data/ap_news
+
+# 1. Build AP News chunks
+python sensemaking/loadApNews.py
+
+# 2. Route 2 graph extraction (PAID — OpenRouter)
+python runners/runGraphExtract.py apnews
+python runners/runGraphBuild.py apnews
+python runners/runEmbed.py apnews
+python runners/runEntityEmbed.py
+
+# 3. Communities + summaries (PAID)
+python graphTraversal/runSynonyms.py apnews 0.85
+python graphTraversal/runCommunities.py apnews
+python runners/runCommunitySummary.py apnews
+
+# 4. Generate questions via AutoQ
+.venv-qed/Scripts/benchmark-qed.exe autoq sensemaking/config/autoq <out> --generation-type data_global
+
+# 5. Generate answers from both systems (global arm vs vector baseline)
+python sensemaking/answerSystems.py <out>/questions.json apnews
+
+# 6. Judge pairwise win-rates (PAID — requires OpenAI or OpenRouter key for judge)
+.venv-qed/Scripts/benchmark-qed.exe autoe pairwise-scores \
+    sensemaking/config/pairwise.json sensemaking/eval_results/pairwise.json
 ```
 
 ---
 
-## Key design constraints
+## 19. Router Training
 
-- **Hallucination resistance**: every LLM-generated claim is forced to cite a `[chunkId]`; no-context queries refuse with an exact bilingual sentence. Implemented via a strict system prompt.
-- **Provenance**: every chunk, entity, and relationship carries `chunkIds` back to source. Citations in the chat are clickable and scroll to the verbatim chunk text.
-- **Access control at retrieval**: chunks the user can't see never reach the LLM. Filtered in Cypher (`WHERE node.docName IN $allowed`), not just hidden in the UI.
-- **Chat persistence**: each authenticated user has isolated chats, messages, and memory in PostgreSQL. The frontend does not own persistence.
-- **Schema-validated extraction**: entities are typed against the ontology; relationships are dropped if subject/object types don't match the schema.
-- **Single source of truth**: ontology lives in one Python file, imported by GLiNER, LLM, and KG validation alike.
-- **Configurable NER strategy**: choose `gliner`, `llm`, or `hybrid` from `.env` to match the hardware and document mix.
+The query router classifier is trained on a synthetic bilingual dataset (English + Arabic, local + global labels).
+
+### 19.1 Generate training data
+
+Requires: MuSiQue data in `musique/data/`, `Doc_Out/*.md` files from the CBE ingestion.
+
+```bash
+python router/genData.py
+# Output: router/train.jsonl (~2600 rows), router/test.jsonl (~1450 rows)
+```
+
+### 19.2 Train the router
+
+```bash
+python router/train.py
+```
+
+### 19.3 Evaluate
+
+```bash
+python router/evalHoldout.py
+```
+
+The holdout file `router/holdout_real.jsonl` is a scaffold. Hand-author 80–100 real bilingual queries (mixing domains and languages) for a proper holdout evaluation.
+
+---
+
+## 20. Project Layout
+
+```
+Gazelle/
+|-- src/                         Core importable modules
+|   |-- ocr.py                   Arabic-aware OCR (Qwen3-VL via Ollama)
+|   |-- ocrPreprocessing.py      Image preprocessing before OCR
+|   |-- parser.py                Markdown --> structured JSON
+|   |-- chunker.py               Token-bounded chunker
+|   |-- semantic_chunker.py      Semantic boundary-aware chunker
+|   |-- embedding.py             BGE-M3 chunk embedding --> Neo4j
+|   |-- glinerExtract.py         GLiNER NER (Route 1)
+|   |-- llmNER.py                LLM-based NER (alternative)
+|   |-- graphExtract.py          LLM entity + relation extraction (Route 2)
+|   |-- kgBuild.py               Route 1 KG writer (Entity + COOCCURS_WITH)
+|   |-- graphBuild.py            Route 2 KG writer (Entity + RELATED)
+|   |-- entityEmbedding.py       BGE-M3 on canonical entity names
+|   |-- entityAlign.py           Cosine deduplication (SYNONYM edges)
+|   |-- retriever.py             Vector / hybrid / graph retrieval
+|   |-- chatApi.py               FastAPI app (chat, graph, auth, memory)
+|   |-- auth.py                  Bearer token auth (SHA-256, PostgreSQL)
+|   |-- docAccess.py             Per-document clearance levels
+|   |-- ontology.py              Entity types + relationship schema
+|   |-- config.py                All tuneable constants + env var loading
+|   |-- router.py                Query router (local vs global)
+|   |-- globalSearch.py          Global arm map-reduce over community reports
+|   |-- communitySummary.py      LLM community report generation
+|   |-- community.py             Persist Leiden hierarchy to Neo4j
+|   |-- llmTriples.py            Multi-backend LLM call (Ollama/Groq/OpenRouter/Gemini)
+|   |-- memory/
+|   |   |-- assembler.py         Token-budgeted prompt assembly
+|   |   |-- summarizer.py        Rolling chat summary updater
+|   |   +-- promoter.py          Pattern-based user memory promotion
+|   |-- db/
+|   |   |-- models.py            SQLAlchemy ORM models
+|   |   |-- session.py           Async session factory
+|   |   +-- repositories/        DAO layer (auth, chat, memory, citation, audit)
+|   +-- classical_NER/
+|       |-- featureExtract.py    Arabic CRF feature engineering (CAMeL Tools)
+|       |-- trainCrf.py          CRF training (sklearn-crfsuite, L-BFGS)
+|       |-- runCrf.py            CRF inference on new chunks
+|       |-- buildGazetteer.py    Build entity gazetteer from annotations
+|       |-- convertToLabelStudio.py  Export GLiNER output for Label Studio
+|       |-- evalNer.py           NER evaluation against gold annotations
+|       |-- annotations/         Gold annotation files (Label Studio format)
+|       |-- models/              Trained CRF model checkpoints (.pkl)
+|       |-- training/            Feature-extracted BIO training sequences
+|       +-- gazetteer/           Compiled entity lookup tables
+|
+|-- runners/                     Entry-point scripts
+|   |-- _bootstrap.py            Adds src/ to sys.path, chdirs to repo root
+|   |-- runApi.py                Start FastAPI server
+|   |-- runOcr.py
+|   |-- runParser.py
+|   |-- runChunker.py
+|   |-- runEmbed.py
+|   |-- runGliner.py
+|   |-- runGraphExtract.py
+|   |-- runGraphBuild.py
+|   |-- runKgBuild.py
+|   |-- runEntityEmbed.py
+|   |-- runCommunitySummary.py
+|   +-- runAll.py                Single-file or directory batch processor
+|
+|-- graphTraversal/              PPR retrieval and community detection
+|   |-- _bootstrap.py
+|   |-- ppr.py                   Personalized PageRank (power iteration, CSR)
+|   |-- seeder.py                Query embedding --> entity seed vector
+|   |-- retrieve.py              RetrievalIndex: loads graph state once per process
+|   |-- loadGraph.py             Cypher edge rows --> sparse adjacency matrix
+|   |-- synonyms.py              SYNONYM edge generation (entity alignment)
+|   |-- leiden.py                From-scratch Leiden community detection
+|   |-- khop.py                  K-hop retrieval (baseline comparison)
+|   |-- runCommunities.py        entity graph --> Leiden --> Neo4j
+|   |-- runSynonyms.py
+|   |-- testLeiden.py
+|   |-- testCommunity.py
+|   +-- validateLeiden.py
+|
+|-- musique/                     MuSiQue multi-hop QA evaluation harness
+|   |-- _bootstrap.py
+|   |-- eval.py                  Recall@K evaluation, versioned JSON output
+|   |-- loadChunks.py            Build chunk JSON from MuSiQue JSONL
+|   |-- data/                    Place musique_ans_v1.0_*.jsonl here
+|   +-- eval_results/            Versioned evaluation result JSONs
+|
+|-- sensemaking/                 Global arm evaluation (AP News + BenchmarkQED)
+|-- router/                      Query router training data + classifier
+|-- frontend/                    React + Vite frontend (chat UI + graph explorer)
+|-- alembic/                     PostgreSQL schema migrations
+|-- docs/                        Design documentation
+|   |-- PROCESS.md               PPR retrieval design log + versioned eval results
+|   |-- GLOBAL_PLAN.md           Global arm architecture plan
+|   |-- COMMUNITY_DETECTION.md   Leiden design notes
+|   +-- MEMORY_ARCHITECTURE.md   Memory system design
+|-- Documents/                   Input PDFs (place your documents here)
+|-- Doc_Out/                     OCR output Markdown
+|-- parsed/                      Parser output JSON
+|-- chunks/                      Chunker output JSON
+|-- extractions/                 Entity and relation extraction outputs
+|-- annotations/                 Gold annotation files (Label Studio format)
+|-- run.py                       Full pipeline orchestrator (skip-if-exists)
+|-- alembic.ini
+|-- requirements.txt
++-- .env                         Your environment variables (do not commit)
+```
+
+---
+
+## 21. Quick Start
+
+```bash
+# 1. Install Python dependencies
+pip install -r requirements.txt
+
+# 2. Install frontend dependencies
+cd frontend && npm install && cd ..
+
+# 3. Pull required Ollama models
+ollama pull qwen3-vl:8b-instruct-q4_K_M
+ollama pull bge-m3
+ollama pull granite4.1:8b
+
+# 4. Start services (Neo4j and PostgreSQL must already be running)
+ollama serve &
+
+# 5. Configure environment
+cp .env.example .env     # then edit .env with your credentials and API keys
+
+# 6. Create the database and run migrations
+createdb gazelle
+alembic upgrade head
+
+# 7. Place your documents in Documents/ and run ingestion
+python run.py
+
+# 8. Add entity synonym edges
+python graphTraversal/runSynonyms.py
+
+# 9. (Optional) Detect communities and generate summaries
+python graphTraversal/runCommunities.py
+python runners/runCommunitySummary.py
+
+# 10. Start the API server
+python runners/runApi.py
+
+# 11. Start the frontend dev server
+cd frontend && npm run dev
+# Open http://localhost:5173
+```

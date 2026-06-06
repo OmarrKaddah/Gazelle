@@ -1,4 +1,5 @@
 import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -17,11 +18,12 @@ load_dotenv()
 
 from config import CHUNKER_TYPE, NER_STRATEGY
 
-# Choose NER strategy (gliner | llm) from config. Mirrors runners/runAll.py
+# Choose NER strategy (gliner | llm | classical) from config.
 if NER_STRATEGY == 'llm':
     from llmNER import extractEntities as extractEntitiesNER, dumpEntities as dumpEntitiesNER
-else:
+elif NER_STRATEGY == 'gliner':
     from glinerExtract import extractEntities as extractEntitiesNER, dumpEntities as dumpEntitiesNER
+# classical: no per-chunk import; runEntities() delegates to runners/runNerPipeline.py
 
 if CHUNKER_TYPE == 'semantic':
     from semantic_chunker import chunkDoc, dumpChunks
@@ -92,6 +94,9 @@ def runEntities():
 def runEntities():
     print("\n=== Entity Extraction ===")
     print(f"[NER_STRATEGY] {NER_STRATEGY}")
+    if NER_STRATEGY == 'classical':
+        subprocess.run([sys.executable, "-u", "runners/runNerPipeline.py"], check=True)
+        return
     for chunk in sorted(Path("chunks").glob("*.json")):
         docName = chunk.stem
         out = Path(f"extractions/{docName}_entities.json")
