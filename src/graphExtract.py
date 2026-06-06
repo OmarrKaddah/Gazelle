@@ -51,11 +51,13 @@ def parseElements(raw):
         for e in data.get('entities', [])
         if e.get('name')
     ]
+
     relationships = [
         (r['source'], r['target'], r.get('predicate', ''), r.get('description', ''), r.get('strength', 1))
         for r in data.get('relationships', [])
         if r.get('source') and r.get('target')
     ]
+
     return {'entities': entities, 'relationships': relationships}
 
 
@@ -98,10 +100,14 @@ def extractDoc(docName, backend=GRAPH_EXTRACT_BACKEND):
 
 
 def dumpElements(results, docName):
+
     # atomic write so a Ctrl-C mid-flush can never corrupt the resume checkpoint
+
     Path(EXTRACT_DIR).mkdir(exist_ok=True)
+
     path = Path(f'{EXTRACT_DIR}/{docName}_graph.json')
     tmp = path.with_suffix('.json.tmp')
+    
     tmp.write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding='utf-8')
     tmp.replace(path)
 

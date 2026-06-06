@@ -132,11 +132,11 @@ def sampleTrainingPatches(image, label, patchSize, patchesPerImage, hogDescripto
 
 
 def buildTrainingSet(handwrittenPaths, cleanPaths, patchSize, patchesPerImage, randomState):
-    hogDescriptor = buildHogDescriptor(patchSize)
-    features = []
+    hogDescriptor = buildHogDescriptor(patchSize)      
+    features = []      
     labels = []
-    for index, imagePath in enumerate(handwrittenPaths):
-        image = loadGrayImage(imagePath)
+    for index, imagePath in enumerate(handwrittenPaths):          
+        image = loadGrayImage(imagePath)         
         sampledFeatures, sampledLabels = sampleTrainingPatches(
             image,
             1,
@@ -150,7 +150,7 @@ def buildTrainingSet(handwrittenPaths, cleanPaths, patchSize, patchesPerImage, r
     for index, imagePath in enumerate(cleanPaths):
         image = loadGrayImage(imagePath)
         sampledFeatures, sampledLabels = sampleTrainingPatches(
-            image,
+            image,              
             0,
             patchSize,
             patchesPerImage,
@@ -175,7 +175,7 @@ def trainHandwritingRemovalModel(handwrittenDir, cleanDir, modelPath, patchSize=
     classifier.fit(features, labels)
     model = HandwritingRemovalModel(
         classifier=classifier,
-        patchSize=patchSize,
+        patchSize=patchSize,       
         stride=stride,
         threshold=HANDWRITING_THRESHOLD,
     )
@@ -192,7 +192,7 @@ def loadHandwritingRemovalModel(modelPath):
     return HandwritingRemovalModel(**model)
 
 
-def predictHandwritingScoreMap(image, model):
+def predictHandwritingScoreMap(image, model):     
     grayscale = image if image.ndim == 2 else cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     padded = padImage(grayscale, model.patchSize)
     hogDescriptor = buildHogDescriptor(model.patchSize)
@@ -203,21 +203,26 @@ def predictHandwritingScoreMap(image, model):
     positiveIndex = int(np.where(model.classifier.classes_ == 1)[0][0])
 
     patchPositions = []
-    patchFeatures = []
+    patchFeatures = []      
     for y in yPositions:
         for x in xPositions:
             patch = padded[y : y + model.patchSize, x : x + model.patchSize]
             patchPositions.append((y, x))
+
+
             patchFeatures.append(extractPatchFeatures(patch, hogDescriptor))
 
     featureMatrix = np.asarray(patchFeatures, dtype=np.float32)
     scores = model.classifier.predict_proba(featureMatrix)[:, positiveIndex]
 
     scoreMap = np.zeros((height, width), dtype=np.float32)
+    
     weightMap = np.zeros((height, width), dtype=np.float32)
 
     for index, (y, x) in enumerate(patchPositions):
+       
         score = float(scores[index])
+       
         scoreMap[y : y + model.patchSize, x : x + model.patchSize] += score
         weightMap[y : y + model.patchSize, x : x + model.patchSize] += 1.0
 

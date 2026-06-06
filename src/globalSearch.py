@@ -46,11 +46,13 @@ def asText(x):
         return x
     if isinstance(x, list):
         return ' '.join(asText(i) for i in x)
+    
     return json.dumps(x, ensure_ascii=False)
 
 
 
 def toScore(x):
+
     try:
         return int(float(x))
     except (TypeError, ValueError):
@@ -108,6 +110,7 @@ def mapBatch(query, reports, backend):
             data = parseJson(raw)
         except json.JSONDecodeError:
             continue
+
         return [(asText(p.get('description', '')), toScore(p.get('score'))) for p in data.get('points', [])]
     
 
@@ -127,7 +130,7 @@ def reduceAnswers(query, points, backend):
 
 
     raw = parseJson(callLLM(REDUCE_PROMPT.format(query=query, points=block), backend=backend))
-    return asText(raw.get('answer', ''))
+    return asText(raw.get('answer', ''))            
 
 
 
@@ -135,7 +138,7 @@ def reduceAnswers(query, points, backend):
 
 def globalSearch(query, corpus, level=0, backend='openrouter'):
     reports = [rep for _, rep in loadCommunityReports(corpus, level)]
-    points = []
+    points = []              
 
 
     for batch in batchReports(reports):

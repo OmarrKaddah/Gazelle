@@ -5,14 +5,7 @@ from pathlib import Path
 from urllib.parse import urldefrag, unquote, urlparse
 from playwright.sync_api import sync_playwright
 
-# Scrape CBE (Central Bank of Egypt) regulation PDFs. cbe.org.eg sits behind a WAF
-# that rejects plain HTTP, so we drive a real Chromium via Playwright: load the
-# regulations pages in a browser (passing the WAF), harvest PDF + sub-page links,
-# and download each PDF through the SAME browser context (carrying the WAF cookies).
-#
-# The first run is also the diagnostic: it prints page titles + link counts so we
-# can see whether headless gets past the WAF and how the listing is structured,
-# then refine SEED_URLS / depth. Run headful (--headful) if headless is blocked.
+
 
 SEED_URLS = [
     'https://www.cbe.org.eg/en/laws-regulations/regulations/overview',
@@ -37,10 +30,12 @@ def bumpPageNo(url):
 
 
 def isRegLink(url):
+
     return '/laws-regulations/' in url.lower() and not isPdf(url)
 
 
 def harvestLinks(page):
+
     return page.eval_on_selector_all('a[href]', 'els => els.map(e => e.href)')
 
 
@@ -59,25 +54,28 @@ def looksBlocked(title):
 def downloadPdf(ctx, url, dest):
     resp = ctx.request.get(url, timeout=120000)
     if resp.status != 200:
+
         return None, str(resp.status)
     body = resp.body()
     if not body.startswith(b'%PDF'):
+
         return None, 'not-pdf'
     dest.write_bytes(body)
     return len(body), '200'
 
 
 def harvestPdfUrls(page, seeds, maxDepth, maxPages=400):
-    # BFS over regulation pages up to maxDepth, collecting PDF links. Pagination
-    # (pageNo=N) inherits the current depth so it doesn't consume the depth budget
-    # — a category with 30 pages of circulars stays fully crawlable at depth 1.
+
+
     pdfUrls = set()
     visited = set()
     queue = [(u, 0) for u in seeds]
     while queue and len(visited) < maxPages:
         url, depth = queue.pop(0)
         base = urldefrag(url)[0]
+
         if base in visited:
+
             continue
         visited.add(base)
         try:
@@ -88,7 +86,9 @@ def harvestPdfUrls(page, seeds, maxDepth, maxPages=400):
             continue
         title = page.title()
         links = harvestLinks(page)
+
         pdfs = [u for u in links if isPdf(u)]
+
         regs = [u for u in links if isRegLink(u)]
         newPdfs = [u for u in pdfs if u not in pdfUrls]
         pdfUrls.update(pdfs)
@@ -108,6 +108,7 @@ def harvestPdfUrls(page, seeds, maxDepth, maxPages=400):
 def scrapeCbe(headless=True, maxDepth=1, seeds=SEED_URLS):
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     with sync_playwright() as p:
+
         browser = p.chromium.launch(headless=headless)
         ctx = browser.new_context(user_agent=UA, viewport={'width': 1366, 'height': 900})
         page = ctx.new_page()
@@ -118,10 +119,13 @@ def scrapeCbe(headless=True, maxDepth=1, seeds=SEED_URLS):
         manifest = []
         for url in sorted(pdfUrls):
             fname = safeName(url)
+
             dest = OUT_DIR / fname
+
             entry = {'url': url, 'filename': fname}
             if dest.exists():
                 entry['status'] = 'exists'
+
             else:
                 size, code = downloadPdf(ctx, url, dest)
                 entry['status'] = 'ok' if size else f'fail:{code}'
@@ -131,6 +135,7 @@ def scrapeCbe(headless=True, maxDepth=1, seeds=SEED_URLS):
             manifest.append(entry)
             print(f'  {entry["status"]:>10}  {fname}', flush=True)
         browser.close()
+
 
     (OUT_DIR / 'manifest.json').write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2), encoding='utf-8'

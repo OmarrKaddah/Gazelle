@@ -13,34 +13,41 @@ from db.session import getDbSession
 bearer = HTTPBearer(auto_error=False)
 
 
-def hashToken(token: str):
+def hashToken(token: str):        
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
 
-def verifyPassword(password: str, passwordHash: str):
+def verifyPassword(password: str, passwordHash: str):        
     return bcrypt.checkpw(password.encode("utf-8"), passwordHash.encode("utf-8"))
 
 
 async def login(username: str, password: str, session: AsyncSession):
     user = await getUserByUsername(session, username)
+
     if not user or not verifyPassword(password, user.passwordHash):
         return None
+    
     token = secrets.token_urlsafe(32)
+
     await createSession(session, user.id, hashToken(token))
     await session.commit()
+
     return token
 
 
 async def logout(token: str, session: AsyncSession):
+
+
     await deleteSessionByTokenHash(session, hashToken(token))
-    await session.commit()
+    await session.commit()         
 
 
 async def userFromToken(token: str, session: AsyncSession):
     user = await getUserByTokenHash(session, hashToken(token))
     if not user:
         return None
-    return {
+    
+    return { 
         "id": str(user.id),
         "username": user.username,
         "name": user.username,
@@ -55,13 +62,16 @@ async def getCurrentUser(
 ):
     if not creds:
         raise HTTPException(status_code=401, detail="Missing credentials")
+    
     user = await userFromToken(creds.credentials, session)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
+    
     return user
 
 
 async def requireAdmin(user=Depends(getCurrentUser)):
     if user["role"] != "Admin":
         raise HTTPException(status_code=403, detail="Admin role required")
+    
     return user

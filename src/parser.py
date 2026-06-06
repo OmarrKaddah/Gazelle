@@ -167,7 +167,9 @@ def parseDocx(path):
                 continue
             if text.strip() in header_texts:
                 continue
+
             header_texts =set()
+            
             kind = 'list' if isinstance(item, ListItem) else 'paragraph'
         else:
 

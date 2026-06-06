@@ -95,12 +95,21 @@ def extractEntities(docName):
         entities.extend(chunk_ents)
         print(f"[{i+1}/{len(chunks)}] {c['chunkId']}: {len(chunk_ents)} entities", flush=True)
     
-    return entities
+    return entities   
+
+
+
+
 
 
 def dumpEntities(entities, docName):
     Path('extractions').mkdir(exist_ok=True)
+    
     Path(f'extractions/{docName}_entities.json').write_text(
         json.dumps(entities, ensure_ascii=False, indent=2),
         encoding='utf-8',
     )
+
+
+
+

@@ -21,6 +21,7 @@ def communityNodes(levels, corpus):
     for level, labels in enumerate(levels):
         for label in sorted(set(int(l) for l in labels)):
             nodes.append({'id': communityId(corpus, level, label), 'level': level, 'corpus': corpus})
+    
     return nodes
 
 

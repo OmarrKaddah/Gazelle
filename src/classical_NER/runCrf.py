@@ -5,6 +5,7 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from pathlib import Path
 from featureExtract import tokenize, posTag, tokenFeatures, loadGazetteer, isArabic
+from config import EXTRACT_DIR
 
 
 def loadModel(name='crf'):
@@ -74,11 +75,8 @@ def predictChunk(crf, chunk, orgTriggers, moneyTriggers, monthNames):
 
 
 def dumpEntities(entities, docName, modelName):
-    
-    Path('extractions').mkdir(exist_ok=True)
-    
-    out = Path(f'extractions/{docName}_{modelName}_entities.json')
-    
+    Path(EXTRACT_DIR).mkdir(exist_ok=True)
+    out = Path(f'{EXTRACT_DIR}/{docName}_entities.json')
     out.write_text(json.dumps(entities, ensure_ascii=False, indent=2), encoding='utf-8')
     print(f"done")
 

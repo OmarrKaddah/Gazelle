@@ -18,7 +18,7 @@ GRAPH_ROUTE = os.environ.get('GRAPH_ROUTE', '2')
 # folders (Doc_Out/, parsed/, chunks/) so they SKIP and don't re-run.
 # EXTRACT_DIR is the only post-chunk *file* output; the rest of the pipeline
 # writes to Neo4j, namespaced by CORPUS_NAME (the :Community {corpus} tag).
-EXTRACT_DIR = os.environ.get('EXTRACT_DIR', 'extractions_cbe') # per-doc extraction JSON; shared by graphExtract write + graphBuild read (Route 2) and glinerExtract + kgBuild (Route 1)
+EXTRACT_DIR = os.environ.get('EXTRACT_DIR', 'extractions') # per-doc extraction JSON; all routes write here — GLiNER/CRF *_entities.json, LLM *_graph.json
 CORPUS_NAME = os.environ.get('CORPUS_NAME', 'cbe')         # tags (:Community {corpus}); the scope key for community summaries
 SYNONYM_THRESHOLD = float(os.environ.get('SYNONYM_THRESHOLD', '0.85'))  # cosine cutoff for SYNONYM identity-bridging edges
 COMMUNITY_RESOLUTION = float(os.environ.get('COMMUNITY_RESOLUTION', '1.0'))  # Leiden resolution

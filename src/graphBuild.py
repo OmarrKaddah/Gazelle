@@ -76,17 +76,22 @@ def mergeRelationships(instances, lookup):
     raw = unmatched = selfRef = 0
     for inst in instances:
         for src, dst, predicate, desc, _strength in inst['relationships']:
+
             raw += 1
             srcId = lookup.get(canonicalKey(src))
             dstId = lookup.get(canonicalKey(dst))
+
             if srcId is None or dstId is None:
                 unmatched += 1
                 continue
+
             if srcId == dstId:
                 selfRef += 1
                 continue
+
             edge = edges[(srcId, dstId)]
             edge['weight'] += 1
+
             if desc:
                 edge['descriptions'].add(desc)
             if predicate:
@@ -94,6 +99,7 @@ def mergeRelationships(instances, lookup):
     print(f'[graphBuild] {raw} raw rels, {unmatched} unmatched (orphan endpoints), {selfRef} self-referential, {len(edges)} unique pairs')
     return [
         {
+
             'src': src,
             'dst': dst,
             'weight': d['weight'],
@@ -148,16 +154,23 @@ def writeGraph(docName, entities, edges, chunks):
     with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
         with driver.session() as session:
             session.execute_write(setupConstraints)
+
             session.execute_write(writeDocument, docName)
+
             session.execute_write(writeChunks, docName, chunks)
+
             session.execute_write(writeEntities, entities)
+
             session.execute_write(writeRelated, edges)
 
 
 def buildGraph(docName):
+
     instances = loadElements(docName)
     chunks = loadChunks(docName)
+
     entities = mergeEntities(docName, instances)
     edges = mergeRelationships(instances, buildNameLookup(entities))
+    
     writeGraph(docName, entities, edges, chunks)
     print(f'[graphBuild] {docName}: {len(entities)} entities, {len(edges)} RELATED edges')

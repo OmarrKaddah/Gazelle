@@ -7,11 +7,14 @@ from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, EXTRACT_DIR
 
 
 def loadChunks(docName):
+                              
     return json.loads(Path(f'chunks/{docName}.json').read_text(encoding='utf-8'))
 
 
 def loadEntitySpans(docName):
+                            
     return json.loads(Path(f'{EXTRACT_DIR}/{docName}_entities.json').read_text(encoding='utf-8'))
+
 
 
 
@@ -24,19 +27,24 @@ _AR_FOLD = str.maketrans({
 
 
 def canonicalKey(text):
+                         
     text = _AR_DIACRITICS.sub('', text).translate(_AR_FOLD)
+         
     return re.sub(r'\s+', ' ', text).strip().lower()
 
 
 def canonicalId(docName, key, type):
+                         
     slug = re.sub(r'\s+', '-', key)
+              
     return f'{docName}-{slug}-{type.lower()}'
 
 
 def groupEntities(docName, spans):
     grouped = {}
     for s in spans:
-        key = (canonicalKey(s['text']), s['type'])
+                    
+        key = (canonicalKey(s['text']), s['type'])         
         if key not in grouped:
             grouped[key] = {
                 'canonicalId': canonicalId(docName, key[0], key[1]),
@@ -48,11 +56,12 @@ def groupEntities(docName, spans):
             }
         rec = grouped[key]
         surface = s['text'].strip()
+                       
         if surface != rec['canonicalName']:
-            rec['aliases'].add(surface)
+            rec['aliases'].add(surface)              
         rec['chunkIds'].add(s['chunkId'])
-    for rec in grouped.values():
-        rec['aliases'] = sorted(rec['aliases'])
+    for rec in grouped.values():             
+        rec['aliases'] = sorted(rec['aliases'])            
         rec['chunkIds'] = sorted(rec['chunkIds'])
     return list(grouped.values())
 
@@ -129,7 +138,7 @@ def loadNameLookup(docName):
     return lookup
 
 
-def writeTripleEdges(docName):
+def writeTripleEdges(docName):             
     triplesPath = Path(f'extractions/{docName}_triples.json')
     data = json.loads(triplesPath.read_text(encoding='utf-8'))
     lookup = loadNameLookup(docName)
@@ -137,19 +146,25 @@ def writeTripleEdges(docName):
     edgeData = defaultdict(lambda: {'count': 0, 'predicates': set()})
     raw = unmatched = selfRef = 0
     for entry in data:
+
         for triple in entry['triples']:
+
             if len(triple) != 3:
                 continue
+
             raw += 1
             subText, pred, objText = triple
             subId = lookup.get(subText.lower().strip())
             objId = lookup.get(objText.lower().strip())
             if subId is None or objId is None:
                 unmatched += 1
+
                 continue
+
             if subId == objId:
                 selfRef += 1
                 continue
+            
             key = (subId, objId)
             edgeData[key]['count'] += 1
             edgeData[key]['predicates'].add(pred)
