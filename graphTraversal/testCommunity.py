@@ -8,10 +8,6 @@ from community import orientLevels, communityNodes, memberships, parentLinks, co
 from retrieve import scopeClause
 from validateLeiden import adjacencyOf, footballGraph
 
-# Pure-function tests for the community-detection persistence (src/community.py).
-# No Neo4j: we validate the payload builders against a real Leiden hierarchy
-# (football) plus a hand-built non-nested hierarchy that exercises the plurality
-# vote directly. The Neo4j write path is smoke-tested separately via runCommunities.
 
 
 def check(name, condition, detail=''):

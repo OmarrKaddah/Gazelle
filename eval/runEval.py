@@ -12,7 +12,7 @@ from retriever import retrieve
 
 K = 5
 HOPS = 1
-CLEARANCE = 'restricted'  # eval as max-clearance user so RBAC doesn't filter results
+CLEARANCE = 'restricted'  #IMPORTANT: filters fa returnns 0 chunks error
 
 
 def loadQueries():

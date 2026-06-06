@@ -6,19 +6,12 @@ from globalSearch import globalSearch
 from baseline import vectorAnswer
 from config import GRAPH_EXTRACT_BACKEND
 
-# Bridge between AutoQ (questions) and AutoE (judging): run both systems over the
-# questions and write one answer file per condition in the schema AutoE merges on —
-# a JSON list of {question_id, question_text, answer}. AutoE pairwise-scores then
-# compares these two files. Resume-safe: re-running skips already-answered questions.
-#
-# Usage: python sensemaking/answerSystems.py <questionsJson> [corpus] [outDir]
+
 
 CORPUS = sys.argv[2] if len(sys.argv) > 2 else 'apnews'
 OUT_DIR = Path(sys.argv[3] if len(sys.argv) > 3 else 'sensemaking/eval_results')
 
-# AutoE reads each condition's answers from a DIRECTORY as <set>.json, looping over
-# the named question_sets in pairwise.json. So each system gets its own subdir and we
-# name the file after the question set (the questions filename, sans 'questions_').
+
 SET = Path(sys.argv[1]).stem
 if SET.startswith('questions_'):
     SET = SET[len('questions_'):]

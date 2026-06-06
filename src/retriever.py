@@ -1,8 +1,16 @@
+import re
+
 from neo4j import GraphDatabase
 from embedding import embedQuery
 from docAccess import allowedDocs
 from localRetrieve import getLocalIndex
 from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, NEO4J_DB, RRF_K, OVERFETCH
+
+_LUCENE_SPECIAL = re.compile(r'[+\-&|!(){}\[\]^"~*?:\\/]')
+
+
+def sanitizeFulltext(query):
+    return _LUCENE_SPECIAL.sub(' ', query).strip() or '*'
 
 
 def vectorQuery(tx, queryEmbedding, k, allowed):
@@ -28,7 +36,7 @@ def fulltextQuery(tx, query, k, allowed):
         RETURN node.chunkId AS chunkId, node.text AS text, node.sectionPath AS sectionPath,
                node.pages AS pages, node.docName AS docName, score
         """,
-        searchText=query, k=k, allowed=allowed,
+        searchText=sanitizeFulltext(query), k=k, allowed=allowed,
     )
     return [dict(r) for r in res]
 
@@ -104,13 +112,15 @@ def graphRetrieve(query, k, clearance):
 def retrieve(query, mode='vector', k=5, clearance='public'):
     allowed = allowedDocs(clearance)
     if not allowed:
-        return []
+        return {'chunks': [], 'seeds': [], 'pathEdges': []}
     if mode == 'vector':
-        return vectorSearch(query, k, allowed)
+        chunks = vectorSearch(query, k, allowed)
+        return {'chunks': chunks, 'seeds': [], 'pathEdges': []}
     if mode == 'fusion':
-        return fusionSearch(query, k, allowed)
+        chunks = fusionSearch(query, k, allowed)
+        return {'chunks': chunks, 'seeds': [], 'pathEdges': []}
     if mode == 'graph':
-        return graphRetrieve(query, k, clearance)['chunks']
+        return graphRetrieve(query, k, clearance)
     if mode == 'hybrid':
-        return hybridRetrieve(query, k, clearance)['chunks']
-    return []
+        return hybridRetrieve(query, k, clearance)
+    return {'chunks': [], 'seeds': [], 'pathEdges': []}

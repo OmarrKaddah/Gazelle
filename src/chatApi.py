@@ -32,12 +32,14 @@ from memory.promoter import maybePromote
 from config import (
     NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD,
     OLLAMA_URL, GROQ_URL, OLLAMA_CHAT_MODEL, GROQ_MODEL, GROQ_API_KEY,
+    OPENROUTER_URL, OPENROUTER_API_KEY, OPENROUTER_MODEL,
     CHAT_DOMAIN,
 )
 
 PROVIDERS = {
     'ollama': {'url': OLLAMA_URL, 'model': OLLAMA_CHAT_MODEL, 'apiKey': None},
     'groq': {'url': GROQ_URL, 'model': GROQ_MODEL, 'apiKey': GROQ_API_KEY},
+    'openrouter': {'url': OPENROUTER_URL, 'model': OPENROUTER_MODEL, 'apiKey': OPENROUTER_API_KEY},
 }
 
 
@@ -51,7 +53,7 @@ app = FastAPI(title="Gazelle API")
 @app.on_event("startup")
 async def onStartup():
     await initDb()
-    asyncio.create_task(asyncio.to_thread(getLocalIndex))
+    await asyncio.to_thread(getLocalIndex)
 
 
 
@@ -291,6 +293,7 @@ def infoEndpoint():
         "providers": {
             "ollama": {"model": OLLAMA_CHAT_MODEL, "available": True},
             "groq": {"model": GROQ_MODEL, "available": bool(GROQ_API_KEY)},
+            "openrouter": {"model": OPENROUTER_MODEL, "available": bool(OPENROUTER_API_KEY)},
         },
         "levels": LEVELS,
     }
@@ -323,7 +326,8 @@ async def meEndpoint(user=Depends(getCurrentUser)):
 
 @app.post("/api/retrieve")
 def retrieveEndpoint(req: ChatRequest, user=Depends(getCurrentUser)):
-    return {"chunks": retrieve(req.query, mode=req.mode, k=req.k, clearance=user['clearance'])}
+    result = retrieve(req.query, mode=req.mode, k=req.k, clearance=user['clearance'])
+    return {"chunks": result['chunks']}
 
 
 @app.post("/api/admin/documents/publish")
@@ -504,8 +508,10 @@ async def graphEndpoint(
     }
 
 
-async def chatEventGen(query, chunks, userMemRows, chatSummary, recentTurns, chatId, userId, req):
+async def chatEventGen(query, chunks, seeds, pathEdges, userMemRows, chatSummary, recentTurns, chatId, userId, req):
     yield "data: " + json.dumps({"type": "citations", "citations": chunks}) + "\n\n"
+    if seeds:
+        yield "data: " + json.dumps({"type": "graph", "seeds": seeds, "pathEdges": pathEdges}) + "\n\n"
     parts = []
     async for event in streamTokens(query, chunks, userMemRows, chatSummary, recentTurns, req.provider):
         payload = json.loads(event[6:].strip())
@@ -533,7 +539,10 @@ async def chatEventGen(query, chunks, userMemRows, chatSummary, recentTurns, cha
 
 @app.post("/api/chat")
 async def chatStream(req: ChatRequest, user=Depends(getCurrentUser)):
-    chunks = await asyncio.to_thread(retrieve, req.query, mode=req.mode, k=req.k, clearance=user['clearance'])
+    result = await asyncio.to_thread(retrieve, req.query, mode=req.mode, k=req.k, clearance=user['clearance'])
+    chunks = result['chunks']
+    seeds = result['seeds']
+    pathEdges = result['pathEdges']
     userId = uuid.UUID(user["id"])
     async with asyncSessionFactory() as session:
         if req.chatId:
@@ -550,7 +559,7 @@ async def chatStream(req: ChatRequest, user=Depends(getCurrentUser)):
         chatSummary = chatMem.summary if chatMem else ""
         recentTurns = await loadRecentMessages(session, chatId, n=4)
     return StreamingResponse(
-        chatEventGen(req.query, chunks, userMemRows, chatSummary, recentTurns, chatId, userId, req),
+        chatEventGen(req.query, chunks, seeds, pathEdges, userMemRows, chatSummary, recentTurns, chatId, userId, req),
         media_type="text/event-stream; charset=utf-8",
     )
 

@@ -1,13 +1,6 @@
 import re
 
-# Hand-crafted bilingual cue features for the query router (Model 1, and shared by
-# every model as an optional concat). The local/global signal is largely lexical:
-# global queries carry sensemaking cues ("across the corpus", "الاتجاهات العامة"),
-# local queries carry specific-fact cues ("how much", "متى"). These features encode
-# that directly, in both Arabic and English, with no embedding and no model call.
 
-# Arabic cue stems are stored already-normalised (see normalizeArabic) so they match
-# regardless of attached clitics (و/ف/ب/ك/ل/ال) via substring containment.
 GLOBAL_CUES_AR = ['اتجاه', 'اتجاهات', 'موضوعات', 'مواضيع', 'بشكل عام', 'بصفه عام',
                   'عبر الوثائق', 'عبر المستندات', 'عبر المجموعه', 'نمط', 'انماط',
                   'ملخص', 'لخص', 'عموما', 'المتكرره', 'ككل', 'الرئيسيه',
@@ -33,12 +26,31 @@ WHO_CUES = ['who', 'من هو', 'من هي']
 QUANTITY_CUES = ['how much', 'how many', 'كم']
 DEFINE_CUES = ['define', 'definition', 'تعريف', 'عرف', 'ما المقصود']
 
+
+
+
+
 GLOBAL_CUES = GLOBAL_CUES_AR + GLOBAL_CUES_EN
 LOCAL_CUES = LOCAL_CUES_AR + LOCAL_CUES_EN
 
-_HARAKAT = re.compile(r'[ً-ْٰـ]')
-_TOKEN = re.compile(r'[\w؀-ۿ]+')
-_DIGIT = re.compile(r'[0-9٠-٩]')
+
+
+
+
+
+
+HARAKAT = re.compile(r'[ً-ْٰـ]')
+TOKEN = re.compile(r'[\w؀-ۿ]+')
+DIGIT = re.compile(r'[0-9٠-٩]')
+
+
+
+
+
+
+
+
+
 
 FEATURE_NAMES = ['globalCueRatio', 'localCueRatio', 'globalCuePresent',
                  'localCuePresent', 'cueDiff', 'tokenCount', 'hasDigit',
@@ -46,38 +58,75 @@ FEATURE_NAMES = ['globalCueRatio', 'localCueRatio', 'globalCuePresent',
                  'hasWho', 'hasQuantity', 'hasDefine']
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def normalizeArabic(text):
-    text = _HARAKAT.sub('', text)
+    text = HARAKAT.sub('', text)
     text = re.sub('[أإآٱ]', 'ا', text)
     text = text.replace('ى', 'ي').replace('ة', 'ه')
     return text
 
 
+
+
+
+
+
+
+
+
+
+
+
 def normalizeText(text):
+
     return normalizeArabic(text.lower())
 
 
 def isArabic(text):
+
     return any('؀' <= c <= 'ۿ' for c in text)
 
 
 def cueCount(textNorm, cue):
+
     if isArabic(cue):
+
         return textNorm.count(cue)
     return len(re.findall(r'\b' + re.escape(cue) + r'\b', textNorm))
 
 
+
 def totalHits(textNorm, cues):
+
     return sum(cueCount(textNorm, c) for c in cues)
+
+
 
 
 def anyHit(textNorm, cues):
     return 1.0 if totalHits(textNorm, cues) else 0.0
 
 
+
+
+
 def cueFeatures(query):
     norm = normalizeText(query)
-    tokens = _TOKEN.findall(norm)
+    tokens = TOKEN.findall(norm)
     n = len(tokens)
     globalHits = totalHits(norm, GLOBAL_CUES)
     localHits = totalHits(norm, LOCAL_CUES)
@@ -88,7 +137,7 @@ def cueFeatures(query):
         1.0 if localHits else 0.0,
         float(globalHits - localHits),
         float(n),
-        1.0 if _DIGIT.search(query) else 0.0,
+        1.0 if DIGIT.search(query) else 0.0,
         anyHit(norm, COMPARISON_CUES),
         anyHit(norm, AGGREGATE_CUES),
         anyHit(norm, WHEN_CUES),

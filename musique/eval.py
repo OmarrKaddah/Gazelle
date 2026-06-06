@@ -8,7 +8,6 @@ from khop import KhopIndex
 from loadChunks import chunkId, DEV, LIMIT
 
 
-# ── version + config for this run ────────────────────────────────
 VERSION = 'v8'
 LABEL = 'route2related'
 NOTES = 'Route 2 graph (OpenRouter LLM extraction -> RELATED {predicate,description,weight}) retrieved by PPR. Default deployment layers: RELATED + SYNONYM (entity alignment). co-mention and bare triples OFF. Same PPR knobs as the best prior run (v4/v7b: alpha=0.5, seedTopK=5, synonymWeight=1.0). First eval of the unified RELATED edge on a fresh Neo4j instance.'
@@ -23,7 +22,7 @@ CONFIG = {
     'tripleEdges': False,
     'nodeSpecificity': False,
 }
-# ─────────────────────────────────────────────────────────────────
+
 
 
 K_VALUES = (1, 2, 5, 10)

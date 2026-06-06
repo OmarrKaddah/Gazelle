@@ -38,8 +38,7 @@ def extractElements(chunkText, entityGuide, backend=GRAPH_EXTRACT_BACKEND):
 
 
 def salvageJson(raw):
-    # llama sometimes wraps the object in ```fences``` or trails prose after it;
-    # take the outermost brace span. Truncated responses still fail loads (caller retries).
+
     raw = raw.strip()
     start, end = raw.find('{'), raw.rfind('}')
     return raw[start:end + 1] if start != -1 and end > start else raw
@@ -61,8 +60,7 @@ def parseElements(raw):
 
 
 def extractChunk(chunk, entityGuide, backend):
-    # bounded retry: a malformed/truncated response shouldn't kill the run, and provider
-    # routing means a retry often lands on a backend that returns clean JSON.
+
     for attempt in range(3):
         raw = extractElements(chunk['text'], entityGuide, backend)
         try:

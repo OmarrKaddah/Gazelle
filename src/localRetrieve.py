@@ -36,8 +36,7 @@ def ppr(adjacency, seedVector, alpha=ALPHA, nIter=100, tol=1e-9):
 
 
 class LocalIndex:
-    """PPR over the RELATED + SYNONYM entity graph. Heavy state is loaded once at construction;
-    per-query cost is query-embed + a sparse power iteration + chunk projection (~sub-second)."""
+
 
     def __init__(self, scope=None):
         where = '' if scope is None else 'AND e.docName IN $scope'
@@ -63,11 +62,9 @@ class LocalIndex:
 
         rows, cols, data = [], [], []
 
-        # NOTE (franco): 3amalna .extend() badal el "+=" 3ashan da gowa function gowaneya (addEdge).
-        # law katabna "rows += [i, j]" Python haye3teber rows variable local gowa addEdge, w hayrmy
-        # UnboundLocalError 3ashan el "+=" beye2ra rows el-awel w e7na lessa msh 3arrafnaha gowa el function.
-        # enama .extend() bey-modify nafs el list (in place) men gher ma ye-rebind el esm, fa beyzawwed
-        # 3al rows el-barra (el f scope beta3 __init__) 3adi men gher mashakel.
+        #  3amalna .extend() badal el "+=" 3ashan UnboundLocalError
+        
+        
         def addEdge(a, b, w):
             i, j = self.idToIdx.get(a), self.idToIdx.get(b)
             if i is None or j is None:

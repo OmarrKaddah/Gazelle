@@ -529,6 +529,7 @@ function SettingsPopover({ settings, setSettings, providers, onClose }) {
   const providerList = [
     { id: 'ollama', label: 'Local · Ollama' },
     { id: 'groq', label: 'Cloud · Groq' },
+    { id: 'openrouter', label: 'Cloud · OpenRouter' },
   ];
   return (
     <>

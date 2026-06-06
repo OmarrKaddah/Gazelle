@@ -70,9 +70,7 @@ def isGoodSlot(term, lang):
     return True
 
 
-# ---------------------------------------------------------------------------
-# Arabic stopwords (40+)
-# ---------------------------------------------------------------------------
+
 AR_STOPS = {
     'في', 'من', 'إلى', 'على', 'عن', 'مع', 'هذا', 'هذه', 'التي', 'الذي',
     'أن', 'إن', 'كان', 'قد', 'ما', 'لا', 'و', 'أو', 'ثم', 'كل', 'بعد',
@@ -89,7 +87,7 @@ AR_STOPS = {
     'التحويلات', 'المالية،', 'المالية',
 }
 
-# OCR-artifact filter: token must consist only of Arabic letters, digits, spaces, common punctuation
+
 AR_CLEAN_RE = re.compile(r'^[؀-ۿ٠-٩\s،؛\-]+$')
 
 EN_STOPS = {
@@ -105,9 +103,7 @@ EN_STOPS = {
     'can', 'do', 'does', 'did', 'if', 'while', 'since', 'however',
 }
 
-# ---------------------------------------------------------------------------
-# Template banks
-# ---------------------------------------------------------------------------
+
 EN_LOCAL_TEMPLATES = [
     ("What is {e}?", "en_local_01"),
     ("Who is {e}?", "en_local_02"),
@@ -165,26 +161,24 @@ AR_GLOBAL_TEMPLATES = [
     ("ما الاستنتاجات العامة التي يمكن استخلاصها حول {t} من المجموعة بأكملها؟", "ar_global_10"),
 ]
 
-# ---------------------------------------------------------------------------
-# Entity-type → preferred template index
-# ---------------------------------------------------------------------------
+
 TYPE_TMPL_EN = {
-    'Person': 1,      # "Who is {e}?"
-    'Date': 2,        # "When was {e} established?"
-    'Number': 5,      # "How much is {e}?"
-    'Percent': 6,     # "What is the value of {e}?"
+    'Person': 1,     
+    'Date': 2,       
+    'Number': 5,     
+    'Percent': 6,    
     'Money': 5,
-    'Location': 7,    # "Where is {e} located?"
-    'Org': 9,         # "What is the role of {e}?"
+    'Location': 7,    
+    'Org': 9,       
     'Organization': 9,
     'Event': 0,
-    'default': 0,     # "What is {e}?"
+    'default': 0,   
 }
 
 TYPE_TMPL_AR = {
-    'Person': 2,      # "من هو {e}؟"
-    'Date': 5,        # "متى تم إنشاء {e}؟"
-    'Number': 6,      # "كم تبلغ قيمة {e}؟"
+    'Person': 2,     
+    'Date': 5,       
+    'Number': 6,     
     'Percent': 7,
     'Money': 7,
     'Location': 0,
@@ -193,9 +187,7 @@ TYPE_TMPL_AR = {
     'default': 0,
 }
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
+
 
 def isArabicScript(text):
     return bool(re.search(r'[؀-ۿ]', text))

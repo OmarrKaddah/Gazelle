@@ -10,12 +10,31 @@ def loadChunks(docName):
     return json.loads(Path(f'chunks/{docName}.json').read_text(encoding='utf-8'))
 
 
+
+
+
+
 def loadExtractions(docName):
     return json.loads(Path(f'extractions/{docName}.json').read_text(encoding='utf-8'))
 
 
+
+
+
+
+
+
+
+
 def isValidEntity(entity):
     return entity.get('canonicalId') and entity.get('type') in ENTITIES
+
+
+
+
+
+
+
 
 
 def buildTypeMap(extractions):
@@ -26,19 +45,32 @@ def buildTypeMap(extractions):
                 cid = entity['canonicalId']
                 etype = entity['type']
                 typeMap[cid] = etype
-                # Also index by name-only key (strip the trailing -type suffix) so
-                # relationships that omit the suffix still resolve.
+
                 namePart = cid.rsplit('-', 1)[0] if '-' in cid else cid
                 if namePart not in typeMap:
                     typeMap[namePart] = etype
     return typeMap
 
 
+
+
+
+
+
+
+
+
+
 def normalizeRelationship(rel):
     pred = rel.get('predicate', '')
-    # LLM sometimes uses dashes instead of underscores (ISSUED-BY → ISSUED_BY)
+   
     rel['predicate'] = pred.replace('-', '_').upper()
     return rel
+
+
+
+
+
 
 
 def isValidRelationship(rel, typeMap):
@@ -63,14 +95,35 @@ def clearDb():
     print("Cleared Neo4j database")
 
 
+
+
+
+
+
+
+
+
+
 def setupSchema(tx):
     tx.run("CREATE CONSTRAINT IF NOT EXISTS FOR (d:Document) REQUIRE d.docName IS UNIQUE")
     tx.run("CREATE CONSTRAINT IF NOT EXISTS FOR (c:Chunk) REQUIRE c.chunkId IS UNIQUE")
     tx.run("CREATE CONSTRAINT IF NOT EXISTS FOR (e:Entity) REQUIRE e.canonicalId IS UNIQUE")
 
 
+
+
+
+
+
+
 def mergeDocument(tx, docName):
     tx.run("MERGE (d:Document {docName: $docName})", docName=docName)
+
+
+
+
+
+
 
 
 def mergeChunk(tx, chunk):
@@ -92,6 +145,10 @@ def mergeChunk(tx, chunk):
         text=chunk['text'],
         accessLevel=chunk['accessLevel'],
     )
+
+
+
+
 
 
 def mergeEntityWithMention(tx, entity, chunkId):

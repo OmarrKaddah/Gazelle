@@ -6,11 +6,6 @@ from leiden import leiden
 from clusterMetrics import nmi
 from validateLeiden import adjacencyOf, footballGraph
 
-# Visual sanity check. Node fill = the node's TRUE label, so colour shows the
-# real grouping. Each detected community is assigned the true label its members
-# mostly carry; a node is "correct" if its own true label matches that, "wrong"
-# otherwise. Correct nodes get a green ring, wrong nodes a red ring with their
-# name in bold red. So you can read every right/wrong call at a glance.
 
 OUT = 'figures'
 

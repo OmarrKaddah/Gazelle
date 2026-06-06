@@ -5,8 +5,7 @@ from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
 
 
 
-MAP_BATCH_CHARS = 10000   
-REDUCE_TOP_POINTS = 40    # cap the points fed to reduce, highest score first
+MAP_BATCH_CHARS = 10000   # batchaya
 
 
 REFUSAL = 'The provided context does not contain enough information to answer this question.'

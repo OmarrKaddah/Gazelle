@@ -64,8 +64,7 @@ def fetchSeedNeighbors(seedId):
 
 
 def pickSeed():
-    #go through every entity count unique neighbors keep only b/w 5-50 pick one at random
-    #5-50 3ashan mayrag3sh star nodes nodes connected le kol haga mostly leaves and leaves score the same
+
     with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
 
         with driver.session() as session:
