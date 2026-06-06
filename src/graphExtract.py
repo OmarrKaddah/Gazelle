@@ -101,7 +101,7 @@ def extractDoc(docName, backend=GRAPH_EXTRACT_BACKEND):
 
 def dumpElements(results, docName):
 
-    # atomic write so a Ctrl-C mid-flush can never corrupt the resume checkpoint
+    
 
     Path(EXTRACT_DIR).mkdir(exist_ok=True)
 

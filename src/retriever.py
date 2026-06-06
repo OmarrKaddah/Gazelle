@@ -113,19 +113,35 @@ def graphRetrieve(query, k, clearance):
     return result
 
 
-def retrieve(query, mode='vector', k=5, clearance='public'):
+def retrieve(query, mode='vector', k=5, clearance='public', corpus='', useLlmMap=True):
+    from router import routeQuery
+    from globalSearch import globalSearch
+    from config import CORPUS_NAME
+
     allowed = allowedDocs(clearance)
-             
+
+    if mode == 'auto':
+        route = routeQuery(query)
+        print(f"[retriever] auto-route → {route}", flush=True)
+        if route == 'global':
+            if not allowed:
+                return {"chunks": [], "seeds": [], "pathEdges": [], "route": "global", "globalAnswer": None}
+            gs = globalSearch(query, corpus or CORPUS_NAME, useLlmMap=useLlmMap)
+            return {"chunks": gs["chunks"], "seeds": [], "pathEdges": [], "route": "global",
+                    "globalAnswer": gs["answer"]}
+        mode = 'hybrid'
+
     if not allowed:
-        return {"chunks": [], "seeds": [], "pathEdges": []}
+        return {"chunks": [], "seeds": [], "pathEdges": [], "route": mode, "globalAnswer": None}
     if mode == 'vector':
-        return {"chunks": vectorSearch(query, k, allowed), "seeds": [], "pathEdges": []}
+        return {"chunks": vectorSearch(query, k, allowed), "seeds": [], "pathEdges": [], "route": "vector", "globalAnswer": None}
     if mode == 'fusion':
-        return {"chunks": fusionSearch(query, k, allowed), "seeds": [], "pathEdges": []}
-
+        return {"chunks": fusionSearch(query, k, allowed), "seeds": [], "pathEdges": [], "route": "fusion", "globalAnswer": None}
     if mode == 'graph':
-        return graphRetrieve(query, k, clearance)
+        r = graphRetrieve(query, k, clearance)
+        return {**r, "route": "graph", "globalAnswer": None}
     if mode == 'hybrid':
-        return hybridRetrieve(query, k, clearance)
+        r = hybridRetrieve(query, k, clearance)
+        return {**r, "route": "hybrid", "globalAnswer": None}
 
-    return {"chunks": [], "seeds": [], "pathEdges": []}
+    return {"chunks": [], "seeds": [], "pathEdges": [], "route": mode, "globalAnswer": None}

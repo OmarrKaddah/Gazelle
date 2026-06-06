@@ -33,7 +33,7 @@ from config import (
     NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD,
     OLLAMA_URL, GROQ_URL, OLLAMA_CHAT_MODEL, GROQ_MODEL, GROQ_API_KEY,
     OPENROUTER_URL, OPENROUTER_API_KEY, OPENROUTER_MODEL,
-    CHAT_DOMAIN,
+    CHAT_DOMAIN, CORPUS_NAME,
 )
 
 PROVIDERS = {
@@ -72,6 +72,8 @@ class ChatRequest(BaseModel):
     k: int = 5
     hops: int = 1
     provider: str = "ollama"
+    useLlmMap: bool = True
+    corpus: str = ""
 
 
 class CreateChatRequest(BaseModel):
@@ -296,6 +298,7 @@ def infoEndpoint():
             "openrouter": {"model": OPENROUTER_MODEL, "available": bool(OPENROUTER_API_KEY)},
         },
         "levels": LEVELS,
+        "corpus": CORPUS_NAME,
     }
 class LoginRequest(BaseModel):
     username: str
@@ -508,18 +511,24 @@ async def graphEndpoint(
     }
 
 
-async def chatEventGen(query, chunks, seeds, pathEdges, userMemRows, chatSummary, recentTurns, chatId, userId, req):
+async def chatEventGen(query, chunks, seeds, pathEdges, globalAnswer, route, userMemRows, chatSummary, recentTurns, chatId, userId, req):
+    if route:
+        yield "data: " + json.dumps({"type": "route", "label": route}) + "\n\n"
     yield "data: " + json.dumps({"type": "citations", "citations": chunks}) + "\n\n"
     if seeds:
         yield "data: " + json.dumps({"type": "graph", "seeds": seeds, "pathEdges": pathEdges}) + "\n\n"
     parts = []
-    async for event in streamTokens(query, chunks, userMemRows, chatSummary, recentTurns, req.provider):
-        payload = json.loads(event[6:].strip())
-        if payload.get("type") == "token":
-            parts.append(payload.get("text", ""))
-        yield event
+    if globalAnswer is not None:
+        yield "data: " + json.dumps({"type": "token", "text": globalAnswer}) + "\n\n"
+        parts.append(globalAnswer)
+    else:
+        async for event in streamTokens(query, chunks, userMemRows, chatSummary, recentTurns, req.provider):
+            payload = json.loads(event[6:].strip())
+            if payload.get("type") == "token":
+                parts.append(payload.get("text", ""))
+            yield event
     assistantText = "".join(parts)
-    chatMetadata = {"mode": req.mode, "provider": req.provider, "k": req.k, "hops": req.hops}
+    chatMetadata = {"mode": req.mode, "provider": req.provider, "k": req.k, "hops": req.hops, "route": route}
     async with asyncSessionFactory() as session:
         msg = await createMessage(session, chatId, "assistant", assistantText, countTokens(assistantText))
         await insertCitations(session, msg.id, chunks)
@@ -539,10 +548,15 @@ async def chatEventGen(query, chunks, seeds, pathEdges, userMemRows, chatSummary
 
 @app.post("/api/chat")
 async def chatStream(req: ChatRequest, user=Depends(getCurrentUser)):
-    result = await asyncio.to_thread(retrieve, req.query, mode=req.mode, k=req.k, clearance=user['clearance'])
+    result = await asyncio.to_thread(
+        retrieve, req.query, mode=req.mode, k=req.k,
+        clearance=user['clearance'], corpus=req.corpus, useLlmMap=req.useLlmMap,
+    )
     chunks = result['chunks']
     seeds = result['seeds']
     pathEdges = result['pathEdges']
+    globalAnswer = result.get('globalAnswer')
+    route = result.get('route')
     userId = uuid.UUID(user["id"])
     async with asyncSessionFactory() as session:
         if req.chatId:
@@ -559,7 +573,7 @@ async def chatStream(req: ChatRequest, user=Depends(getCurrentUser)):
         chatSummary = chatMem.summary if chatMem else ""
         recentTurns = await loadRecentMessages(session, chatId, n=4)
     return StreamingResponse(
-        chatEventGen(req.query, chunks, seeds, pathEdges, userMemRows, chatSummary, recentTurns, chatId, userId, req),
+        chatEventGen(req.query, chunks, seeds, pathEdges, globalAnswer, route, userMemRows, chatSummary, recentTurns, chatId, userId, req),
         media_type="text/event-stream; charset=utf-8",
     )
 

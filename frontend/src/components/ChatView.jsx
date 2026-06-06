@@ -9,20 +9,33 @@ import { authHeaders } from '../hooks/useAuth';
 import GraphPath from './GraphPath';
 
 const MODES = [
-  { id: 'vector', label: 'Vector', desc: 'Pure semantic similarity' },
-  { id: 'fusion', label: 'Fusion', desc: 'Vector + keyword (RRF)' },
-  { id: 'graph', label: 'Graph', desc: 'PPR over the knowledge graph' },
-  { id: 'hybrid', label: 'Hybrid', desc: 'Fusion + Graph merged via RRF' },
+  { id: 'auto',   label: 'Auto',   desc: 'Classifier routes each query to local retrieval or global community sensemaking automatically' },
+  { id: 'vector', label: 'Vector', desc: 'Pure semantic similarity — fast nearest-neighbour search over chunk embeddings' },
+  { id: 'fusion', label: 'Fusion', desc: 'Vector + keyword BM25 merged via Reciprocal Rank Fusion (RRF)' },
+  { id: 'graph',  label: 'Graph',  desc: 'Personalised PageRank over the knowledge graph, seeded by query entities' },
+  { id: 'hybrid', label: 'Hybrid', desc: 'Fusion + Graph results merged via RRF — highest recall' },
 ];
 
-const SUGGESTIONS = [
-  { text: 'ما هي شروط إلغاء ترخيص البنك؟', tag: 'Licensing' },
-  { text: 'متى يجب إخطار البنك المركزي بتغيير ملكية البنك؟', tag: 'Ownership' },
-  { text: 'ما هي إجراءات وقف العمليات المصرفية جزئياً؟', tag: 'Operations' },
-];
+const CORPUS_SUGGESTIONS = {
+  cbe: [
+    { text: 'من وقّع على قانون مكافحة غسل الأموال رقم ٨٠ لسنة ٢٠٠٢؟', tag: 'Compliance' },
+    { text: 'ما المخاطر التي يشملها تعريف مخاطر التشغيل وما تلك التي يستثنيها صراحةً؟', tag: 'Risk' },
+    { text: 'هل تلتزم فروع البنوك الأجنبية العاملة في مصر بالحفاظ على نسبة الـ ١٠٪ الحد الأدنى لكفاية رأس المال', tag: 'Capital' },
+  ],
+  apnews: [
+    { text: 'What did the Missouri Supreme Court decide about the abortion ballot wording?', tag: 'Law' },
+    { text: 'What are the main health-related topics covered across the news corpus?', tag: 'Global' },
+    { text: 'Who is the chair of 1in6?', tag: 'People' },
+  ],
+  musique: [
+    { text: 'What is the fourth studio album by British progressive rock musician Steve Hillage?', tag: 'Music' },
+    { text: 'Who is married to Phylicia Rashād\'s older sister?', tag: 'Relationships' },
+    { text: 'The Latin Bit is an album by who?', tag: 'Albums' },
+  ],
+};
 
-const SETTINGS_KEY = 'gazelle.settings.v1';
-const DEFAULTS = { mode: 'vector', k: 5, provider: 'ollama' };
+const SETTINGS_KEY = 'gazelle.settings.v3';
+const DEFAULTS = { mode: 'vector', k: 20, provider: 'ollama', useLlmMap: true };
 
 function loadSettings() {
   try {
@@ -59,6 +72,7 @@ export default function ChatView({ chatState }) {
   const [streaming, setStreaming] = useState(false);
   const [settings, setSettings] = useState(loadSettings);
   const [providers, setProviders] = useState(null);
+  const [corpus, setCorpus] = useState('');
   const scrollRef = useRef(null);
 
   useEffect(() => saveSettings(settings), [settings]);
@@ -66,7 +80,7 @@ export default function ChatView({ chatState }) {
   useEffect(() => {
     fetch('/api/info', { headers: { ...authHeaders() } })
       .then((r) => r.json())
-      .then((d) => setProviders(d.providers))
+      .then((d) => { setProviders(d.providers); setCorpus(d.corpus || ''); })
       .catch(() => setProviders(null));
   }, []);
 
@@ -116,6 +130,7 @@ export default function ChatView({ chatState }) {
           mode: settings.mode,
           k: settings.k,
           provider: settings.provider,
+          useLlmMap: settings.useLlmMap,
         }),
       });
       if (!response.body) throw new Error('No response stream');
@@ -133,7 +148,9 @@ export default function ChatView({ chatState }) {
           const line = part.trim();
           if (!line.startsWith('data: ')) continue;
           const evt = JSON.parse(line.slice(6));
-          if (evt.type === 'citations') {
+          if (evt.type === 'route') {
+            messages = patchLast(messages, { routeLabel: evt.label });
+          } else if (evt.type === 'citations') {
             messages = patchLast(messages, { citations: evt.citations });
           } else if (evt.type === 'graph') {
             messages = patchLast(messages, { graph: { seeds: evt.seeds, pathEdges: evt.pathEdges } });
@@ -166,7 +183,7 @@ export default function ChatView({ chatState }) {
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
         <div className="max-w-3xl mx-auto px-8 pt-6 pb-10">
           {showWelcome ? (
-            <Welcome onSuggestion={(t) => setQuery(t)} />
+            <Welcome onSuggestion={(t) => setQuery(t)} corpus={corpus} />
           ) : (
             <div className="space-y-7 animate-fadeIn">
               {currentChat.messages.map((m, i) => (
@@ -224,7 +241,9 @@ function TopBar({ title, provider, providers }) {
   );
 }
 
-function Welcome({ onSuggestion }) {
+function Welcome({ onSuggestion, corpus }) {
+  const suggestions = CORPUS_SUGGESTIONS[corpus] || CORPUS_SUGGESTIONS.cbe;
+  const corpusLabel = corpus || 'knowledge base';
   return (
     <div className="pt-16 pb-8 animate-fadeIn">
       <div className="text-center mb-10">
@@ -235,12 +254,14 @@ function Welcome({ onSuggestion }) {
           Welcome back, <span className="italic text-adib-deep">Omar</span>.
         </h1>
         <p className="text-[15px] text-ink-muted max-w-lg mx-auto leading-relaxed">
-          Gazelle is ready. Ask about ADIB. Answers are grounded in cited regulatory documents.
+          Ask anything about the{' '}
+          <span className="font-mono text-adib-deep text-[13px] bg-adib/8 px-1.5 py-0.5 rounded">{corpusLabel}</span>
+          {' '}knowledge base.
         </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl mx-auto">
-        {SUGGESTIONS.map((s, i) => (
+        {suggestions.map((s, i) => (
           <button
             key={i}
             onClick={() => onSuggestion(s.text)}
@@ -273,9 +294,10 @@ function Message({ message }) {
       </div>
     );
   }
+  const isGlobal = message.routeLabel === 'global';
   const citedIds = new Set();
   {
-    const pat = /\[([\w؀-ۿ.\-:]+)\]/g;
+    const pat = /\[([^\[\]\s]+)\]/g;
     let m;
     while ((m = pat.exec(message.text)) !== null) citedIds.add(m[1]);
   }
@@ -285,6 +307,18 @@ function Message({ message }) {
   const showGraphArea = message.mode === 'graph' || message.mode === 'hybrid';
   return (
     <div className="space-y-4">
+      {message.routeLabel && (
+        <div className="flex items-center gap-2">
+          <span className={`inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.16em] font-semibold px-2 py-0.5 rounded-full ${
+            isGlobal
+              ? 'bg-gold/20 text-brand border border-gold/40'
+              : 'bg-adib/10 text-adib-deep border border-adib/20'
+          }`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${isGlobal ? 'bg-gold' : 'bg-adib'}`} />
+            {isGlobal ? 'Global sensemaking' : 'Local retrieval'}
+          </span>
+        </div>
+      )}
       <div className="text-ink leading-[1.7] text-[15.5px] prose-message" dir="auto">
         <RenderedText text={message.text} citationMap={citationMap} />
         {message.streaming && <span className="caret" />}
@@ -305,7 +339,7 @@ function Message({ message }) {
   );
 }
 
-const CITATION_PATTERN = /\[([\w؀-ۿ.\-:]+)\]/g;
+const CITATION_PATTERN = /\[([^\[\]\s]+)\]/g;
 
 function RenderedText({ text, citationMap }) {
   const segments = [];
@@ -480,7 +514,7 @@ function Composer({ query, setQuery, send, streaming, settings, setSettings, pro
                 send();
               }
             }}
-            placeholder="Ask Gazelle about ADIB compliance…"
+            placeholder="Ask anything…"
             rows={1}
             dir="auto"
             disabled={streaming}
@@ -508,18 +542,24 @@ function ModePills({ mode, setMode }) {
   return (
     <div className="flex gap-1 bg-cream-frame border border-cream-border rounded-full p-0.5">
       {MODES.map((m) => (
-        <button
-          key={m.id}
-          onClick={() => setMode(m.id)}
-          title={m.desc}
-          className={`px-3 py-1 text-[11px] font-medium rounded-full transition ${
-            mode === m.id
-              ? 'bg-adib text-white shadow-sm'
-              : 'text-ink-muted hover:text-ink'
-          }`}
-        >
-          {m.label}
-        </button>
+        <div key={m.id} className="relative group">
+          <button
+            onClick={() => setMode(m.id)}
+            className={`px-3 py-1 text-[11px] font-medium rounded-full transition ${
+              mode === m.id
+                ? 'bg-adib text-white shadow-sm'
+                : 'text-ink-muted hover:text-ink'
+            }`}
+          >
+            {m.label}
+          </button>
+          <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+            <div className="bg-brand text-white text-[10.5px] leading-snug rounded-lg px-2.5 py-1.5 shadow-lg whitespace-nowrap max-w-[220px] text-center">
+              {m.desc}
+            </div>
+            <div className="w-2 h-2 bg-brand rotate-45 mx-auto -mt-1" />
+          </div>
+        </div>
       ))}
     </div>
   );
@@ -582,6 +622,30 @@ function SettingsPopover({ settings, setSettings, providers, onClose }) {
           />
         </SettingRow>
 
+        {settings.mode === 'auto' && (
+          <SettingRow label="Global map" value={settings.useLlmMap ? 'LLM map-reduce' : 'Direct chunks'}>
+            <div className="flex gap-1">
+              <button
+                onClick={() => setSettings({ ...settings, useLlmMap: true })}
+                title="LLM extracts key points from each community report batch, then reduces to a final answer"
+                className={`flex-1 py-1.5 text-[10.5px] font-medium rounded transition ${
+                  settings.useLlmMap ? 'bg-adib text-white shadow-sm' : 'bg-cream-frame text-ink-muted hover:bg-cream-deeper'
+                }`}
+              >
+                LLM map-reduce
+              </button>
+              <button
+                onClick={() => setSettings({ ...settings, useLlmMap: false })}
+                title="Pass community reports directly as context chunks — faster, no extra LLM calls"
+                className={`flex-1 py-1.5 text-[10.5px] font-medium rounded transition ${
+                  !settings.useLlmMap ? 'bg-adib text-white shadow-sm' : 'bg-cream-frame text-ink-muted hover:bg-cream-deeper'
+                }`}
+              >
+                Direct chunks
+              </button>
+            </div>
+          </SettingRow>
+        )}
 
         <div className="text-[10.5px] text-ink-faint pt-2 mt-2 border-t border-cream-border">
           Settings persist locally. Disabled providers need an API key in <code className="font-mono text-[10px]">.env</code>.

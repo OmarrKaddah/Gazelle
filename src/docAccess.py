@@ -7,7 +7,7 @@ from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
 
 LEVELS = ['public', 'internal', 'confidential', 'restricted']
 
-DEFAULT_LEVEL = 'internal'
+DEFAULT_LEVEL = 'public'
 
 DOC_ACCESS = {
     # Mock data — replace with real classifications.
