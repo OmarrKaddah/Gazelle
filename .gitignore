@@ -76,8 +76,13 @@ $RECYCLE.BIN/
 Documents/
 Scraped/
 musique/data
+musique/data
 
 # =====================================================================
+# Project: pipeline-derived data (regenerable, but expensive)
+# Ignore the directories by default; explicitly allow the MuSiQue
+# artifacts that took hours to extract (entities, triples, chunks)
+# so they're part of the thesis-reproducible record.
 # Project: pipeline-derived data (regenerable, but expensive)
 # Ignore the directories by default; explicitly allow the MuSiQue
 # artifacts that took hours to extract (entities, triples, chunks)
@@ -86,6 +91,15 @@ musique/data
 Doc_Out/
 output/
 parsed/
+
+# chunks/ and extractions/ — ignore contents by default, allowlist
+# the thesis-critical MuSiQue artifacts so they're in the repo record.
+chunks/*
+extractions/*
+
+!chunks/musique.json
+!extractions/musique_entities.json
+!extractions/musique_triples.json
 
 # CBE-specific extractions (regenerable from the pipeline)
 extractions_cbe/
@@ -111,10 +125,27 @@ extractions/*
 !extractions/musique_triples.json
 
 # =====================================================================
+# Offline install cache
+# =====================================================================
+wheelhouse/
+wheelhouse_win/
+
+# Large model binaries
+models/
+*.bin
+*.vec
+
+# CAMeL Tools downloaded data
+.camel_tools/
+
+# =====================================================================
 # Misc
 # =====================================================================
 *.tmp
 *.bak
+*.pdf
+*.txt
+*.json
 plans/
 .ini
 
@@ -157,4 +188,31 @@ viz/
 gazelle.db
 
 # Large benchmark datasets
-twowiki/data/
+twowiki/data/.ini
+
+# Stray clipboard / WhatsApp images at project root
+WhatsApp Image *.jpeg
+WhatsApp Image *.jpg
+WhatsApp Image *.png
+
+# Throwaway probe scripts at project root (not in src/ or runners/)
+/test.py
+/scratch.py
+
+# Session handoff — kept on disk for working memory, not in repo
+/HANDOFF.md
+
+# Local Claude config
+.claude/
+
+# graphTraversal validation fixtures + generated figures (regenerable/downloadable)
+graphTraversal/datasets/
+graphTraversal/figures/
+
+
+gliner_env/*
+*.json
+*.pkl
+
+classical_env/*
+ocr_dataset/*

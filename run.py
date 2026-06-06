@@ -2,9 +2,11 @@ import os
 import sys
 from pathlib import Path
 
-SRC = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src')
-if SRC not in sys.path:
-    sys.path.insert(0, SRC)
+from dotenv import load_dotenv
+
+load_dotenv()
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src'))
 
 from ocr import runOcrAndDump
 from parser import parseDoc, dumpParsed, loadParsed
@@ -48,7 +50,8 @@ def runOcr():
 
 def runParser():
     print("\n=== Parser ===")
-    for source in sorted(Path("Doc_Out").glob("*.md")):
+    sources = sorted(Path("Doc_Out").glob("*.md")) + sorted(Path("Documents").glob("*.docx"))
+    for source in sources:
         docName = source.stem.lower()
         out = Path(f"parsed/{docName}.json")
         if out.exists():
@@ -66,7 +69,7 @@ def runChunker():
         docName = parsed.stem
         out = Path(f"chunks/{docName}.json")
         if out.exists():
-            print(f"[skip] {docName}")
+            print(f"[skip]  {docName}")
             continue
         print(f"[chunk] {docName}")
         elements = loadParsed(docName)
@@ -86,12 +89,18 @@ def runEmbed():
 def runEntities():
     print("\n=== Entity Extraction ===")
     print(f"[NER_STRATEGY] {NER_STRATEGY}")
+def runEntities():
+    print("\n=== Entity Extraction ===")
+    print(f"[NER_STRATEGY] {NER_STRATEGY}")
     for chunk in sorted(Path("chunks").glob("*.json")):
         docName = chunk.stem
         out = Path(f"extractions/{docName}_entities.json")
         if out.exists():
             print(f"[skip] {docName}")
             continue
+        print(f"[ner  ] {docName}  ({NER_STRATEGY})")
+        entities = extractEntitiesNER(docName)
+        dumpEntitiesNER(entities, docName)
         print(f"[ner  ] {docName}  ({NER_STRATEGY})")
         entities = extractEntitiesNER(docName)
         dumpEntitiesNER(entities, docName)

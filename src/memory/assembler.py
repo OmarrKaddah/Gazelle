@@ -1,21 +1,28 @@
-BUDGET_USER_MEM   = 80
-BUDGET_CHAT_SUMM  = 300
-BUDGET_HISTORY    = 600
-BUDGET_CONTEXT    = 1500
-BUDGET_QUESTION   = 200
+from transformers import AutoTokenizer
+
+from config import BGE_M3_PATH
+
+tokenizer = AutoTokenizer.from_pretrained(BGE_M3_PATH)
+
+BUDGET_USER_MEM = 80
+BUDGET_CHAT_SUMM = 300
+BUDGET_HISTORY = 600
+BUDGET_CONTEXT = 20000
+BUDGET_QUESTION = 500
 
 
-def estimateTokens(text):
-    return max(1, len(text.split()))
+def countTokens(text):
+    return len(tokenizer.encode(text, add_special_tokens=False))
 
 
 def truncateToBudget(text, budgetTokens):
     if not text:
         return ""
-    words = text.split()
-    if len(words) <= budgetTokens:
+    tokens = tokenizer.encode(text, add_special_tokens=False)
+    if len(tokens) <= budgetTokens:
         return text
-    return " ".join(words[:budgetTokens])
+    truncated = tokenizer.decode(tokens[:budgetTokens], skip_special_tokens=True)
+    return truncated
 
 
 def formatUserMemory(rows):
@@ -34,6 +41,7 @@ def formatChatSummary(summary):
 
 
 def formatHistory(recentTurns):
+
     if not recentTurns:
         return ""
     parts = ["RECENT TURNS (verbatim, oldest first):"]
@@ -49,11 +57,15 @@ def assembleMessages(systemPrompt, userMemRows, chatSummary, recentTurns, contex
     historyText = truncateToBudget(formatHistory(recentTurns), BUDGET_HISTORY)
     contextText = truncateToBudget(contextBlock, BUDGET_CONTEXT)
     questionText = truncateToBudget(question, BUDGET_QUESTION)
+    
 
     sections = [systemPrompt]
-    if userMemText:  sections.append(userMemText)
-    if chatSummText: sections.append(chatSummText)
-    if historyText:  sections.append(historyText)
+    if userMemText:
+        sections.append(userMemText)
+    if chatSummText:
+        sections.append(chatSummText)
+    if historyText:
+        sections.append(historyText)
     sections.append(f"CONTEXT:\n{contextText}")
     sections.append(
         "---\nReminder: answer ONLY using the CONTEXT above. Cite [chunkId] for every claim. "

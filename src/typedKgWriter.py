@@ -58,7 +58,7 @@ def isValidRelationship(rel, typeMap):
 
 def clearDb():
     with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
-        with driver.session() as session:
+        with driver.session(database=NEO4J_DB) as session:
             session.execute_write(lambda tx: tx.run("MATCH (n) DETACH DELETE n"))
     print("Cleared Neo4j database")
 
@@ -140,7 +140,7 @@ def writeDocEntitiesOnly(docName):
     realDocName = chunks[0]['docName']
     entCount = 0
     with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
-        with driver.session() as session:
+        with driver.session(database=NEO4J_DB) as session:
             session.execute_write(setupSchema)
             session.execute_write(mergeDocument, realDocName)
             for chunk in chunks:
@@ -161,7 +161,7 @@ def writeDoc(docName):
     relCount = 0
     relSkipped = 0
     with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
-        with driver.session() as session:
+        with driver.session(database=NEO4J_DB) as session:
             session.execute_write(setupSchema)
             session.execute_write(mergeDocument, realDocName)
             for chunk in chunks:

@@ -1,23 +1,20 @@
 import asyncio
 import json
 import os
-import subprocess
-import sys
 import uuid
 
 import httpx
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from neo4j import GraphDatabase
-from retriever import retrieve, graphRetrieve, hybridRetrieve
-from localRetrieve import reloadLocalIndex
-from auth import bearer, getCurrentUser, login, logout, userFromToken
+from retriever import retrieve
+from auth import bearer, getCurrentUser, login, logout, requireAdmin, userFromToken
 from docAccess import LEVELS
-from db.session import asyncSessionFactory, getDbSession, initDb
+from db.session import asyncSessionFactory, getDbSession
 from db.repositories.chatRepo import (
     createChat, listChats, getChatById, deleteChat, createMessage, listMessages,
 )
@@ -72,24 +69,12 @@ class ChatRequest(BaseModel):
     provider: str = "ollama"
 
 
-
-
-
-
 class CreateChatRequest(BaseModel):
     title: str | None = None
 
 
-
-
-
 class UpdateChatRequest(BaseModel):
     title: str
-
-
-
-
-
 
 
 class UpsertChatMemoryRequest(BaseModel):
@@ -102,10 +87,6 @@ class UpsertUserMemoryRequest(BaseModel):
     memoryValue: str
     confidence: float = 1.0
     metadata: dict | None = None
-
-
-
-
 
 
 def buildContext(chunks):
@@ -197,12 +178,6 @@ def buildPrompt(query, chunks):
     )
 
 
-
-
-
-
-
-
 async def streamTokens(query, chunks, userMemRows, chatSummary, recentTurns, provider='ollama'):
     if not chunks:
         print(
@@ -214,7 +189,6 @@ async def streamTokens(query, chunks, userMemRows, chatSummary, recentTurns, pro
     cfg = PROVIDERS.get(provider) or PROVIDERS['ollama']
 
     headers = {"Authorization": f"Bearer {cfg['apiKey']}"} if cfg['apiKey'] else {}
-
     messages = assembleMessages(
         systemPrompt=SYSTEM_PROMPT,
         userMemRows=userMemRows,
@@ -229,7 +203,6 @@ async def streamTokens(query, chunks, userMemRows, chatSummary, recentTurns, pro
         flush=True,
     )
     async with httpx.AsyncClient(timeout=300) as client:
-
         async with client.stream(
             "POST",
             cfg['url'],
@@ -241,21 +214,16 @@ async def streamTokens(query, chunks, userMemRows, chatSummary, recentTurns, pro
                 "stream": True,
             },
         ) as response:
-            
             response.raise_for_status()
             async for raw in response.aiter_lines():
-
                 if not raw or not raw.startswith("data: "):
                     continue
                 payload = raw[6:]
-
                 if payload == "[DONE]":
-
                     break
                 chunk = json.loads(payload)
                 delta = chunk["choices"][0].get("delta", {}).get("content", "")
                 if delta:
-
                     yield "data: " + json.dumps({"type": "token", "text": delta}) + "\n\n"
 
 
@@ -269,9 +237,6 @@ def serializeChat(chat):
     }
 
 
-
-
-
 def serializeMessage(message):
     return {
         "id": str(message.id),
@@ -281,6 +246,8 @@ def serializeMessage(message):
         "tokenCount": message.tokenCount,
         "createdAt": message.createdAt.isoformat(),
     }
+
+
 def serializeUserMemory(row):
     return {
         "id": str(row.id),
@@ -290,6 +257,8 @@ def serializeUserMemory(row):
         "metadata": row.metadataJson,
         "updatedAt": row.updatedAt.isoformat(),
     }
+
+
 def serializeChatMemory(row):
     if not row:
         return None
@@ -301,16 +270,17 @@ def serializeChatMemory(row):
         "metadata": row.metadataJson,
         "updatedAt": row.updatedAt.isoformat(),
     }
+
+
 def countTokens(text: str):
     return len(text.split())
 
+
 def buildChatSummary(userQuery: str, assistantAnswer: str):
-
     userPart = userQuery.strip()[:500]
-
     assistantPart = assistantAnswer.strip()[:1200]
-
     return f"User: {userPart}\nAssistant: {assistantPart}"
+
 
 @app.get("/api/info")
 def infoEndpoint():
@@ -326,7 +296,6 @@ class LoginRequest(BaseModel):
     password: str
 
 @app.post("/api/login")
-
 async def loginEndpoint(req: LoginRequest, session: AsyncSession = Depends(getDbSession)):
     token = await login(req.username, req.password, session)
     if not token:
@@ -354,13 +323,23 @@ def retrieveEndpoint(req: ChatRequest, user=Depends(getCurrentUser)):
     return {"chunks": retrieve(req.query, mode=req.mode, k=req.k, clearance=user['clearance'])}
 
 
-
-
-
-
-
-
-
+@app.post("/api/admin/documents/publish")
+async def publishDocumentsEndpoint(
+    files: list[UploadFile] = File(...),
+    user=Depends(requireAdmin),
+    session: AsyncSession = Depends(getDbSession),
+):
+    payloads = [(f.filename, await f.read()) for f in files]
+    # Imported here, not at module top, so OCR/NER models stay out of startup.
+    from ingest import ingestUploads
+    # Blocking pipeline (OCR, LLM, Neo4j); keep it off the event loop.
+    result = await asyncio.to_thread(ingestUploads, payloads)
+    await logAudit(
+        session, uuid.UUID(user["id"]), "documents.publish", "document",
+        ",".join(name for name, _ in payloads),
+    )
+    await session.commit()
+    return {"ok": True, **result}
 
 
 def queryGraph(tx, search, entityType, limit):
@@ -492,19 +471,8 @@ async def graphEndpoint(
     }
 
 
-
-
-
-
-
-
-
-
-
-async def chatEventGen(query, chunks, userMemRows, chatSummary, recentTurns, chatId, userId, req, provenance=None):
+async def chatEventGen(query, chunks, userMemRows, chatSummary, recentTurns, chatId, userId, req):
     yield "data: " + json.dumps({"type": "citations", "citations": chunks}) + "\n\n"
-    if provenance:
-        yield "data: " + json.dumps({"type": "graph", **provenance}) + "\n\n"
     parts = []
     async for event in streamTokens(query, chunks, userMemRows, chatSummary, recentTurns, req.provider):
         payload = json.loads(event[6:].strip())
@@ -532,14 +500,7 @@ async def chatEventGen(query, chunks, userMemRows, chatSummary, recentTurns, cha
 
 @app.post("/api/chat")
 async def chatStream(req: ChatRequest, user=Depends(getCurrentUser)):
-    if req.mode in ('graph', 'hybrid'):
-        fn = graphRetrieve if req.mode == 'graph' else hybridRetrieve
-        result = await asyncio.to_thread(fn, req.query, req.k, user['clearance'])
-        chunks = result['chunks']
-        provenance = {'seeds': result['seeds'], 'pathEdges': result['pathEdges']}
-    else:
-        chunks = await asyncio.to_thread(retrieve, req.query, mode=req.mode, k=req.k, clearance=user['clearance'])
-        provenance = None
+    chunks = await asyncio.to_thread(retrieve, req.query, mode=req.mode, k=req.k, clearance=user['clearance'])
     userId = uuid.UUID(user["id"])
     async with asyncSessionFactory() as session:
         if req.chatId:
@@ -556,9 +517,10 @@ async def chatStream(req: ChatRequest, user=Depends(getCurrentUser)):
         chatSummary = chatMem.summary if chatMem else ""
         recentTurns = await loadRecentMessages(session, chatId, n=4)
     return StreamingResponse(
-        chatEventGen(req.query, chunks, userMemRows, chatSummary, recentTurns, chatId, userId, req, provenance),
+        chatEventGen(req.query, chunks, userMemRows, chatSummary, recentTurns, chatId, userId, req),
         media_type="text/event-stream; charset=utf-8",
     )
+
 
 @app.get("/api/chats")
 async def listChatsEndpoint(
@@ -569,6 +531,7 @@ async def listChatsEndpoint(
 ):
     rows = await listChats(session, uuid.UUID(user["id"]), limit, offset)
     return {"chats": [serializeChat(row) for row in rows]}
+
 
 @app.post("/api/chats")
 async def createChatEndpoint(
@@ -583,6 +546,7 @@ async def createChatEndpoint(
     messages = await listMessages(session, row.id, 200, 0)
     return {"chat": {**serializeChat(row), "messages": [serializeMessage(msg) for msg in messages]}}
 
+
 @app.get("/api/chats/{chatId}")
 async def getChatEndpoint(
     chatId: str,
@@ -596,8 +560,6 @@ async def getChatEndpoint(
         raise HTTPException(status_code=404, detail="Chat not found")
     messages = await listMessages(session, row.id, limit, offset)
     return {"chat": {**serializeChat(row), "messages": [serializeMessage(msg) for msg in messages]}}
-
-
 
 
 @app.patch("/api/chats/{chatId}")
@@ -617,8 +579,6 @@ async def updateChatEndpoint(
     return {"chat": serializeChat(row)}
 
 
-
-
 @app.delete("/api/chats/{chatId}")
 async def deleteChatEndpoint(
     chatId: str,
@@ -631,26 +591,20 @@ async def deleteChatEndpoint(
     return {"ok": True}
 
 
-
 @app.get("/api/chats/{chatId}/memory")
 async def getChatMemoryEndpoint(
     chatId: str,
     user=Depends(getCurrentUser),
     session: AsyncSession = Depends(getDbSession),
 ):
-    
-
     row = await getChatById(session, uuid.UUID(user["id"]), uuid.UUID(chatId))
     if not row:
-
         raise HTTPException(status_code=404, detail="Chat not found")
     memory = await getChatMemory(session, row.id)
     return {"memory": serializeChatMemory(memory)}
 
 
 @app.put("/api/chats/{chatId}/memory")
-
-
 async def putChatMemoryEndpoint(
     chatId: str,
     req: UpsertChatMemoryRequest,
@@ -668,7 +622,6 @@ async def putChatMemoryEndpoint(
 
 
 @app.get("/api/memory/user")
-
 async def getUserMemoryEndpoint(
     user=Depends(getCurrentUser),
     session: AsyncSession = Depends(getDbSession),
@@ -677,15 +630,7 @@ async def getUserMemoryEndpoint(
     return {"memory": [serializeUserMemory(row) for row in rows]}
 
 
-
-
-
-
-
-
 @app.put("/api/memory/user/{memoryKey}")
-
-
 async def putUserMemoryEndpoint(
     memoryKey: str,
     req: UpsertUserMemoryRequest,
@@ -704,118 +649,6 @@ async def putUserMemoryEndpoint(
     await session.commit()
     await session.refresh(row)
     return {"memory": serializeUserMemory(row)}
-
-
-
-
-REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-# stage id -> runner script. 'all' is the end-to-end orchestrator (branches on GRAPH_ROUTE).
-PIPELINE_STAGES = {
-    "ocr": "runners/runOcr.py",
-    "parser": "runners/runParser.py",
-    "chunker": "runners/runChunker.py",
-    "embed": "runners/runEmbed.py",
-    "gliner": "runners/runGliner.py",
-    "kgBuild": "runners/runKgBuild.py",
-    "graphExtract": "runners/runGraphExtract.py",
-    "graphBuild": "runners/runGraphBuild.py",
-    "entityEmbed": "runners/runEntityEmbed.py",
-    "all": "runners/runPipeline.py",
-}
-
-# stage id -> (directory, glob) used to count how many docs have reached that stage.
-PIPELINE_OUTPUTS = {
-    "ocr": ("Doc_Out", "*.md"),
-    "parser": ("parsed", "*.json"),
-    "chunker": ("chunks", "*.json"),
-    "gliner": ("extractions", "*_entities.json"),
-    "graphExtract": ("extractions", "*_graph.json"),
-}
-
-
-
-
-class PipelineRunRequest(BaseModel):
-    stage: str
-    route: str = "2"
-    ner: str = "gliner"
-    chunker: str = "semantic"
-    backend: str = "openrouter"
-    workers: int = 12
-
-
-
-
-def pipelineEnv(req: PipelineRunRequest):
-    env = dict(os.environ)
-    env.update({
-        "GRAPH_ROUTE": req.route,
-        "NER_STRATEGY": req.ner,
-        "CHUNKER_TYPE": req.chunker,
-        "GRAPH_EXTRACT_BACKEND": req.backend,
-        "GRAPH_EXTRACT_WORKERS": str(req.workers),
-        "PYTHONUNBUFFERED": "1",
-        "PYTHONUTF8": "1",
-    })
-    return env
-
-
-
-
-@app.get("/api/pipeline/status")
-async def pipelineStatus(user=Depends(getCurrentUser)):
-    counts = {}
-    for stage, (folder, pattern) in PIPELINE_OUTPUTS.items():
-        d = os.path.join(REPO_ROOT, folder)
-        counts[stage] = len([f for f in os.listdir(d) if f.endswith(pattern.lstrip("*"))]) if os.path.isdir(d) else 0
-    return {
-        "counts": counts,
-        "config": {
-            "route": os.environ.get("GRAPH_ROUTE", "2"),
-            "ner": os.environ.get("NER_STRATEGY", "gliner"),
-            "chunker": os.environ.get("CHUNKER_TYPE", "semantic"),
-            "backend": os.environ.get("GRAPH_EXTRACT_BACKEND", "openrouter"),
-            "workers": int(os.environ.get("GRAPH_EXTRACT_WORKERS", "12")),
-        },
-    }
-
-
-
-
-@app.post("/api/pipeline/run")
-def pipelineRun(req: PipelineRunRequest, user=Depends(getCurrentUser)):
-    if req.stage not in PIPELINE_STAGES:
-        raise HTTPException(status_code=400, detail=f"Unknown stage: {req.stage}")
-    script = PIPELINE_STAGES[req.stage]
-
-    def gen():
-        yield "data: " + json.dumps({"line": f"$ python {script}  (route={req.route} ner={req.ner} chunker={req.chunker})"}) + "\n\n"
-        proc = subprocess.Popen(
-            [sys.executable, script],
-            cwd=REPO_ROOT,
-            env=pipelineEnv(req),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            bufsize=1,
-        )
-        for line in proc.stdout:
-            yield "data: " + json.dumps({"line": line.rstrip("\n")}) + "\n\n"
-        proc.wait()
-        yield "data: " + json.dumps({"done": True, "code": proc.returncode}) + "\n\n"
-
-    return StreamingResponse(gen(), media_type="text/event-stream; charset=utf-8")
-
-
-
-
-@app.post("/api/pipeline/reloadIndex")
-def pipelineReloadIndex(user=Depends(getCurrentUser)):
-    idx = reloadLocalIndex()
-    return {"entities": len(idx.idxToId), "chunks": len(idx.chunkDoc)}
 
 
 if os.path.isdir("frontend/dist"):

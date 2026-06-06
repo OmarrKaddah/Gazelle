@@ -48,8 +48,9 @@ def rrfFuse(rankedLists, topK):
 def vectorSearch(query, k, allowed):
     emb = embedQuery(query)
     with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
-        with driver.session() as session:
+        with driver.session(database=NEO4J_DB) as session:
             results = session.execute_read(vectorQuery, emb, k, allowed)
+    print(f"[retriever] vectorSearch returned {len(results)} chunks", flush=True)
     for r in results:
         r['source'] = 'vector'
     return results
@@ -58,7 +59,7 @@ def vectorSearch(query, k, allowed):
 def fusionSearch(query, k, allowed):
     emb = embedQuery(query)
     with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
-        with driver.session() as session:
+        with driver.session(database=NEO4J_DB) as session:
             v = session.execute_read(vectorQuery, emb, k * 2, allowed)
             f = session.execute_read(fulltextQuery, query, k * 2, allowed)
     return rrfFuse([v, f], topK=k)

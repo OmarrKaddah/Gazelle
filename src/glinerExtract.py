@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 from tqdm import tqdm
 from gliner import GLiNER
+from dotenv import load_dotenv
 from ontology import ENTITIES
 from config import GLINER_MODEL, GLINER_MODEL_EN, GLINER_THRESHOLD, EXTRACT_DIR
 
@@ -48,7 +49,13 @@ def extractFromChunk(chunk, lang):
 def extractEntities(docName, lang='ar'):
     chunks = loadChunks(docName)
     print(f"[gliner] {docName}: {len(chunks)} chunks", flush=True)
+    print(f"[gliner] {docName}: {len(chunks)} chunks", flush=True)
     entities = []
+    bar = tqdm(chunks, desc=f"{docName}", unit="chunk", file=sys.stdout)
+    for c in bar:
+        spans = extractFromChunk(c, lang)
+        entities.extend(spans)
+        bar.set_postfix(entities=len(entities))
     bar = tqdm(chunks, desc=f"{docName}", unit="chunk", file=sys.stdout)
     for c in bar:
         spans = extractFromChunk(c, lang)

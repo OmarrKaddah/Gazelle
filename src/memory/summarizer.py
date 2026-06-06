@@ -1,4 +1,3 @@
-import json
 import uuid
 
 import httpx
@@ -8,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from config import OLLAMA_URL, OLLAMA_CHAT_MODEL
 from db.models import ChatMemory, Message
 from db.session import asyncSessionFactory
+from memory.assembler import countTokens
 
 
 SUMMARIZER_PROMPT = (
@@ -21,10 +21,6 @@ SUMMARIZER_PROMPT = (
 
 DEBOUNCE_TURNS = 6
 DEBOUNCE_TOKENS = 1000
-
-
-def estimateTokens(text):
-    return max(1, len(text.split()))
 
 
 async def loadMem(session: AsyncSession, chatId: uuid.UUID):
@@ -81,7 +77,7 @@ async def updateChatMemory(chatId: uuid.UUID, latestMessageId: uuid.UUID):
         newMessages = await loadMessagesSince(session, chatId, sinceId)
         if not newMessages:
             return
-        total = sum(estimateTokens(m.content) for m in newMessages)
+        total = sum(countTokens(m.content) for m in newMessages)
         if len(newMessages) < DEBOUNCE_TURNS and total < DEBOUNCE_TOKENS:
             return
         newSummary = await callLlmSummarizer(previous, newMessages)
@@ -90,6 +86,6 @@ async def updateChatMemory(chatId: uuid.UUID, latestMessageId: uuid.UUID):
             session.add(mem)
         else:
             mem.summary = newSummary
-        mem.summaryTokens = estimateTokens(newSummary)
+        mem.summaryTokens = countTokens(newSummary)
         mem.lastSummarizedMessageId = latestMessageId
         await session.commit()

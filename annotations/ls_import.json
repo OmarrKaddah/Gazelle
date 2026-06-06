@@ -1,0 +1,538 @@
+[
+  {
+    "data": {
+      "text": "Faculty of Engineering - Cairo University\n\nDepartment of Communications and Computer Engineering\n\nCredit Hours System\n\nSpring 2024\n\n\n\n\n\n"
+    },
+    "meta": {
+      "chunkId": "Phase - 1 document-c0001",
+      "docName": "Phase - 1 document"
+    },
+    "predictions": [
+      {
+        "model_version": "gliner",
+        "result": [
+          {
+            "id": "06918bb0",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 0,
+              "end": 22,
+              "text": "Faculty of Engineering",
+              "labels": [
+                "Person"
+              ]
+            }
+          },
+          {
+            "id": "c79531ef",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 25,
+              "end": 41,
+              "text": "Cairo University",
+              "labels": [
+                "BankingInstitution"
+              ]
+            }
+          },
+          {
+            "id": "76411421",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 98,
+              "end": 117,
+              "text": "Credit Hours System",
+              "labels": [
+                "FinancialInstrument"
+              ]
+            }
+          },
+          {
+            "id": "b6dfb40a",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 119,
+              "end": 130,
+              "text": "Spring 2024",
+              "labels": [
+                "Date"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "data": {
+      "text": "In: CMPS303 – Operating Systems\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nTeam 18 Members:"
+    },
+    "meta": {
+      "chunkId": "Phase - 1 document-c0002",
+      "docName": "Phase - 1 document"
+    },
+    "predictions": [
+      {
+        "model_version": "gliner",
+        "result": [
+          {
+            "id": "d41d3837",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 4,
+              "end": 11,
+              "text": "CMPS303",
+              "labels": [
+                "Document"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "data": {
+      "text": "In: | <!-- rich cell -->       |   <!-- rich cell --> |\n|--------------------------|----------------------|\n| Maryam Osama Abdulmaguid |              1210300 |\n| Maryam Mostafa Habeb     |              1210303 |\n| Youssuf Mohammad Fawzy   |              1210344 |\n| Ziad Ahmed Mohamed Mahdy |              1210226 |"
+    },
+    "meta": {
+      "chunkId": "Phase - 1 document-c0003",
+      "docName": "Phase - 1 document"
+    },
+    "predictions": [
+      {
+        "model_version": "gliner",
+        "result": [
+          {
+            "id": "61c42b91",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 110,
+              "end": 134,
+              "text": "Maryam Osama Abdulmaguid",
+              "labels": [
+                "Person"
+              ]
+            }
+          },
+          {
+            "id": "179bf76a",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 162,
+              "end": 182,
+              "text": "Maryam Mostafa Habeb",
+              "labels": [
+                "Person"
+              ]
+            }
+          },
+          {
+            "id": "d1685db1",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 214,
+              "end": 236,
+              "text": "Youssuf Mohammad Fawzy",
+              "labels": [
+                "Person"
+              ]
+            }
+          },
+          {
+            "id": "f9fe342f",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 266,
+              "end": 290,
+              "text": "Ziad Ahmed Mohamed Mahdy",
+              "labels": [
+                "Person"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "data": {
+      "text": "In: Student Names\n\nStudent Codes\n\n\n\n"
+    },
+    "meta": {
+      "chunkId": "Phase - 1 document-c0004",
+      "docName": "Phase - 1 document"
+    },
+    "predictions": [
+      {
+        "model_version": "gliner",
+        "result": [
+          {
+            "id": "b63268fa",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 4,
+              "end": 17,
+              "text": "Student Names",
+              "labels": [
+                "Article"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "data": {
+      "text": "Table of Contents: \n\nData Structures\t3\n\nAssumptions:\t4\n\nWorkload Distribution:\t4\n\nTime Distribution:\t4\n\n\n\n"
+    },
+    "meta": {
+      "chunkId": "Phase - 1 document-c0005",
+      "docName": "Phase - 1 document"
+    },
+    "predictions": [
+      {
+        "model_version": "gliner",
+        "result": [
+          {
+            "id": "fc220fdd",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 0,
+              "end": 17,
+              "text": "Table of Contents",
+              "labels": [
+                "Article"
+              ]
+            }
+          },
+          {
+            "id": "a398fbef",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 21,
+              "end": 36,
+              "text": "Data Structures",
+              "labels": [
+                "Article"
+              ]
+            }
+          },
+          {
+            "id": "f4289b0a",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 40,
+              "end": 51,
+              "text": "Assumptions",
+              "labels": [
+                "Article"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "data": {
+      "text": "2 Assumptions:: In HPF, if 2 arrive at the same time and have the same priority the lower ID is taken first.\n\nIn SRTN, if the remaining time of the running process =3 and the arriving process has the same run time as the remaining time of the current running process (3), no switching happens.\n\nAll process are compute bound\n\nRR uses queue"
+    },
+    "meta": {
+      "chunkId": "Phase - 1 document-c0007",
+      "docName": "Phase - 1 document"
+    },
+    "predictions": [
+      {
+        "model_version": "gliner",
+        "result": [
+          {
+            "id": "01e5d668",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 19,
+              "end": 22,
+              "text": "HPF",
+              "labels": [
+                "Document"
+              ]
+            }
+          },
+          {
+            "id": "2722ee66",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 113,
+              "end": 117,
+              "text": "SRTN",
+              "labels": [
+                "Document"
+              ]
+            }
+          },
+          {
+            "id": "1566e36c",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 326,
+              "end": 328,
+              "text": "RR",
+              "labels": [
+                "Article"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "data": {
+      "text": "3 Workload Distribution:: | <!-- rich cell -->       | <!-- rich cell -->                            |\n|--------------------------|-----------------------------------------------|\n| Maryam Osama Abdulmaguid | Data structures, HPF, SRTN, General Functions |\n| Maryam Mostafa Habeb     | Data structures, RR, SRTN, Process_generator  |\n| Youssuf Mohammad Fawzy   | Data structures, HPF, SRTN, General Functions |\n| Ziad Ahmed Mohamed Mahdy | Data structures, RR, SRTN, Process            |"
+    },
+    "meta": {
+      "chunkId": "Phase - 1 document-c0009",
+      "docName": "Phase - 1 document"
+    },
+    "predictions": [
+      {
+        "model_version": "gliner",
+        "result": [
+          {
+            "id": "83daf0a2",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 182,
+              "end": 206,
+              "text": "Maryam Osama Abdulmaguid",
+              "labels": [
+                "Person"
+              ]
+            }
+          },
+          {
+            "id": "7b9d4395",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 259,
+              "end": 279,
+              "text": "Maryam Mostafa Habeb",
+              "labels": [
+                "Person"
+              ]
+            }
+          },
+          {
+            "id": "3d2fe1f0",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 336,
+              "end": 358,
+              "text": "Youssuf Mohammad Fawzy",
+              "labels": [
+                "Person"
+              ]
+            }
+          },
+          {
+            "id": "02651d24",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 413,
+              "end": 437,
+              "text": "Ziad Ahmed Mohamed Mahdy",
+              "labels": [
+                "Person"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "data": {
+      "text": "3 Workload Distribution:: Team Member\n\nTask(s)\n\n"
+    },
+    "meta": {
+      "chunkId": "Phase - 1 document-c0010",
+      "docName": "Phase - 1 document"
+    },
+    "predictions": [
+      {
+        "model_version": "gliner",
+        "result": [
+          {
+            "id": "33ab5028",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 26,
+              "end": 37,
+              "text": "Team Member",
+              "labels": [
+                "Person"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "data": {
+      "text": "4 Time Distribution:: | <!-- rich cell -->         | <!-- rich cell -->   |\n|----------------------------|----------------------|\n| Process Generator          | 1 day                |\n| Header and Data structures | 1 hr                 |\n| Process                    | 2 days               |\n| HPF                        | 1.5 days             |\n| General Used functions     | 5 hrs                |\n| SRTN                       | 1 days               |\n| RR                         | 6 hrs                |"
+    },
+    "meta": {
+      "chunkId": "Phase - 1 document-c0012",
+      "docName": "Phase - 1 document"
+    },
+    "predictions": [
+      {
+        "model_version": "gliner",
+        "result": [
+          {
+            "id": "591f1701",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 132,
+              "end": 149,
+              "text": "Process Generator",
+              "labels": [
+                "Article"
+              ]
+            }
+          },
+          {
+            "id": "a31ee929",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 186,
+              "end": 212,
+              "text": "Header and Data structures",
+              "labels": [
+                "Article"
+              ]
+            }
+          },
+          {
+            "id": "e1ee1b49",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 240,
+              "end": 247,
+              "text": "Process",
+              "labels": [
+                "Article"
+              ]
+            }
+          },
+          {
+            "id": "1429d30d",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 294,
+              "end": 297,
+              "text": "HPF",
+              "labels": [
+                "Article"
+              ]
+            }
+          },
+          {
+            "id": "245a5c9b",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 348,
+              "end": 370,
+              "text": "General Used functions",
+              "labels": [
+                "Article"
+              ]
+            }
+          },
+          {
+            "id": "d59be1a2",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 402,
+              "end": 406,
+              "text": "SRTN",
+              "labels": [
+                "Article"
+              ]
+            }
+          },
+          {
+            "id": "8d834f4f",
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 456,
+              "end": 458,
+              "text": "RR",
+              "labels": [
+                "Article"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

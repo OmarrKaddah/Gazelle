@@ -1,9 +1,11 @@
 import json
 import os
+import os
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import requests
 from pathlib import Path
+from dotenv import load_dotenv
 from dotenv import load_dotenv
 from ontology import ENTITIES, RELATIONSHIPS
 

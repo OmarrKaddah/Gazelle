@@ -38,6 +38,7 @@ def writeEmbedding(tx, canonicalId, embedding):
 
 
 def buildEmbedText(entity):
+
     parts = [entity['name']] + (entity['aliases'] or [])
     return ' / '.join(dict.fromkeys(p for p in parts if p))
 
@@ -66,13 +67,19 @@ def embedEntities():
             entities = session.execute_read(loadPending)
             print(f"Embedding {len(entities)} entities", flush=True)
             skipped = 0
+            skipped = 0
             for i in range(0, len(entities), ENTITY_EMBED_BATCH):
                 batch = entities[i:i + ENTITY_EMBED_BATCH]
                 texts = [buildEmbedText(e) for e in batch]
+                embs = embedWithSkip(texts)
                 embs = embedWithSkip(texts)
                 for entity, emb in zip(batch, embs):
                     if emb is None:
                         skipped += 1
                         continue
+                    if emb is None:
+                        skipped += 1
+                        continue
                     session.execute_write(writeEmbedding, entity['id'], emb)
+                print(f"Embedded {min(i + ENTITY_EMBED_BATCH, len(entities))}/{len(entities)} ({skipped} skipped)", flush=True)
                 print(f"Embedded {min(i + ENTITY_EMBED_BATCH, len(entities))}/{len(entities)} ({skipped} skipped)", flush=True)

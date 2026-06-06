@@ -27,12 +27,26 @@ COMMUNITY_RESOLUTION = float(os.environ.get('COMMUNITY_RESOLUTION', '1.0'))  # L
 NEO4J_URI = os.environ['NEO4J_URI']
 NEO4J_USER = os.environ['NEO4J_USER']
 NEO4J_PASSWORD = os.environ['NEO4J_PASSWORD']
+NEO4J_DB = os.environ.get('NEO4J_DB', 'neo4j')
 
 # Ollama / llama-server endpoints
 OLLAMA_URL = os.environ.get('OLLAMA_URL', 'http://localhost:11434/v1/chat/completions')
 LLAMA_SERVER_URL = os.environ.get('LLAMA_SERVER_URL', 'http://localhost:8080/v1/chat/completions')
+OLLAMA_URL = os.environ.get('OLLAMA_URL', 'http://localhost:11434/v1/chat/completions')
+LLAMA_SERVER_URL = os.environ.get('LLAMA_SERVER_URL', 'http://localhost:8080/v1/chat/completions')
 
 # OCR
+OCR_PROVIDER = os.environ.get('OCR_PROVIDER', 'ollama')
+OCR_PARALLEL_PAGES = int(os.environ.get('OCR_PARALLEL_PAGES', '1'))
+OLLAMA_VISION_MODEL = os.environ.get('OLLAMA_VISION_MODEL', 'qwen3-vl:8b-instruct-q4_K_M')
+
+# Handwriting removal before OCR
+HANDWRITING_PREPROCESSING = os.environ.get('HANDWRITING_PREPROCESSING', '0') == '1'
+HANDWRITING_MODEL_PATH = os.environ.get('HANDWRITING_MODEL_PATH', 'models/handwriting_removal.joblib')
+HANDWRITING_PATCH_SIZE = int(os.environ.get('HANDWRITING_PATCH_SIZE', '48'))
+HANDWRITING_PATCH_STRIDE = int(os.environ.get('HANDWRITING_PATCH_STRIDE', '24'))
+HANDWRITING_PATCHES_PER_IMAGE = int(os.environ.get('HANDWRITING_PATCHES_PER_IMAGE', '256'))
+HANDWRITING_THRESHOLD = float(os.environ.get('HANDWRITING_THRESHOLD', '0.7'))
 OCR_PROVIDER = os.environ.get('OCR_PROVIDER', 'ollama')
 OCR_PARALLEL_PAGES = int(os.environ.get('OCR_PARALLEL_PAGES', '1'))
 OLLAMA_VISION_MODEL = os.environ.get('OLLAMA_VISION_MODEL', 'qwen3-vl:8b-instruct-q4_K_M')
@@ -79,12 +93,19 @@ GEMINI_MODEL = os.environ.get('GEMINI_MODEL', 'gemini-2.0-flash')
 # Embedding
 BGE_M3_PATH = os.environ.get('BGE_M3_PATH', 'BAAI/bge-m3')
 OLLAMA_EMBED_URL = os.environ.get('OLLAMA_EMBED_URL', 'http://localhost:11434/api/embed')
+OLLAMA_EMBED_URL = os.environ.get('OLLAMA_EMBED_URL', 'http://localhost:11434/api/embed')
 OLLAMA_EMBED_MODEL = os.environ.get('OLLAMA_EMBED_MODEL', 'bge-m3')
+EMBED_DIM = int(os.environ.get('EMBED_DIM', '1024'))
+CHUNK_EMBED_BATCH = int(os.environ.get('CHUNK_EMBED_BATCH', '16'))
+ENTITY_EMBED_BATCH = int(os.environ.get('ENTITY_EMBED_BATCH', '32'))
 EMBED_DIM = int(os.environ.get('EMBED_DIM', '1024'))
 CHUNK_EMBED_BATCH = int(os.environ.get('CHUNK_EMBED_BATCH', '16'))
 ENTITY_EMBED_BATCH = int(os.environ.get('ENTITY_EMBED_BATCH', '32'))
 
 # GLiNER
+GLINER_MODEL = 'C:/Users/omarl/.cache/huggingface/hub/models--NAMAA-Space--gliner_arabic-v2.1/snapshots/0403be7e18f0b6d27ddc9dd0e7f1ee6b674c17aa'
+GLINER_MODEL_EN = 'urchade/gliner_multi-v2.1'
+GLINER_THRESHOLD = 0.7
 GLINER_MODEL = 'C:/Users/omarl/.cache/huggingface/hub/models--NAMAA-Space--gliner_arabic-v2.1/snapshots/0403be7e18f0b6d27ddc9dd0e7f1ee6b674c17aa'
 GLINER_MODEL_EN = 'urchade/gliner_multi-v2.1'
 GLINER_THRESHOLD = 0.7

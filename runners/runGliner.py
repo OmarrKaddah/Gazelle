@@ -1,6 +1,8 @@
 import _bootstrap  # noqa: F401
 import sys
 import traceback
+import sys
+import traceback
 from pathlib import Path
 from glinerExtract import extractEntities, dumpEntities
 from config import EXTRACT_DIR
@@ -29,7 +31,20 @@ for chunk in allChunks:
     out = Path(f"{EXTRACT_DIR}/{docName}_entities.json")
     if out.exists():
         print(f"[skip] {docName} (already at {out})", flush=True)
+        print(f"[skip] {docName} (already at {out})", flush=True)
         continue
+    print(f"[gliner] starting {docName}", flush=True)
+    try:
+        entities = extractEntities(docName, lang=lang)
+        dumpEntities(entities, docName)
+    except Exception:
+        print(f"[gliner] FAILED on {docName}:", flush=True)
+        traceback.print_exc()
+        sys.exit(1)
+    print(f"         -> {out}  ({len(entities)} entities)", flush=True)
+    processed += 1
+
+print(f"[gliner] done. processed={processed}", flush=True)
     print(f"[gliner] starting {docName}", flush=True)
     try:
         entities = extractEntities(docName, lang=lang)

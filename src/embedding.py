@@ -74,6 +74,7 @@ def loadChunks(docName):
 
 
 def setupVectorIndex(tx):
+    
     tx.run(f"""
         CREATE VECTOR INDEX chunk_embedding IF NOT EXISTS
         FOR (c:Chunk) ON (c.embedding)
@@ -92,6 +93,7 @@ def setupFulltextIndex(tx):
 
 
 def writeEmbedding(tx, chunkId, embedding):
+    
     tx.run(
         "MATCH (c:Chunk {chunkId: $chunkId}) SET c.embedding = $embedding",
         chunkId=chunkId,
@@ -100,6 +102,7 @@ def writeEmbedding(tx, chunkId, embedding):
 
 
 def embedDoc(docName):
+
     chunks = loadChunks(docName)
     before = nanRescued
     with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
@@ -107,8 +110,11 @@ def embedDoc(docName):
 
             session.execute_write(setupVectorIndex)
 
+
             session.execute_write(setupFulltextIndex)
+
             for i in range(0, len(chunks), CHUNK_EMBED_BATCH):
+
 
                 batch = chunks[i:i + CHUNK_EMBED_BATCH]
 
