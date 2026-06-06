@@ -129,7 +129,11 @@ def retrieve(query, mode='vector', k=5, clearance='public', corpus='', useLlmMap
             gs = globalSearch(query, corpus or CORPUS_NAME, useLlmMap=useLlmMap)
             return {"chunks": gs["chunks"], "seeds": [], "pathEdges": [], "route": "global",
                     "globalAnswer": gs["answer"]}
-        mode = 'hybrid'
+        # local → run hybrid but label as 'local' so the frontend knows to show the graph
+        if not allowed:
+            return {"chunks": [], "seeds": [], "pathEdges": [], "route": "local", "globalAnswer": None}
+        r = hybridRetrieve(query, k, clearance)
+        return {**r, "route": "local", "globalAnswer": None}
 
     if not allowed:
         return {"chunks": [], "seeds": [], "pathEdges": [], "route": mode, "globalAnswer": None}

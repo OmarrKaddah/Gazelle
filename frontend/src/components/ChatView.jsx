@@ -304,7 +304,8 @@ function Message({ message }) {
   const allCitations = message.citations || [];
   const visibleCitations = allCitations.filter((c) => citedIds.has(c.chunkId));
   const citationMap = new Map(visibleCitations.map((c, i) => [c.chunkId, i + 1]));
-  const showGraphArea = message.mode === 'graph' || message.mode === 'hybrid';
+  const showGraphArea = message.mode === 'graph' || message.mode === 'hybrid' ||
+    (message.mode === 'auto' && message.routeLabel === 'local');
   return (
     <div className="space-y-4">
       {message.routeLabel && (
