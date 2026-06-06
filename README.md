@@ -55,7 +55,7 @@ src/semantic_chunker.py
        |                                         Route 1 (classical baseline)
        |     -- OR --
        |
-       +---> src/graphExtract.py             --> extractions/<EXTRACT_DIR>/*_graph.json
+       +---> src/graphExtract.py             --> extractions/*_graph.json
        |          (LLM entities + relationships) Route 2 (deployed)
        |
        +---> src/kgBuild.py   (Route 1)      --> Neo4j: Entity + COOCCURS_WITH
@@ -324,7 +324,7 @@ BGE_M3_PATH=BAAI/bge-m3
 
 # ── Pipeline configuration ────────────────────────────────────────
 GRAPH_ROUTE=2                    # 1=GLiNER classical, 2=LLM full graph (default)
-EXTRACT_DIR=extractions_cbe      # directory for extraction JSONs
+EXTRACT_DIR=extractions          # directory for all extraction JSONs (entities + graph)
 CORPUS_NAME=cbe                  # tags Neo4j :Community nodes
 
 # ── NER strategy ─────────────────────────────────────────────────
@@ -454,7 +454,7 @@ python runners/runGliner.py
 
 # Stage 5b — Entity extraction, Route 1, NER_STRATEGY=classical (CRF pipeline)
 python runners/runNerPipeline.py
-# Output: extractions/<model>/<docName>_crf_entities.json
+# Output: extractions/<docName>_entities.json
 # Runs: gazetteer → feature extraction → CRF train → inference
 
 # Stage 5c — Entity extraction, Route 2 (LLM)
@@ -494,8 +494,7 @@ python runners/runAll.py Documents/ --skip-embed
 | `Doc_Out/` | OCR | Markdown text per document |
 | `parsed/` | Parser | Structured JSON (sections, elements, page numbers) |
 | `chunks/` | Chunker | Token-bounded chunk arrays with `chunkId` |
-| `extractions/` | NER/LLM | Entity spans (`*_entities.json`) and relation data |
-| `extractions_cbe/` | Route 2 | LLM graph extractions (`*_graph.json`) |
+| `extractions/` | All routes | Entity spans (`*_entities.json`), relation data (`*_graph.json`) |
 
 ---
 
@@ -591,7 +590,7 @@ python src/classical_NER/trainCrf.py
     |
     v  Inference on new chunks
 python src/classical_NER/runCrf.py
-    --> extractions/crf/<docName>_crf_entities.json
+    --> extractions/<docName>_entities.json
 ```
 
 ### 9.2 CRF feature groups

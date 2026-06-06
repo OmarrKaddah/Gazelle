@@ -68,7 +68,7 @@ examples:
 
     print(f"\n{'='*55}")
     print(f"  Done")
-    print(f"  Entities  →  extractions/{args.name}/")
+    print(f"  Entities  →  extractions/<docName>_entities.json")
     print(f"  Model     →  src/classical_NER/models/{args.name}.pkl")
     print(f"{'='*55}")
     print(f"\nTo evaluate:")
