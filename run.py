@@ -2,21 +2,18 @@ import os
 import sys
 from pathlib import Path
 
-from runners import runGliner
+from dotenv import load_dotenv
 
-SRC = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src')
-if SRC not in sys.path:
-    sys.path.insert(0, SRC)
+load_dotenv()
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src'))
 
 from ocr import runOcrAndDump
 from parser import parseDoc, dumpParsed, loadParsed
 from chunker import chunkDoc, dumpChunks
 from embedding import embedDoc
-from dotenv import load_dotenv
-load_dotenv()
-import os
-
 from config import CHUNKER_TYPE
+from runners import runGliner
 
 # Choose NER strategy (gliner | llm | hybrid). Mirrors runners/runAll.py
 NER_STRATEGY = os.getenv('NER_STRATEGY', 'hybrid').lower()
@@ -53,7 +50,8 @@ def runOcr():
 
 def runParser():
     print("\n=== Parser ===")
-    for source in sorted(Path("Doc_Out").glob("*.md"))+sorted(Path("Documents").glob("*.docx")):
+    sources = sorted(Path("Doc_Out").glob("*.md")) + sorted(Path("Documents").glob("*.docx"))
+    for source in sources:
         docName = source.stem.lower()
         out = Path(f"parsed/{docName}.json")
         if out.exists():
@@ -71,7 +69,7 @@ def runChunker():
         docName = parsed.stem
         out = Path(f"chunks/{docName}.json")
         if out.exists():
-            print(f"[skip] {docName}")
+            print(f"[skip]  {docName}")
             continue
         print(f"[chunk] {docName}")
         elements = loadParsed(docName)

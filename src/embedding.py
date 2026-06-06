@@ -21,6 +21,7 @@ def embedQuery(query):
     try:
         return embedTexts([query])[0]
     except RuntimeError as e:
+
         if 'NaN' not in str(e):
             raise
         return embedTexts([query + ' .'])[0]
@@ -31,6 +32,7 @@ def loadChunks(docName):
 
 
 def setupVectorIndex(tx):
+    
     tx.run(f"""
         CREATE VECTOR INDEX chunk_embedding IF NOT EXISTS
         FOR (c:Chunk) ON (c.embedding)
@@ -49,6 +51,7 @@ def setupFulltextIndex(tx):
 
 
 def writeEmbedding(tx, chunkId, embedding):
+    
     tx.run(
         "MATCH (c:Chunk {chunkId: $chunkId}) SET c.embedding = $embedding",
         chunkId=chunkId,
@@ -57,15 +60,22 @@ def writeEmbedding(tx, chunkId, embedding):
 
 
 def embedDoc(docName):
+
     chunks = loadChunks(docName)
+
     with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
         with driver.session(database=NEO4J_DB) as session:
+
             session.execute_write(setupVectorIndex)
+
             session.execute_write(setupFulltextIndex)
+
             for i in range(0, len(chunks), CHUNK_EMBED_BATCH):
+
                 batch = chunks[i:i + CHUNK_EMBED_BATCH]
                 texts = [c['text'] for c in batch]
                 embs = embedTexts(texts)
+
                 for chunk, emb in zip(batch, embs):
                     session.execute_write(writeEmbedding, chunk['chunkId'], emb)
                 print(f"Embedded {min(i + CHUNK_EMBED_BATCH, len(chunks))}/{len(chunks)}", flush=True)
