@@ -155,6 +155,7 @@ nano .env
 ### Step 4: Download Pre-built Graph
 
 Instead of running the full OCR→Parse→Chunk→NER→KG pipeline, download a pre-built graph dump:
+To test the global sense making feature download the ap_news.jsonl and set retrieval mode to auto and set llm summarizer or use direct chunks
 
 ```bash
 mkdir -p dumps
