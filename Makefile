@@ -164,11 +164,7 @@ graph-dump:
 	@echo "  make graph-restore DUMP=dumps/graph.jsonl"
 
 graph-restore:
-	@if [ -z "$(DUMP)" ]; then \
-		echo "Usage: make graph-restore DUMP=<dump_file.jsonl>"; \
-		echo "Example: make graph-restore DUMP=dumps/graph.jsonl"; \
-		exit 1; \
-	fi
+	@$(PYTHON) -c "import sys; sys.exit(0 if '$(DUMP)' else 1)" || (echo "Usage: make graph-restore DUMP=<dump_file.jsonl>" && echo "Example: make graph-restore DUMP=dumps/graph.jsonl" && exit 1)
 	@echo "Restoring Neo4j graph from $(DUMP)..."
 	@echo "⚠ This will WIPE the current database and restore from the dump."
 	@echo "Press Ctrl+C within 3 seconds to cancel..."
