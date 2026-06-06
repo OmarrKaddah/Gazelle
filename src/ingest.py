@@ -14,7 +14,6 @@ from kgWriter import writeDoc
 from embedding import embedDoc
 from entityEmbedding import embedEntities
 from entityAlign import deduplicate
-from docConvert import docxToMarkdown, pdfPages
 
 NER_STRATEGY = os.getenv('NER_STRATEGY', 'hybrid').lower()
 if NER_STRATEGY == 'llm':
@@ -38,9 +37,6 @@ DOCX_EXT = {'.docx'}
 TEXT_EXT = {'.md', '.txt'}
 SUPPORTED_EXT = IMAGE_EXT | PDF_EXT | DOCX_EXT | TEXT_EXT
 
-# Above this many extractable chars we treat the PDF as digital and skip OCR.
-PDF_TEXT_MIN_CHARS = 200
-
 log = logging.getLogger('gazelle.ingest')
 
 
@@ -56,7 +52,6 @@ def docNameFor(source):
     return source.stem.lower()
 
 
-# output/<stem>.json, same [{'page', 'markdown'}] shape OCR produces
 def writeSidecar(stem, pages):
     OUTPUT.mkdir(exist_ok=True)
     (OUTPUT / f'{stem}.json').write_text(
@@ -64,30 +59,24 @@ def writeSidecar(stem, pages):
     )
 
 
-# OCR only for images and scanned PDFs; digital PDFs, docx and text read directly.
 def parseSource(source):
+
     ext = source.suffix.lower()
-    if ext in IMAGE_EXT:
+
+    if ext in IMAGE_EXT or ext in PDF_EXT:
+
         runOcrAndDump(str(source))
-    elif ext in PDF_EXT:
-        pages = pdfPages(str(source))
-        if sum(len(p['markdown']) for p in pages) >= PDF_TEXT_MIN_CHARS:
-            log.info('pdf has text layer (%d pages): reading directly, no OCR', len(pages))
-            writeSidecar(source.stem, pages)
-        else:
-            log.info('pdf has no usable text layer, falling back to OCR')
-            runOcrAndDump(str(source))
     elif ext in DOCX_EXT:
-        writeSidecar(source.stem, [{'page': 1, 'markdown': docxToMarkdown(str(source))}])
+
+        return parseDoc(str(source))
     elif ext in TEXT_EXT:
+
         writeSidecar(source.stem, [{'page': 1, 'markdown': source.read_text(encoding='utf-8')}])
     else:
+        
         raise ValueError(f'unsupported file type: {ext}')
     return parseDoc(str(DOC_OUT / f'{source.stem}.md'))
 
-
-# Full pipeline for one doc. writeDoc merges into Neo4j (no clearDb), and
-# embedDoc runs after it so the Chunk nodes exist before we set their vectors.
 def ingestOne(source):
     docName = docNameFor(source)
     log.info('ingest start: %s -> doc=%s', source.name, docName)
@@ -114,14 +103,14 @@ def ingestOne(source):
     }
 
 
-# API entry point. payloads is a list of (filename, bytes). One bad file
-# doesn't abort the batch; embed + dedup run once at the end so new entities
-# link against the existing graph.
+
 def ingestUploads(payloads):
     os.chdir(ROOT)
     results = []
     sources = []
+
     for filename, data in payloads:
+
         ext = Path(filename).suffix.lower()
         if ext not in SUPPORTED_EXT:
             log.warning('rejected unsupported upload: %s', filename)
@@ -130,6 +119,7 @@ def ingestUploads(payloads):
         sources.append(saveUpload(filename, data))
 
     for source in sources:
+
         try:
             results.append(ingestOne(source))
         except Exception as exc:

@@ -41,6 +41,7 @@ def formatChatSummary(summary):
 
 
 def formatHistory(recentTurns):
+
     if not recentTurns:
         return ""
     parts = ["RECENT TURNS (verbatim, oldest first):"]
@@ -56,6 +57,7 @@ def assembleMessages(systemPrompt, userMemRows, chatSummary, recentTurns, contex
     historyText = truncateToBudget(formatHistory(recentTurns), BUDGET_HISTORY)
     contextText = truncateToBudget(contextBlock, BUDGET_CONTEXT)
     questionText = truncateToBudget(question, BUDGET_QUESTION)
+    
 
     sections = [systemPrompt]
     if userMemText:

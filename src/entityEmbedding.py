@@ -30,10 +30,8 @@ def writeEmbedding(tx, canonicalId, embedding):
         emb=embedding,
     )
 
-
-# Concatenate canonical name + aliases so semantically equivalent surface forms
-# pull the entity's vector toward all of them, not just the first-seen variant.
 def buildEmbedText(entity):
+
     parts = [entity['name']] + (entity['aliases'] or [])
     return ' / '.join(dict.fromkeys(p for p in parts if p))
 
@@ -41,8 +39,10 @@ def buildEmbedText(entity):
 def embedWithSkip(texts):
     try:
         return embedTexts(texts)
+    
     except RuntimeError:
         if len(texts) == 1:
+            
             print(f"[skip] {texts[0][:60]}", flush=True)
             return [None]
         mid = len(texts) // 2
