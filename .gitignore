@@ -27,6 +27,8 @@ venv/
 .venv/
 env/
 ENV/
+classical_env/
+gliner_env/
 
 # =====================================================================
 # Node / Vite / React
@@ -75,14 +77,9 @@ $RECYCLE.BIN/
 # =====================================================================
 Documents/
 Scraped/
-musique/data
-musique/data
+musique/data/
 
 # =====================================================================
-# Project: pipeline-derived data (regenerable, but expensive)
-# Ignore the directories by default; explicitly allow the MuSiQue
-# artifacts that took hours to extract (entities, triples, chunks)
-# so they're part of the thesis-reproducible record.
 # Project: pipeline-derived data (regenerable, but expensive)
 # Ignore the directories by default; explicitly allow the MuSiQue
 # artifacts that took hours to extract (entities, triples, chunks)
@@ -110,24 +107,15 @@ gazetteer/
 
 # Trained model artifacts and classical NER subsystem (regenerable)
 src/models/
-src/classical_NER/models
+src/classical_NER/models/
 src/classical_NER/*.txt
-src/classical_NER/training
+src/classical_NER/training/
 train_data.json
 router/data/*.pkl
 *.pkl
 
 # NER annotation datasets
 annotations/
-
-# chunks/ and extractions/ — ignore contents by default, allowlist
-# the thesis-critical MuSiQue artifacts so they're in the repo record.
-chunks/*
-extractions/*
-
-!chunks/musique.json
-!extractions/musique_entities.json
-!extractions/musique_triples.json
 
 # =====================================================================
 # Offline install cache
@@ -139,6 +127,7 @@ wheelhouse_win/
 models/
 *.bin
 *.vec
+bge-reranker-v2-m3/
 
 # CAMeL Tools downloaded data
 .camel_tools/
@@ -152,7 +141,6 @@ models/
 *.txt
 *.json
 plans/
-.ini
 
 # Stray clipboard / WhatsApp images at project root
 WhatsApp Image *.jpeg
@@ -180,47 +168,20 @@ CLAUDE.md
 graphTraversal/datasets/
 graphTraversal/figures/
 
-# Global-arm benchmark (sensemaking): downloaded corpora, question sets, eval results, vizualizations
+# Global-arm benchmark (sensemaking): downloaded corpora, question sets, eval results, visualizations
 sensemaking/data/
 sensemaking/eval_results/
 sensemaking/questions_*.json
 sensemaking/config/
 viz/
 
-.venv*
-
 # SQLite database (binary, not mergeable)
 gazelle.db
 
-# Large benchmark datasets
-twowiki/data/.ini
+# Temporary test data
+chunk_tests/
+twowiki/
+ocr_dataset/
 
-# Stray clipboard / WhatsApp images at project root
-WhatsApp Image *.jpeg
-WhatsApp Image *.jpg
-WhatsApp Image *.png
-
-# Throwaway probe scripts at project root (not in src/ or runners/)
-/test.py
-/scratch.py
-
-# Session handoff — kept on disk for working memory, not in repo
-/HANDOFF.md
-
-# Local Claude config
-.claude/
-
-# graphTraversal validation fixtures + generated figures (regenerable/downloadable)
-graphTraversal/datasets/
-graphTraversal/figures/
-
-
-gliner_env/*
-*.json
-*.pkl
-
-classical_env/*
-ocr_dataset/*
-
-wheelhouse/
-wheelhouse_win/
+# Build artifacts
+.streamlit/

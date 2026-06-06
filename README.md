@@ -1390,7 +1390,6 @@ Gazelle/
 |-- sensemaking/                 Global arm evaluation (AP News + BenchmarkQED)
 |-- router/                      Query router training data + classifier
 |-- frontend/                    React + Vite frontend (chat UI + graph explorer)
-|-- alembic/                     PostgreSQL schema migrations
 |-- docs/                        Design documentation
 |   |-- PROCESS.md               PPR retrieval design log + versioned eval results
 |   |-- GLOBAL_PLAN.md           Global arm architecture plan
@@ -1402,7 +1401,6 @@ Gazelle/
 |-- chunks/                      Chunker output JSON
 |-- extractions/                 Entity and relation extraction outputs
 |-- annotations/                 Gold annotation files (Label Studio format)
-|-- alembic.ini
 |-- requirements.txt
 +-- .env                         Your environment variables (do not commit)
 ```
