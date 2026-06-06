@@ -50,7 +50,7 @@ src/semantic_chunker.py
        +---> src/glinerExtract.py             --> extractions/*_entities.json
        |          (GLiNER Arabic NER)             NER_STRATEGY=gliner (default)
        |     -- OR --
-       +---> runners/runNerPipeline.py      --> extractions/<model>/
+       +---> runners/runNerPipeline.py      --> extractions/<docName>_entities.json
        |          (CRF classical NER)             NER_STRATEGY=classical
        |                                         Route 1 (classical baseline)
        |     -- OR --
@@ -323,7 +323,7 @@ GEMINI_MODEL=gemini-2.0-flash
 BGE_M3_PATH=BAAI/bge-m3
 
 # ── Pipeline configuration ────────────────────────────────────────
-GRAPH_ROUTE=2                    # 1=GLiNER classical, 2=LLM full graph (default)
+GRAPH_ROUTE=2                    # 1=classical NER (gliner|crf|llm) + COOCCURS_WITH, 2=LLM full graph (default)
 EXTRACT_DIR=extractions          # directory for all extraction JSONs (entities + graph)
 CORPUS_NAME=cbe                  # tags Neo4j :Community nodes
 
@@ -426,10 +426,10 @@ Place source documents (PDFs, images) in the `Documents/` directory.
 ### 7.1 Full pipeline (all stages, skip-if-exists)
 
 ```bash
-python run.py
+python runners/runPipeline.py
 ```
 
-Runs: OCR → Parse → Chunk → Embed → Entity extraction → KG write → Entity embed. Skips any stage whose output already exists.
+Runs: OCR → Parse → Chunk → NER/Extract → KG build → Embed → Entity embed → Synonyms, skipping any stage whose output already exists. Respects `GRAPH_ROUTE` and `NER_STRATEGY` — automatically selects the correct NER runner and, for Route 2, also runs community detection and summarization.
 
 ### 7.2 Individual stages
 
@@ -459,7 +459,7 @@ python runners/runNerPipeline.py
 
 # Stage 5c — Entity extraction, Route 2 (LLM)
 python runners/runGraphExtract.py
-# Output: <EXTRACT_DIR>/<docName>_graph.json
+# Output: extractions/<docName>_graph.json
 
 # Stage 6a — KG build, Route 1: Entity layer + COOCCURS_WITH
 python runners/runKgBuild.py
@@ -559,7 +559,7 @@ python graphTraversal/runSynonyms.py 0.85      # explicit threshold
 
 A standalone Arabic NER pipeline using a CRF trained on gold-annotated CBE banking documents. This subsystem is in `src/classical_NER/`.
 
-Set `NER_STRATEGY=classical` in `.env` (or the env var) to activate it in the main pipeline. Both `runPipeline.py` (§7.2 orchestrator) and `run.py` (§7.1 full pipeline) will then call `runners/runNerPipeline.py` in place of `runGliner.py` for the entity extraction step.
+Set `NER_STRATEGY=classical` in `.env` (or the env var) to activate it in the main pipeline. `runners/runPipeline.py` will then call `runners/runNerPipeline.py` in place of `runGliner.py` for the entity extraction step.
 
 ### 9.1 Full CRF pipeline
 
@@ -1132,7 +1132,6 @@ Gazelle/
 |-- chunks/                      Chunker output JSON
 |-- extractions/                 Entity and relation extraction outputs
 |-- annotations/                 Gold annotation files (Label Studio format)
-|-- run.py                       Full pipeline orchestrator (skip-if-exists)
 |-- alembic.ini
 |-- requirements.txt
 +-- .env                         Your environment variables (do not commit)
@@ -1165,7 +1164,7 @@ createdb gazelle
 alembic upgrade head
 
 # 7. Place your documents in Documents/ and run ingestion
-python run.py
+python runners/runPipeline.py
 
 # 8. Add entity synonym edges
 python graphTraversal/runSynonyms.py
