@@ -48,7 +48,10 @@ src/semantic_chunker.py
        +---> src/embedding.py                 (BGE-M3 --> Neo4j vector index)
        |
        +---> src/glinerExtract.py             --> extractions/*_entities.json
-       |          (GLiNER Arabic NER)
+       |          (GLiNER Arabic NER)             NER_STRATEGY=gliner (default)
+       |     -- OR --
+       +---> runners/runNerPipeline.py      --> extractions/<model>/
+       |          (CRF classical NER)             NER_STRATEGY=classical
        |                                         Route 1 (classical baseline)
        |     -- OR --
        |
@@ -325,7 +328,7 @@ EXTRACT_DIR=extractions_cbe      # directory for extraction JSONs
 CORPUS_NAME=cbe                  # tags Neo4j :Community nodes
 
 # ── NER strategy ─────────────────────────────────────────────────
-NER_STRATEGY=gliner              # gliner | llm
+NER_STRATEGY=gliner              # gliner | llm | classical
 GLINER_MODEL=NAMAA-Space/gliner_arabic-v2.1
 GLINER_THRESHOLD=0.7
 
@@ -445,11 +448,16 @@ python runners/runChunker.py
 # Stage 4 — Embed chunks: chunks/*.json --> Neo4j vector index
 python runners/runEmbed.py
 
-# Stage 5a — Entity extraction, Route 1 (GLiNER)
+# Stage 5a — Entity extraction, Route 1, NER_STRATEGY=gliner (default)
 python runners/runGliner.py
 # Output: extractions/<docName>_entities.json
 
-# Stage 5b — Entity extraction, Route 2 (LLM)
+# Stage 5b — Entity extraction, Route 1, NER_STRATEGY=classical (CRF pipeline)
+python runners/runNerPipeline.py
+# Output: extractions/<model>/<docName>_crf_entities.json
+# Runs: gazetteer → feature extraction → CRF train → inference
+
+# Stage 5c — Entity extraction, Route 2 (LLM)
 python runners/runGraphExtract.py
 # Output: <EXTRACT_DIR>/<docName>_graph.json
 
@@ -495,20 +503,37 @@ python runners/runAll.py Documents/ --skip-embed
 
 Select the route via the `GRAPH_ROUTE` env var (default: `2`). Both routes share the OCR → parse → chunk → embed pipeline.
 
-### Route 1 — Classical (GLiNER baseline)
+### Route 1 — Classical (GLiNER or CRF baseline)
 
-Extracts named entities with GLiNER and builds co-mention edges between entities that appear in the same chunk.
+Extracts named entities and builds co-mention edges between entities that appear in the same chunk.
 
 - **Builds:** `(:Entity)` nodes + `COOCCURS_WITH {count}` edges
 - **Use when:** Fast local baseline, no API cost, no cloud dependency
 - **Cannot feed:** Community summarization (no relationship descriptions)
 
+The NER step is controlled by `NER_STRATEGY` (independent of `GRAPH_ROUTE`):
+
+| `NER_STRATEGY` | NER runner | Notes |
+|----------------|-----------|-------|
+| `gliner` (default) | `runners/runGliner.py` | GLiNER Arabic model, single-pass |
+| `classical` | `runners/runNerPipeline.py` | CRF pipeline — gazetteer → features → train → infer |
+| `llm` | `src/llmNER.py` | LLM-based NER, higher quality, API cost |
+
 ```bash
 export GRAPH_ROUTE=1
+
+# Option A — GLiNER (default)
 python runners/runGliner.py
+
+# Option B — Classical CRF (set NER_STRATEGY=classical first)
+export NER_STRATEGY=classical
+python runners/runNerPipeline.py
+
 python runners/runKgBuild.py
 python runners/runEntityEmbed.py
 ```
+
+Using `runPipeline.py` picks the correct NER runner automatically based on `NER_STRATEGY`.
 
 ### Route 2 — LLM (deployed, default)
 
@@ -533,7 +558,9 @@ python graphTraversal/runSynonyms.py 0.85      # explicit threshold
 
 ## 9. Classical NER Subsystem (CRF)
 
-A standalone Arabic NER pipeline using a CRF trained on gold-annotated CBE banking documents. This subsystem is in `src/classical_NER/` and is separate from the main GLiNER/LLM pipeline.
+A standalone Arabic NER pipeline using a CRF trained on gold-annotated CBE banking documents. This subsystem is in `src/classical_NER/`.
+
+Set `NER_STRATEGY=classical` in `.env` (or the env var) to activate it in the main pipeline. Both `runPipeline.py` (§7.2 orchestrator) and `run.py` (§7.1 full pipeline) will then call `runners/runNerPipeline.py` in place of `runGliner.py` for the entity extraction step.
 
 ### 9.1 Full CRF pipeline
 
@@ -1061,6 +1088,7 @@ Gazelle/
 |   |-- runChunker.py
 |   |-- runEmbed.py
 |   |-- runGliner.py
+|   |-- runNerPipeline.py            Full classical CRF NER pipeline (NER_STRATEGY=classical)
 |   |-- runGraphExtract.py
 |   |-- runGraphBuild.py
 |   |-- runKgBuild.py
