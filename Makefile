@@ -1,9 +1,8 @@
 PYTHON ?= python
 PIP ?= pip
-ALEMBIC ?= alembic
 NPM ?= npm
 
-.PHONY: help quick-start setup-db setup-ollama setup-env run-ingestion setup-synonyms setup-communities run-system graph-dump graph-restore install install-frontend migrate upgrade downgrade revision current history run-api run-frontend build-frontend py-compile eval test test-parser test-chunker test-embedding test-semantic test-gliner test-llm-ner test-config test-cov test-modules test-modules-parser test-modules-ner test-modules-embedding test-integration test-all services-docker services-stop docker-neo4j docker-ollama clean
+.PHONY: help quick-start setup-db setup-ollama setup-env run-ingestion setup-synonyms setup-communities run-system graph-dump graph-restore install install-frontend run-api run-frontend build-frontend py-compile eval test test-parser test-chunker test-embedding test-semantic test-gliner test-llm-ner test-config test-cov test-modules test-modules-parser test-modules-ner test-modules-embedding test-integration test-all services-docker services-stop docker-neo4j docker-ollama clean
 
 help:
 	@echo "Gazelle — Graph-Grounded RAG for Banking Compliance"
@@ -11,7 +10,7 @@ help:
 	@echo "Quick Start targets (run in order):"
 	@echo "  quick-start      Run full setup in one command (requires manual service setup)"
 	@echo "  setup-env        Configure .env file from .env.example"
-	@echo "  setup-db         Create database and run Alembic migrations"
+	@echo "  setup-db         Initialize SQLite database"
 	@echo "  setup-ollama     Pull required Ollama models"
 	@echo "  run-ingestion    Run full OCR→Parse→Chunk→NER→KG→Embed pipeline"
 	@echo "  setup-synonyms   Add entity synonym (SYNONYM) edges"
@@ -29,14 +28,10 @@ help:
 	@echo "  graph-restore    Restore graph from JSONL file (requires dump file)"
 	@echo "  graph-restore    DUMP=dumps/myfile.jsonl  (specify dump file)"
 	@echo ""
-	@echo "Installation & Database targets:"
+	@echo "Installation targets:"
 	@echo "  install          Install Python dependencies"
 	@echo "  install-frontend Install frontend dependencies"
-	@echo "  migrate          Create a new Alembic revision with autogenerate"
-	@echo "  upgrade          Apply all database migrations"
-	@echo "  downgrade        Roll back one migration"
-	@echo "  current          Show current Alembic migration"
-	@echo "  history          Show Alembic migration history"
+	@echo "  install-test     Install test dependencies"
 	@echo ""
 	@echo "Server targets:"
 	@echo "  run-api          Start the FastAPI server (http://localhost:8000)"
@@ -169,11 +164,7 @@ graph-dump:
 	@echo "  make graph-restore DUMP=dumps/graph.jsonl"
 
 graph-restore:
-	@if [ -z "$(DUMP)" ]; then \
-		echo "Usage: make graph-restore DUMP=<dump_file.jsonl>"; \
-		echo "Example: make graph-restore DUMP=dumps/graph.jsonl"; \
-		exit 1; \
-	fi
+	@$(PYTHON) -c "import sys; sys.exit(0 if '$(DUMP)' else 1)" || (echo "Usage: make graph-restore DUMP=<dump_file.jsonl>" && echo "Example: make graph-restore DUMP=dumps/graph.jsonl" && exit 1)
 	@echo "Restoring Neo4j graph from $(DUMP)..."
 	@echo "⚠ This will WIPE the current database and restore from the dump."
 	@echo "Press Ctrl+C within 3 seconds to cancel..."
@@ -189,21 +180,6 @@ install:
 
 install-frontend:
 	cd frontend && $(NPM) install
-
-migrate:
-	$(ALEMBIC) revision --autogenerate -m "$(MSG)"
-
-upgrade:
-	$(ALEMBIC) upgrade head
-
-downgrade:
-	$(ALEMBIC) downgrade -1
-
-current:
-	$(ALEMBIC) current
-
-history:
-	$(ALEMBIC) history
 
 run-api:
 	$(PYTHON) runners/runApi.py

@@ -95,197 +95,165 @@ FRONTEND (frontend/, React + Vite + Tailwind + Cytoscape.js)
 
 ## 2. Quick Start
 
-### Using Make commands (Recommended)
+**Get up and running in 5 minutes using a pre-built graph.**
 
-The easiest way to get started. All commands below run from the **project root**.
+### Step 1: Download Requirements
 
-#### Step 1: Start required services
-
-**Neo4j and Ollama must be running before you proceed.**
-
-**Option A: Using Docker with Make** (simplest and recommended)
+Clone the repository and install all dependencies:
 
 ```bash
-# Start all required services with one command
+git clone <repository-url>
+cd Gazelle
+
+# Install Python and frontend dependencies
+make install install-frontend install-test
+
+# Download Ollama models (required for chat and embeddings)
+make setup-ollama
+
+# This downloads:
+# - qwen3-vl (OCR model)
+# - bge-m3 (embedding model)
+# - granite4.1 (chat model)
+```
+
+### Step 2: Start Services
+
+**Neo4j and Ollama must be running.**
+
+#### Option A: Using Docker (Recommended)
+
+```bash
+# Start Neo4j and Ollama with one command
 make services-docker
 
-# Services will be available at:
+# Services available at:
 #   Neo4j:  http://localhost:7474 (user: neo4j, password: your_password)
 #   Ollama: localhost:11434
-
-# Database: SQLite is created automatically at ./gazelle.db
-
-# To stop services later:
-make services-stop
 ```
 
-**Option B: Using Docker manually**
+#### Option B: Installed Locally
+
+- Start **Neo4j** manually from https://neo4j.com/download/
+- Start **Ollama** manually from https://ollama.com/download/
+
+### Step 3: Setup Database and Configuration
 
 ```bash
-# Start Neo4j (accessible at http://localhost:7474)
-docker run -d \
-  -p 7687:7687 -p 7474:7474 \
-  -e NEO4J_AUTH=neo4j/your_password \
-  --name gazelle-neo4j \
-  neo4j:5-community
-
-# Start Ollama (keep this terminal open — it serves models on localhost:11434)
-docker run -d \
-  -p 11434:11434 \
-  --gpus=all \
-  --name gazelle-ollama \
-  ollama/ollama
-ollama serve
-```
-
-**Option C: Installed locally**
-
-- **Neo4j**: Download and start from https://neo4j.com/download/ (Community Edition recommended)
-- **Ollama**: Download and start from https://ollama.com/download/
-- **Database**: SQLite is created automatically when you run `make quick-start`
-
-#### Step 2: One-command setup and run
-
-```bash
+# Initialize SQLite database and create default users
 make quick-start
+
+# This:
+# - Creates ./gazelle.db (SQLite)
+# - Initializes default seed users (omar, sara, ahmed, guest)
+# - Copies .env.example to .env
+
+# Edit .env with your API keys if needed
+nano .env
 ```
 
-This single command:
-- Installs Python and frontend dependencies
-- Initializes SQLite database at `./gazelle.db`
-- Creates default seed users (omar, sara, ahmed, guest)
-- Configures `.env` from `.env.example` (edit it with your credentials)
+### Step 4: Download Pre-built Graph
 
-**Then:**
+Instead of running the full OCR→Parse→Chunk→NER→KG pipeline, download a pre-built graph dump:
 
 ```bash
-# 3. Place your documents in Documents/ directory
+mkdir -p dumps
+# Download the graph dump
+# 📥 Download from:
+https://drive.google.com/drive/folders/14TZO9BMip4-8wX2tgVZ78EYoUlm5t7IU
+#
+# Place the file in: dumps/graph.jsonl
+# (Create the dumps/ directory if it doesn't exist)
 
-# 4. Run the full ingestion pipeline (OCR → Parse → Chunk → NER → KG → Embed)
-make run-ingestion
 
-# 5. Add entity synonym edges
-make setup-synonyms
+# Copy/move downloaded file to: dumps/graph.jsonl
 
-# 6. (Optional) Detect communities and generate summaries
-make setup-communities
+# Restore the graph to Neo4j
+make graph-restore DUMP=dumps/graph.jsonl
 
-# 7. Start the API server (in terminal A)
+# This restores:
+# - All entities and their embeddings
+# - Knowledge graph relationships
+# - Vector indexes
+# - Fulltext indexes
+```
+
+### Step 5: Start the Application
+
+```bash
+# Terminal A: Start API server
 make run-api
 # API available at http://localhost:8000
 
-# 8. Start the frontend (in terminal B)
+# Terminal B: Start frontend dev server
 make run-frontend
 # Frontend available at http://localhost:5173
-```
 
-### Alternative: Restore graph from backup (skip full ingestion)
-
-If you have a pre-built graph dump, you can restore it instead of running the full ingestion pipeline:
-
-```bash
-# Restore from a previously saved graph dump
-make graph-restore DUMP=dumps/graph.jsonl
-
-# Then go straight to starting the servers
-make run-api        # Terminal A
-make run-frontend   # Terminal B
-```
-
-To save the current graph for later restoration:
-
-```bash
-make graph-dump
-# Saves to dumps/graph.jsonl
+# Open http://localhost:5173 in your browser
+# Login with default user: omar / admin123
 ```
 
 ### All make targets at a glance
 
-Run `make help` to see complete documentation. Key targets:
+Run `make help` for complete documentation. Key quick-start targets:
 
-| Target | Purpose |
-|--------|---------|
-| **Setup & Services** | |
-| `make quick-start` | Install deps, setup DB, configure .env |
-| `make services-docker` | Start Neo4j and Ollama via Docker |
-| `make services-stop` | Stop all Docker services |
-| **Pipeline** | |
-| `make setup-ollama` | Download Ollama models |
-| `make run-ingestion` | Run full pipeline (OCR → Parse → Chunk → NER → KG → Embed) |
-| `make setup-synonyms` | Add entity synonym edges |
-| `make setup-communities` | Detect communities and generate summaries (Route 2) |
-| **Graph Backup/Restore** | |
-| `make graph-dump` | Backup current Neo4j graph to JSONL |
-| `make graph-restore DUMP=file.jsonl` | Restore graph from backup (alternative to pipeline) |
-| **Running** | |
-| `make run-api` | Start FastAPI server (http://localhost:8000) |
-| `make run-frontend` | Start Vite dev server (http://localhost:5173) |
-| `make build-frontend` | Build frontend for production |
-| **Testing** | |
-| `make test` | Run all unit tests |
-| `make test-all` | Run all tests with coverage |
+| Command                                     | Purpose                               |
+| ------------------------------------------- | ------------------------------------- |
+| `make install`                              | Install Python dependencies           |
+| `make install-frontend`                     | Install Node.js frontend dependencies |
+| `make install-test`                         | Install test dependencies             |
+| `make setup-ollama`                         | Download required Ollama models       |
+| `make services-docker`                      | Start Neo4j and Ollama via Docker     |
+| `make quick-start`                          | Initialize database and .env          |
+| `make graph-restore DUMP=dumps/graph.jsonl` | Restore pre-built graph               |
+| `make run-api`                              | Start FastAPI server                  |
+| `make run-frontend`                         | Start Vite dev server                 |
+| `make services-stop`                        | Stop Docker services                  |
 
-### Complete workflow summary
-
-Here's the full end-to-end setup in one place:
+### Full Example Workflow
 
 ```bash
-# Terminal 1: Start services (one-time setup)
+# Terminal 1: Start services
 make services-docker
-# Services running: Neo4j, Ollama
 
-# Terminal 2: Setup and configure
+# Terminal 2: Setup everything
+make install install-frontend install-test
+make setup-ollama
 make quick-start
-# This installs everything and prepares the database
 
-# Edit .env with your API keys (OPENROUTER_API_KEY, GROQ_API_KEY, etc.)
-nano .env
+# Download graph dump to dumps/graph.jsonl
+# (See Step 4 above)
 
-# Place your documents in Documents/ directory
-
-# Run the ingestion pipeline
-make run-ingestion
-
-# Add synonym edges and communities (optional)
-make setup-synonyms
-make setup-communities
-
-# Terminal 2 (split or new): Start API server
-make run-api
-# API available at http://localhost:8000
-
-# Terminal 3: Start frontend dev server
-make run-frontend
-# Frontend available at http://localhost:5173
-```
-
-### For returning users: Skip re-processing with graph restore
-
-If you already have a built graph (from a previous run or backup):
-
-```bash
-# Start services
-make services-docker
-
-# Restore the graph instead of re-running the pipeline
+# Restore the graph
 make graph-restore DUMP=dumps/graph.jsonl
 
-# Start the servers
-make run-api       # Terminal 2
-make run-frontend  # Terminal 3
+# Edit .env if needed
+nano .env
+
+# Terminal 2 (new tab): Start API
+make run-api
+# API at http://localhost:8000
+
+# Terminal 3: Start frontend
+make run-frontend
+# Frontend at http://localhost:5173
+
+# Login with: omar / admin123
 ```
 
 ### Troubleshooting
 
-- **"Neo4j connection failed"**: Ensure Neo4j is running and `NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD` are set in `.env`
-  - If using Docker: `make services-docker` starts Neo4j with user `neo4j`, password `your_password`
-- **"gazelle.db not found"**: Run `make setup-db` to create and initialize the SQLite database
-- **"Ollama models not found"**: Run `make setup-ollama` (Ollama must be running)
-- **Port conflicts**: Default ports are 8000 (API), 5173 (frontend), 7687 (Neo4j), 11434 (Ollama)
-  - Change them in `.env` and frontend proxy config if needed
-- **Docker container already exists**: Run `make services-stop` then `make services-docker` to restart cleanly
-- **Can't connect to Docker daemon**: Ensure Docker Desktop is running (Windows/Mac) or Docker daemon is started (Linux)
-- **"Permission denied" on ./gazelle.db**: Ensure the project directory is writable by your user
+- **"Neo4j connection failed"**: Ensure Neo4j is running
+  - Check: http://localhost:7474 (should show Neo4j browser)
+- **"Ollama models not found"**: Run `make setup-ollama` or pull manually:
+  ```bash
+  ollama pull qwen3-vl:8b-instruct-q4_K_M
+  ollama pull bge-m3
+  ollama pull granite4.1:8b
+  ```
+- **"Graph restore failed"**: Ensure `dumps/graph.jsonl` exists and has correct format
+- **Port conflicts**: Change in `.env` if needed (NEO4J_URI, OLLAMA_URL, etc.)
+- **Docker issues**: Run `make services-stop` then `make services-docker` to restart cleanly
 
 ---
 
@@ -293,20 +261,20 @@ make run-frontend  # Terminal 3
 
 ### System requirements
 
-| Component | Minimum | Recommended |
-|-----------|---------|-------------|
-| Python | 3.10 | 3.12 |
-| Node.js | 18 | 20+ |
-| RAM | 16 GB | 32 GB+ |
-| GPU VRAM | 8 GB (GLiNER + small LLM) | 24 GB+ (70B LLMs) |
-| Storage | 20 GB | 50 GB+ |
+| Component | Minimum                   | Recommended       |
+| --------- | ------------------------- | ----------------- |
+| Python    | 3.10                      | 3.12              |
+| Node.js   | 18                        | 20+               |
+| RAM       | 16 GB                     | 32 GB+            |
+| GPU VRAM  | 8 GB (GLiNER + small LLM) | 24 GB+ (70B LLMs) |
+| Storage   | 20 GB                     | 50 GB+            |
 
 ### Required services
 
-| Service | Purpose | Reference |
-|---------|---------|-----------|
+| Service    | Purpose                                             | Reference                   |
+| ---------- | --------------------------------------------------- | --------------------------- |
 | **Ollama** | OCR model, embedding model, local chat/extract LLMs | https://ollama.com/download |
-| **Neo4j** | Graph database + vector index + fulltext index | https://neo4j.com/download/ |
+| **Neo4j**  | Graph database + vector index + fulltext index      | https://neo4j.com/download/ |
 
 **Database:** SQLite (built-in, no additional setup required)
 
@@ -338,12 +306,14 @@ ollama pull qwen2.5:72b-instruct-q4_K_M  # best quality, needs ~45 GB VRAM
 These download automatically on first use via the `transformers` and `gliner` libraries. To pre-download:
 
 **BGE-M3 embedding model** (~2.2 GB)
+
 ```bash
 # Reference: https://huggingface.co/BAAI/bge-m3
 python -c "from transformers import AutoTokenizer; AutoTokenizer.from_pretrained('BAAI/bge-m3')"
 ```
 
 **GLiNER Arabic NER model** (~300 MB)
+
 ```bash
 # Arabic-specific (recommended for Arabic-only documents)
 # Reference: https://huggingface.co/NAMAA-Space/gliner_arabic-v2.1
@@ -355,6 +325,7 @@ python -c "from gliner import GLiNER; GLiNER.from_pretrained('urchade/gliner_mul
 ```
 
 **CAMeL Tools Arabic POS tagger** (required for Classical CRF NER only)
+
 ```bash
 pip install camel-tools
 # Download the CALIMA-MSA-r13 morphology database
@@ -369,6 +340,7 @@ camel_data -i morphology-db-msa-r13
 Download from: https://github.com/stonybrooknlp/musique
 
 Place the files at:
+
 ```
 musique/data/musique_ans_v1.0_dev.jsonl
 musique/data/musique_ans_v1.0_train.jsonl
@@ -435,14 +407,15 @@ python convertAnercorp.py /path/to/ANERCorp_test.txt anercorp_test
 
 ### 3.4 Generated model files (not included — generate with commands below)
 
-| File | Size | How to generate |
-|------|------|----------------|
-| `src/classical_NER/models/crf.pkl` | ~5 MB | `python src/classical_NER/trainCrf.py` |
-| `src/classical_NER/models/crf_combined.pkl` | ~5 MB | Train with `includeWikiann=True, includeAnercorp=True` |
-| `src/classical_NER/gazetteer/gazetteer.json` | <1 MB | `python src/classical_NER/buildGazetteer.py` |
-| `src/classical_NER/training/train_data.json` | ~10 MB | `python src/classical_NER/featureExtract.py` |
+| File                                         | Size   | How to generate                                        |
+| -------------------------------------------- | ------ | ------------------------------------------------------ |
+| `src/classical_NER/models/crf.pkl`           | ~5 MB  | `python src/classical_NER/trainCrf.py`                 |
+| `src/classical_NER/models/crf_combined.pkl`  | ~5 MB  | Train with `includeWikiann=True, includeAnercorp=True` |
+| `src/classical_NER/gazetteer/gazetteer.json` | <1 MB  | `python src/classical_NER/buildGazetteer.py`           |
+| `src/classical_NER/training/train_data.json` | ~10 MB | `python src/classical_NER/featureExtract.py`           |
 
 Pre-trained CRF variants already present in the repo (small enough to commit):
+
 ```
 src/classical_NER/models/crf_bank.pkl       # trained on banking annotations only
 src/classical_NER/models/crf_anercorp.pkl   # anercorp only
@@ -590,6 +563,7 @@ make setup-db
 ```
 
 This command creates `./gazelle.db` with the following tables:
+
 - `users` — authenticated user accounts with role and clearance level
 - `user_sessions` — session tokens and timestamps
 - `chats` — conversation records
@@ -603,12 +577,12 @@ This command creates `./gazelle.db` with the following tables:
 
 The database is initialized with these accounts (change passwords on first login):
 
-| Username | Role | Clearance | Password |
-|----------|------|-----------|----------|
-| `omar` | Admin | restricted | admin123 |
-| `sara` | Senior Compliance | confidential | compliance123 |
-| `ahmed` | Compliance Analyst | internal | staff123 |
-| `guest` | External | public | guest |
+| Username | Role               | Clearance    | Password      |
+| -------- | ------------------ | ------------ | ------------- |
+| `omar`   | Admin              | restricted   | admin123      |
+| `sara`   | Senior Compliance  | confidential | compliance123 |
+| `ahmed`  | Compliance Analyst | internal     | staff123      |
+| `guest`  | External           | public       | guest         |
 
 ---
 
@@ -682,11 +656,11 @@ python runners/runAll.py Documents/ --skip-embed
 
 ### 7.4 Output directories
 
-| Directory | Stage | Contents |
-|-----------|-------|----------|
-| `Doc_Out/` | OCR | Markdown text per document |
-| `parsed/` | Parser | Structured JSON (sections, elements, page numbers) |
-| `chunks/` | Chunker | Token-bounded chunk arrays with `chunkId` |
+| Directory      | Stage      | Contents                                                         |
+| -------------- | ---------- | ---------------------------------------------------------------- |
+| `Doc_Out/`     | OCR        | Markdown text per document                                       |
+| `parsed/`      | Parser     | Structured JSON (sections, elements, page numbers)               |
+| `chunks/`      | Chunker    | Token-bounded chunk arrays with `chunkId`                        |
 | `extractions/` | All routes | Entity spans (`*_entities.json`), relation data (`*_graph.json`) |
 
 ---
@@ -698,6 +672,7 @@ python runners/runAll.py Documents/ --skip-embed
 ### Overview
 
 The preprocessing pipeline detects and removes handwritten regions from documents before OCR, which can improve Qwen3-VL's accuracy on printed text. This is particularly useful for:
+
 - Scanned official documents with handwritten annotations
 - Forms with handwritten entries mixed with printed fields
 - Documents with margin notes or stamps
@@ -717,11 +692,13 @@ Download the required datasets for training the handwriting detector:
 ### Setup and Training
 
 1. **Install preprocessing dependencies** (if not already installed):
+
    ```bash
    pip install opencv-python scikit-learn  # (already in requirements.txt)
    ```
 
 2. **Run the preprocessing notebook**:
+
    ```bash
    # Open the notebook and update dataset paths
    jupyter notebook preprocess_ocr.ipynb
@@ -746,6 +723,7 @@ Download the required datasets for training the handwriting detector:
 ### Configuration
 
 In `.env`:
+
 ```bash
 # Enable/disable handwriting preprocessing
 HANDWRITING_PREPROCESSING=true    # default: false
@@ -757,6 +735,7 @@ HANDWRITING_MODEL_PATH=./models/handwriting_detector.pkl
 ### Output
 
 Preprocessed documents are saved to `Doc_Out/` with the same structure as regular OCR output:
+
 - Raw OCR (before preprocessing): stored in pipeline logs if needed
 - Cleaned OCR (after preprocessing): the primary output used for parsing
 
@@ -782,11 +761,11 @@ Extracts named entities and builds co-mention edges between entities that appear
 
 The NER step is controlled by `NER_STRATEGY` (independent of `GRAPH_ROUTE`):
 
-| `NER_STRATEGY` | NER runner | Notes |
-|----------------|-----------|-------|
-| `gliner` (default) | `runners/runGliner.py` | GLiNER Arabic model, single-pass |
-| `classical` | `runners/runNerPipeline.py` | CRF pipeline — gazetteer → features → train → infer |
-| `llm` | `src/llmNER.py` | LLM-based NER, higher quality, API cost |
+| `NER_STRATEGY`     | NER runner                  | Notes                                               |
+| ------------------ | --------------------------- | --------------------------------------------------- |
+| `gliner` (default) | `runners/runGliner.py`      | GLiNER Arabic model, single-pass                    |
+| `classical`        | `runners/runNerPipeline.py` | CRF pipeline — gazetteer → features → train → infer |
+| `llm`              | `src/llmNER.py`             | LLM-based NER, higher quality, API cost             |
 
 ```bash
 export GRAPH_ROUTE=1
@@ -867,14 +846,14 @@ python src/classical_NER/runCrf.py
 
 Each Arabic token is represented by six feature groups:
 
-| Group | Features |
-|-------|---------|
-| Surface + context | `word`, `w-1`, `w+1`, `is_first` |
-| POS tags | `pos`, `p-2`, `p-1`, `p+1`, `p+2` (CALIMA-MSA-r13) |
-| Morphological | `has_def_art` (ال prefix), `has_prep_clitic`, `stem` |
-| Script | `is_arabic_num`, `is_western_num`, `contains_latin`, `is_clause_ref` |
-| Character n-grams | All bigrams and trigrams over token surface |
-| Domain triggers | `is_org_trigger`, `in_money_trigger`, `in_month`, `prev_is_org_trigger` |
+| Group             | Features                                                                |
+| ----------------- | ----------------------------------------------------------------------- |
+| Surface + context | `word`, `w-1`, `w+1`, `is_first`                                        |
+| POS tags          | `pos`, `p-2`, `p-1`, `p+1`, `p+2` (CALIMA-MSA-r13)                      |
+| Morphological     | `has_def_art` (ال prefix), `has_prep_clitic`, `stem`                    |
+| Script            | `is_arabic_num`, `is_western_num`, `contains_latin`, `is_clause_ref`    |
+| Character n-grams | All bigrams and trigrams over token surface                             |
+| Domain triggers   | `is_org_trigger`, `in_money_trigger`, `in_month`, `prev_is_org_trigger` |
 
 ### 9.3 Training with external datasets
 
@@ -929,23 +908,23 @@ python runSynonyms.py 0.85    # explicit threshold
 
 ### 10.3 Edge layers
 
-| Edge type | Enabled by | Notes |
-|-----------|-----------|-------|
-| `RELATED` | `useRelated=True` (default) | LLM-extracted semantic relations — Route 2 |
-| `COOCCURS_WITH` | `useCoMention=True` | Co-mention within chunk — Route 1 |
-| `SYNONYM` | `includeSynonyms=True` | Entity alignment bridges — both routes |
-| `TRIPLE` | `useTriples=True` | Bare OpenIE triples — deprecated |
+| Edge type       | Enabled by                  | Notes                                      |
+| --------------- | --------------------------- | ------------------------------------------ |
+| `RELATED`       | `useRelated=True` (default) | LLM-extracted semantic relations — Route 2 |
+| `COOCCURS_WITH` | `useCoMention=True`         | Co-mention within chunk — Route 1          |
+| `SYNONYM`       | `includeSynonyms=True`      | Entity alignment bridges — both routes     |
+| `TRIPLE`        | `useTriples=True`           | Bare OpenIE triples — deprecated           |
 
 ### 10.4 PPR hyperparameters (`src/config.py`)
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| PPR `alpha` | 0.5 | Teleport probability (restart rate) |
-| `SEED_K` | 8 | Entity seeds per query |
-| `RRF_K` | 60 | Reciprocal Rank Fusion constant |
-| `OVERFETCH` | 4 | Fetch k * OVERFETCH before access-control filter |
-| `SYNONYM_THRESHOLD` | 0.85 | Cosine cutoff for SYNONYM edges |
-| `ENTITY_WEIGHT` | 0.6 | Path score = entity_weight * entity_sim + (1-entity_weight) * rel_sim |
+| Parameter           | Default | Description                                                           |
+| ------------------- | ------- | --------------------------------------------------------------------- |
+| PPR `alpha`         | 0.5     | Teleport probability (restart rate)                                   |
+| `SEED_K`            | 8       | Entity seeds per query                                                |
+| `RRF_K`             | 60      | Reciprocal Rank Fusion constant                                       |
+| `OVERFETCH`         | 4       | Fetch k \* OVERFETCH before access-control filter                     |
+| `SYNONYM_THRESHOLD` | 0.85    | Cosine cutoff for SYNONYM edges                                       |
+| `ENTITY_WEIGHT`     | 0.6     | Path score = entity*weight * entity*sim + (1-entity_weight) * rel_sim |
 
 ---
 
@@ -1026,10 +1005,10 @@ Each community node gets: `title`, `summary`, `rating` (0–10), `rating_explana
 
 `src/router.py` classifies each query before retrieval:
 
-| Classification | Trigger | Handled by |
-|----------------|---------|------------|
-| `local` | Specific fact, entity, number, date | PPR retrieval |
-| `global` | Themes, trends, comparisons, "across documents" | Community map-reduce |
+| Classification | Trigger                                         | Handled by           |
+| -------------- | ----------------------------------------------- | -------------------- |
+| `local`        | Specific fact, entity, number, date             | PPR retrieval        |
+| `global`       | Themes, trends, comparisons, "across documents" | Community map-reduce |
 
 ```bash
 # Test the router standalone
@@ -1049,18 +1028,18 @@ python runners/runApi.py
 
 ### 13.2 API endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/auth/login` | Login — returns bearer token |
-| `POST` | `/api/auth/logout` | Invalidate session token |
-| `POST` | `/api/chat` | Send a query, stream the LLM answer |
-| `GET` | `/api/chats` | List the authenticated user's chats |
-| `POST` | `/api/chats` | Create a new chat |
-| `DELETE` | `/api/chats/{id}` | Delete a chat |
-| `GET` | `/api/chats/{id}/messages` | Get all messages in a chat |
-| `GET` | `/api/graph` | Query Neo4j for the graph explorer |
-| `GET` | `/api/memory/user` | Get the user's persistent memory entries |
-| `PUT` | `/api/memory/user/{key}` | Set a user memory entry |
+| Method   | Endpoint                   | Description                              |
+| -------- | -------------------------- | ---------------------------------------- |
+| `POST`   | `/api/auth/login`          | Login — returns bearer token             |
+| `POST`   | `/api/auth/logout`         | Invalidate session token                 |
+| `POST`   | `/api/chat`                | Send a query, stream the LLM answer      |
+| `GET`    | `/api/chats`               | List the authenticated user's chats      |
+| `POST`   | `/api/chats`               | Create a new chat                        |
+| `DELETE` | `/api/chats/{id}`          | Delete a chat                            |
+| `GET`    | `/api/chats/{id}/messages` | Get all messages in a chat               |
+| `GET`    | `/api/graph`               | Query Neo4j for the graph explorer       |
+| `GET`    | `/api/memory/user`         | Get the user's persistent memory entries |
+| `PUT`    | `/api/memory/user/{key}`   | Set a user memory entry                  |
 
 ### 13.3 Chat request body
 
@@ -1075,12 +1054,12 @@ python runners/runApi.py
 }
 ```
 
-| Field | Values | Description |
-|-------|--------|-------------|
-| `mode` | `vector`, `hybrid`, `graph` | Retrieval strategy |
-| `k` | integer | Number of chunks to retrieve |
-| `hops` | integer | Traversal depth for k-hop graph mode |
-| `provider` | `ollama`, `groq` | LLM backend for answer generation |
+| Field      | Values                      | Description                          |
+| ---------- | --------------------------- | ------------------------------------ |
+| `mode`     | `vector`, `hybrid`, `graph` | Retrieval strategy                   |
+| `k`        | integer                     | Number of chunks to retrieve         |
+| `hops`     | integer                     | Traversal depth for k-hop graph mode |
+| `provider` | `ollama`, `groq`            | LLM backend for answer generation    |
 
 ### 13.4 System prompt and grounding
 
@@ -1110,14 +1089,14 @@ npm run build
 
 ### 14.3 Tech stack
 
-| Package | Purpose |
-|---------|---------|
-| React 18 | UI framework |
-| Vite 5 | Build tool + dev server |
-| Tailwind CSS 3 | Styling |
-| Cytoscape.js 3 | Graph explorer visualization |
-| cytoscape-fcose | Force-directed graph layout |
-| react-cytoscapejs | React wrapper for Cytoscape |
+| Package           | Purpose                      |
+| ----------------- | ---------------------------- |
+| React 18          | UI framework                 |
+| Vite 5            | Build tool + dev server      |
+| Tailwind CSS 3    | Styling                      |
+| Cytoscape.js 3    | Graph explorer visualization |
+| cytoscape-fcose   | Force-directed graph layout  |
+| react-cytoscapejs | React wrapper for Cytoscape  |
 
 ### 14.4 Features
 
@@ -1158,12 +1137,12 @@ Documents not listed default to `'internal'`. The `allowedDocs(userClearance)` f
 
 The memory system has four layers that are assembled into the LLM prompt for each turn.
 
-| Layer | Storage | Lifetime | Token budget |
-|-------|---------|----------|-------------|
-| Retrieved context | Neo4j chunks | Per turn | 1500 |
-| Chat memory (rolling summary) | PostgreSQL `chat_memory` | Per chat session | 300 |
-| User memory (persistent preferences) | PostgreSQL `user_memory` | Across all chats | 80 |
-| Recent turn history | PostgreSQL `messages` | Last N turns | 600 |
+| Layer                                | Storage                  | Lifetime         | Token budget |
+| ------------------------------------ | ------------------------ | ---------------- | ------------ |
+| Retrieved context                    | Neo4j chunks             | Per turn         | 1500         |
+| Chat memory (rolling summary)        | PostgreSQL `chat_memory` | Per chat session | 300          |
+| User memory (persistent preferences) | PostgreSQL `user_memory` | Across all chats | 80           |
+| Recent turn history                  | PostgreSQL `messages`    | Last N turns     | 600          |
 
 ### Chat memory
 
@@ -1212,11 +1191,11 @@ Each run writes a versioned JSON with full config, per-question results, and rec
 
 ### 17.4 Results summary
 
-| Version | Retriever | recall@5 | recall@10 |
-|---------|-----------|----------|-----------|
-| v0 (baseline) | k-hop (k=2) | 0.285 | 0.331 |
-| v4 / v7b (best) | PPR, alpha=0.5, seedTopK=5 | **0.364** | 0.419 |
-| v8 | PPR + Route 2 RELATED edges | in progress | — |
+| Version         | Retriever                   | recall@5    | recall@10 |
+| --------------- | --------------------------- | ----------- | --------- |
+| v0 (baseline)   | k-hop (k=2)                 | 0.285       | 0.331     |
+| v4 / v7b (best) | PPR, alpha=0.5, seedTopK=5  | **0.364**   | 0.419     |
+| v8              | PPR + Route 2 RELATED edges | in progress | —         |
 
 Full version log with design decisions in `docs/PROCESS.md`.
 
@@ -1390,7 +1369,6 @@ Gazelle/
 |-- sensemaking/                 Global arm evaluation (AP News + BenchmarkQED)
 |-- router/                      Query router training data + classifier
 |-- frontend/                    React + Vite frontend (chat UI + graph explorer)
-|-- alembic/                     PostgreSQL schema migrations
 |-- docs/                        Design documentation
 |   |-- PROCESS.md               PPR retrieval design log + versioned eval results
 |   |-- GLOBAL_PLAN.md           Global arm architecture plan
@@ -1402,7 +1380,6 @@ Gazelle/
 |-- chunks/                      Chunker output JSON
 |-- extractions/                 Entity and relation extraction outputs
 |-- annotations/                 Gold annotation files (Label Studio format)
-|-- alembic.ini
 |-- requirements.txt
 +-- .env                         Your environment variables (do not commit)
 ```
@@ -1459,6 +1436,7 @@ htmlcov/index.html
 #### Open the report in your browser:
 
 **Linux/Mac:**
+
 ```bash
 # After running tests
 open htmlcov/index.html
@@ -1466,6 +1444,7 @@ open htmlcov/index.html
 ```
 
 **Windows:**
+
 ```bash
 # After running tests
 start htmlcov/index.html
@@ -1485,13 +1464,13 @@ htmlcov/
 
 The HTML report shows:
 
-| Column | Meaning |
-|--------|---------|
-| **Coverage** | Percentage of lines executed during tests |
-| **Statements** | Total lines of code |
-| **Missed** | Lines not executed (uncovered) |
-| **Branches** | Conditional branches (if/else, loops) |
-| **Partial** | Branches with partial coverage |
+| Column         | Meaning                                   |
+| -------------- | ----------------------------------------- |
+| **Coverage**   | Percentage of lines executed during tests |
+| **Statements** | Total lines of code                       |
+| **Missed**     | Lines not executed (uncovered)            |
+| **Branches**   | Conditional branches (if/else, loops)     |
+| **Partial**    | Branches with partial coverage            |
 
 ### Key metrics to watch:
 
@@ -1526,10 +1505,11 @@ Coverage reports can be integrated with CI/CD pipelines:
 - **Coverage badges**: Generate and embed in README
 
 Example for GitHub:
+
 ```yaml
 - name: Generate coverage report
   run: make test-all
-  
+
 - name: Upload coverage
   uses: codecov/codecov-action@v3
   with:
