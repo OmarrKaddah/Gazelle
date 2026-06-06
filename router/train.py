@@ -15,10 +15,7 @@ from concurrent.futures import ThreadPoolExecutor
 from routerFeatures import cueFeatures
 from embedding import embedNanSafe
 
-# Trains the four router variants on router/data/train.jsonl, reports per-class +
-# macro-F1 on the held-out test set, then persists the deployed model: a calibrated
-# logistic regression over bge-m3 query embeddings, with an asymmetric threshold
-# tuned for high global precision (firing the expensive global arm only when sure).
+
 
 DATA_DIR = 'router/data'
 EMB_CACHE = 'router/data/emb_cache.pkl'
@@ -100,25 +97,25 @@ def main():
     embTest = embedTextsCached(testTexts, 'test')
     cueTrain, cueTest = cueMatrix(trainTexts), cueMatrix(testTexts)
 
-    # Baseline 1: hand-crafted cues
+    # hand-crafted cues
     cueLR = Pipeline([('scale', StandardScaler()),
                       ('lr', LogisticRegression(max_iter=1000, class_weight='balanced'))])
     cueLR.fit(cueTrain, yTrain)
     report('cue + LR', yTest, cueLR.predict(cueTest))
 
-    # Baseline 2: char n-gram tfidf
+    # char n-gram tfidf
     charLR = Pipeline([('tfidf', TfidfVectorizer(analyzer='char_wb', ngram_range=(3, 5), min_df=2)),
                        ('lr', LogisticRegression(max_iter=1000, class_weight='balanced'))])
     charLR.fit(trainTexts, yTrain)
     report('char(3-5) tfidf + LR', yTest, charLR.predict(testTexts))
 
-    # Ablation: embedding + cues concatenated
+    #  embedding + cues concatenated 1024 +14?
     embCueTrain = np.hstack([embTrain, StandardScaler().fit_transform(cueTrain)])
     embCueTest = np.hstack([embTest, StandardScaler().fit(cueTrain).transform(cueTest)])
     embCueLR = LogisticRegression(max_iter=1000, class_weight='balanced').fit(embCueTrain, yTrain)
     report('embedding + cues + LR', yTest, embCueLR.predict(embCueTest))
 
-    # Deployed: calibrated LR over embeddings + asymmetric threshold
+   
     base = Pipeline([('scale', StandardScaler()),
                      ('lr', LogisticRegression(max_iter=1000, class_weight='balanced'))])
     fitEmb, valEmb, fitY, valY = train_test_split(embTrain, yTrain, test_size=0.2,

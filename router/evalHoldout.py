@@ -10,11 +10,7 @@ from sklearn.metrics import classification_report, f1_score
 from train import loadRows, labels, cueMatrix, embedTextsCached, tuneThreshold
 from routerFeatures import cueFeatures
 
-# The honest evaluation: score the deployed embedding-LR + the cue and char
-# baselines on the FRESH LLM-generated held-out set (router/data/holdout_llm.jsonl),
-# broken down by language. Arabic is the deployment reality, so the AR rows are the
-# headline. Also re-tunes the global-precision threshold on this real set, replacing
-# the degenerate T=0.100 that the saturated synthetic val produced.
+
 
 HOLDOUT = 'router/data/holdout_llm.jsonl'
 ARTIFACT = 'src/models/router.joblib'
@@ -70,13 +66,13 @@ def main():
     charLR.fit(trainTexts, yTrain)
     byLang('char(3-5) tfidf + LR', rows, yTrue, charLR.predict(texts))
 
-    # deployed embedding-LR at its stored threshold
+    # deployed embedding-LR 
     art = joblib.load(ARTIFACT)
     model, storedT = art['model'], art['threshold']
     probs = model.predict_proba(embHold)[:, 1]
     byLang(f'embedding-LR (stored T={storedT:.3f})', rows, yTrue, (probs >= storedT).astype(int))
 
-    # re-tune threshold on the real holdout (high global precision)
+   
     newT = tuneThreshold(probs, yTrue)
     byLang(f'embedding-LR (retuned T={newT:.3f})', rows, yTrue, (probs >= newT).astype(int))
     print(f'\n>>> stored threshold {storedT:.3f} -> retuned on real holdout {newT:.3f}')

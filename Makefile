@@ -241,6 +241,9 @@ test-llm-ner:
 test-config:
 	$(PYTHON) -m pytest tests/unit-tests/test_config.py -v
 
+test-classical-ner:
+	$(PYTHON) -m pytest tests/unit-tests/test_classical_ner.py -v
+
 test-cov:
 	$(PYTHON) -m pytest tests/unit-tests --cov=src --cov-report=html --cov-report=term-missing
 
@@ -255,6 +258,9 @@ test-modules-ner:
 
 test-modules-embedding:
 	$(PYTHON) -m pytest tests/module-tests/test_embedding_pipeline_integration.py -v
+
+test-modules-classical-ner:
+	$(PYTHON) -m pytest tests/module-tests/test_classical_ner_pipeline.py -v
 
 test-integration:
 	$(PYTHON) -m pytest tests/integration-tests -v

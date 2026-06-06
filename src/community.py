@@ -56,7 +56,7 @@ def parentLinks(levels, corpus):
     return links
 
 
-#  Neo4j writers 
+
 
 def setupConstraints(tx):
     tx.run('CREATE CONSTRAINT IF NOT EXISTS FOR (c:Community) REQUIRE c.id IS UNIQUE')

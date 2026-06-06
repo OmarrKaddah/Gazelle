@@ -1,6 +1,4 @@
-# Banking/finance regulatory ontology — v0.
-# Both extraction stages (GLiNER + LLM) read from this file.
-# Iterate by editing here; track changes with comments noting why types were added/dropped.
+
 
 ENTITIES = {
     'Person':                'Individuals such as signatories, executives, license holders.',
@@ -50,10 +48,7 @@ RELATIONSHIPS = {
     'APPLIES_TO':     (['Law', 'Article'],              ['BankingInstitution']),
 }
 
-# Natural-language descriptions used to embed each relationship type so the
-# retriever can score query–relation semantic similarity. Bilingual on purpose:
-# BGE-M3 handles cross-lingual matching, but Arabic queries hit Arabic phrasings
-# more reliably.
+
 RELATIONSHIP_DESCRIPTIONS = {
     'ISSUED_BY':      'صادر عن جهة، يصدر من، صادر بقرار من — issued by, granted by, authorized by',
     'GOVERNS':        'يحكم، ينظم، يضع قواعد على — governs, regulates, controls',

@@ -8,21 +8,14 @@ from concurrent.futures import ThreadPoolExecutor
 from config import OPENROUTER_URL, OPENROUTER_API_KEY
 from routerFeatures import normalizeText
 
-# Generates a FRESH held-out router eval set with DeepSeek V3 over real corpus
-# excerpts: {local,global} x {en,ar}, natural varied phrasing (NOT templates), so
-# it can honestly test the global + Arabic cells that no on-disk data covers and
-# that the synthetic training set leaked. Labels = generation intent; a second LLM
-# (the llama-3.3-70b router judge) cross-checks every question for an honest
-# agreement number. The CBE corpus is ~all Arabic (26/27 docs), so the set is
-# Arabic-dominant by design; English is the smaller cross-lingual comparison arm.
-# Output: router/data/holdout_llm.jsonl.
+
 
 GEN_MODEL = 'deepseek/deepseek-chat'
 OUT = 'router/data/holdout_llm.jsonl'
-PER_EXCERPT = 6          # questions per intent per excerpt
-AR_EXCERPTS = 24         # Arabic regulatory excerpts (deployment reality → dominant)
-EN_NEWS_EXCERPTS = 8     # English news excerpts (apnews)
-EN_REG_EXCERPTS = 6      # English regulatory excerpts (the one EN CBE doc)
+PER_EXCERPT = 6         
+AR_EXCERPTS = 24         
+EN_NEWS_EXCERPTS = 8     
+EN_REG_EXCERPTS = 6      
 MIN_CHARS, MAX_CHARS = 220, 1400
 SEED = 17
 
@@ -87,7 +80,6 @@ def chunkTexts(files):
 
 
 def corpusExcerpts():
-    # split chunk docs by actual script (filenames are unreliable), sample per cell
     arFiles, enFiles = [], []
     for f in sorted(os.listdir('chunks')):
         d = json.load(open(f'chunks/{f}', encoding='utf-8'))
@@ -130,7 +122,7 @@ def dedup(rows):
 
 
 def judge(rows):
-    from router import routeQuery  # imported here: needs OPENROUTER plumbing, same dir
+    from router import routeQuery  
 
     def one(r):
         try:

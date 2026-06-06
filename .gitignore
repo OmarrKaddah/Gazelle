@@ -91,6 +91,7 @@ musique/data
 Doc_Out/
 output/
 parsed/
+dumps/
 
 # chunks/ and extractions/ — ignore contents by default, allowlist
 # the thesis-critical MuSiQue artifacts so they're in the repo record.

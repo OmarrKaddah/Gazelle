@@ -3,9 +3,7 @@ from leiden import leiden, modularity
 from clusterMetrics import nmi
 from validateLeiden import adjacencyOf, evaluate
 
-# Cora citation network: 2708 papers, 7 subject classes = gold topic labels.
-# A pre-built, labeled document graph — tests "do communities recover document
-# topics" with no dependence on our own entity/relation extraction.
+
 
 
 def coraGraph():
@@ -24,8 +22,7 @@ def coraGraph():
 
 
 def resolutionSweep(G, truth):
-    # modularity over-segments at resolution 1.0 (finds far more than 7 groups);
-    # lowering resolution merges them toward the number of real classes.
+
     print('cora — NMI vs resolution (lower = fewer, bigger communities)', flush=True)
     adj = adjacencyOf(G)
     for r in (0.2, 0.4, 0.6, 0.8, 1.0):

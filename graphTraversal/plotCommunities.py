@@ -7,15 +7,7 @@ from pathlib import Path
 from neo4j import GraphDatabase
 from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, CORPUS_NAME
 
-# Interactive community view (Cytoscape.js, the engine the frontend already uses).
-# Communities are COMPOUND nodes — labelled boxes that physically contain their
-# entities — so the grouping is explicit, not guessed from a force layout. One HTML:
-#   - default "themes" mode: boxes collapsed to nodes, sized by members, linked by
-#     aggregated cross-community relation weight; the global thematic map.
-#   - "entities" toggle: boxes expand to show member entities + RELATED edges.
-#   - tap any node: side panel shows the community's LLM summary (or entity details).
-#
-# Usage: python graphTraversal/plotCommunities.py <scope> [level]
+
 
 OUT_DIR = Path('viz')
 

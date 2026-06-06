@@ -6,15 +6,6 @@ from pathlib import Path
 from chunker import countTokens
 from config import CHUNK_TARGET_TOKENS
 
-# AP News (BenchmarkQED) -> chunks/apnews.json, the same chunk schema the rest of
-# the pipeline consumes (musique/loadChunks.py is the sibling for MuSiQue). Each
-# article is AP NITF JSON: text in body_nitf (<p> blocks), title in headline,
-# stable id in altids.itemid. Articles are long, so we pack their paragraphs to
-# CHUNK_TARGET_TOKENS instead of one-chunk-per-doc.
-#
-# Get the corpus first (in the benchmark-qed venv):
-#   benchmark-qed data download AP_news sensemaking/data/ap_news
-# which unzips the per-article JSONs under <dir>/raw_data/.
 
 LIMIT = 200  # number of articles; set to None for the full 1,397
 RAW = Path(__file__).resolve().parent / 'data' / 'ap_news'

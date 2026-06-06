@@ -6,10 +6,7 @@ from llmTriples import callLLM
 from globalSearch import asText
 from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
 
-# Naive vector RAG — the baseline the global arm is judged against (the paper's
-# vector-RAG comparator). Top-k chunk retrieval over the chunk_embedding index,
-# then a single-shot synthesis. Self-contained (passes the corpus scope directly)
-# so it doesn't drag in the production retriever's clearance machinery.
+
 
 ANSWER_PROMPT = '''Answer the question using ONLY the numbered context passages below. Cite the
 passages you use by their number, e.g. [1]. If the context is insufficient, say so.

@@ -58,6 +58,14 @@ def communityEdges(session, communityId):
 
 
 
+
+
+
+
+
+
+
+
 def communityElements(session, communityId):
     members = communityMembers(session, communityId)
     edges = communityEdges(session, communityId)
@@ -99,7 +107,7 @@ def reportText(report):
 
 
 def parseJson(raw):
-    # tolerate ```fences``` / trailing prose: take the outermost brace span.
+
     raw = raw.strip()
     start, end = raw.find('{'), raw.rfind('}')
     return json.loads(raw[start:end + 1] if start != -1 and end > start else raw)

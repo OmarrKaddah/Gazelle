@@ -6,10 +6,7 @@ from urllib.parse import urljoin, urldefrag, unquote
 import requests
 from bs4 import BeautifulSoup
 
-# Scrape FRA (Egyptian Financial Regulatory Authority) regulation PDFs.
-# The listing at lc00-regulations links directly to PDFs on wp-content/uploads,
-# paginated via a "Next" link. We follow that link rather than guessing the URL
-# scheme, download each PDF into Documents/fra/, and write a provenance manifest.
+
 
 BASE_URL = 'https://fra.gov.eg/en/lc00-regulations/'
 OUT_DIR = Path('Documents/fra')

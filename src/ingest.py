@@ -6,19 +6,11 @@ from pathlib import Path
 from dotenv import load_dotenv
 load_dotenv()
 
-from config import CHUNKER_TYPE
+from config import CHUNKER_TYPE, GRAPH_ROUTE, NER_STRATEGY
 from ocr import runOcrAndDump
 from parser import parseDoc, dumpParsed, loadParsed
-from graphExtract import extractDoc, dumpElements
-from graphBuild import buildGraph
 from embedding import embedDoc
 from entityEmbedding import embedEntities
-
-NER_STRATEGY = os.getenv('NER_STRATEGY', 'hybrid').lower()
-if NER_STRATEGY == 'llm':
-    from llmNER import extractEntities as extractEntitiesNER, dumpEntities as dumpEntitiesNER
-else:
-    from glinerExtract import extractEntities as extractEntitiesNER, dumpEntities as dumpEntitiesNER
 
 from chunker import dumpChunks
 
@@ -28,6 +20,15 @@ if CHUNKER_TYPE == 'semantic':
 else:
     from chunker import chunkDoc
 
+if GRAPH_ROUTE == '1':
+    if NER_STRATEGY == 'llm':
+        from llmNER import extractEntities as _extractNER, dumpEntities as _dumpNER
+    else:
+        from glinerExtract import extractEntities as _extractNER, dumpEntities as _dumpNER
+    from kgBuild import buildEntityLayer as _buildGraph
+else:
+    from graphExtract import extractDoc as _extractDoc, dumpElements as _dumpElements
+    from graphBuild import buildGraph as _buildGraph
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCUMENTS = ROOT / 'Documents'
@@ -101,17 +102,20 @@ def ingestOne(source, emit=None):
     dumpChunks(chunks, docName)
     tell(f'[{source.name}] {len(chunks)} chunks')
 
-    tell(f'[{source.name}] NER')
-    dumpEntitiesNER(extractEntitiesNER(docName), docName)
-
-    tell(f'[{source.name}] LLM extraction')
-    extractions = extractDoc(docName)
-    dumpElements(extractions, docName)
-    relCount = sum(len(r['relationships']) for r in extractions)
-    tell(f'[{source.name}] {relCount} relationships extracted')
-
-    tell(f'[{source.name}] writing graph')
-    buildGraph(docName)
+    if GRAPH_ROUTE == '1':
+        tell(f'[{source.name}] NER ({NER_STRATEGY})')
+        _dumpNER(_extractNER(docName), docName)
+        tell(f'[{source.name}] writing co-mention graph')
+        _buildGraph(docName)
+        relCount = 0
+    else:
+        tell(f'[{source.name}] LLM extraction')
+        extractions = _extractDoc(docName)
+        _dumpElements(extractions, docName)
+        relCount = sum(len(r['relationships']) for r in extractions)
+        tell(f'[{source.name}] {relCount} relationships extracted')
+        tell(f'[{source.name}] writing graph')
+        _buildGraph(docName)
 
     tell(f'[{source.name}] embedding chunks')
     embedDoc(docName)

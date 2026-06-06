@@ -5,14 +5,7 @@ from pathlib import Path
 from urllib.parse import urldefrag, unquote, urlparse
 from playwright.sync_api import sync_playwright
 
-# Scrape CBE (Central Bank of Egypt) regulation PDFs. cbe.org.eg sits behind a WAF
-# that rejects plain HTTP, so we drive a real Chromium via Playwright: load the
-# regulations pages in a browser (passing the WAF), harvest PDF + sub-page links,
-# and download each PDF through the SAME browser context (carrying the WAF cookies).
-#
-# The first run is also the diagnostic: it prints page titles + link counts so we
-# can see whether headless gets past the WAF and how the listing is structured,
-# then refine SEED_URLS / depth. Run headful (--headful) if headless is blocked.
+
 
 SEED_URLS = [
     'https://www.cbe.org.eg/en/laws-regulations/regulations/overview',
@@ -72,9 +65,8 @@ def downloadPdf(ctx, url, dest):
 
 
 def harvestPdfUrls(page, seeds, maxDepth, maxPages=400):
-    # BFS over regulation pages up to maxDepth, collecting PDF links. Pagination
-    # (pageNo=N) inherits the current depth so it doesn't consume the depth budget
-    # — a category with 30 pages of circulars stays fully crawlable at depth 1.
+
+
     pdfUrls = set()
     visited = set()
     queue = [(u, 0) for u in seeds]
