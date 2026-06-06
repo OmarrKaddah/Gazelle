@@ -95,7 +95,6 @@ gazetteer/
 
 # Trained model artifacts and classical NER subsystem (regenerable)
 src/models/
-src/classical_NER/
 models/
 training/
 router/data/*.pkl
@@ -168,3 +167,4 @@ wheelhouse_win/
 # Scratch/notes files at project root
 /filespurposes.txt
 
+*.txt
