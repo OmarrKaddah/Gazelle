@@ -93,9 +93,12 @@ extractions_cbe/
 # Gazetteer (regenerable)
 gazetteer/
 
-# Trained model artifacts and classical NER subsystem (regenerable)
+# Trained model artifacts (regenerable)
 src/models/
 models/
+src/classical_NER/models/
+src/classical_NER/training/
+src/classical_NER/*.txt
 training/
 router/data/*.pkl
 
@@ -167,4 +170,3 @@ wheelhouse_win/
 # Scratch/notes files at project root
 /filespurposes.txt
 
-*.txt
