@@ -96,6 +96,8 @@ gazetteer/
 # Trained model artifacts and classical NER subsystem (regenerable)
 src/models/
 src/classical_NER/
+models/
+training/
 router/data/*.pkl
 
 # NER annotation datasets
@@ -158,3 +160,11 @@ gazelle.db
 
 # Large benchmark datasets
 twowiki/data/
+
+# Offline install wheels (platform-specific binaries, regenerable via pip download)
+wheelhouse/
+wheelhouse_win/
+
+# Scratch/notes files at project root
+/filespurposes.txt
+
