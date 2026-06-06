@@ -2,7 +2,7 @@ import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
-from config import GRAPH_EXTRACT_BACKEND, GRAPH_EXTRACT_WORKERS
+from config import GRAPH_EXTRACT_BACKEND, GRAPH_EXTRACT_WORKERS, EXTRACT_DIR
 from kgBuild import loadChunks
 from llmTriples import callLLM
 from ontology import ontologyFor
@@ -19,7 +19,7 @@ Allowed entity types:
 
 From the PASSAGE extract:
 1. "entities": each as {{"name": <exact surface form from the passage>, "type": <one allowed type>, "description": <one concise sentence describing the entity, grounded ONLY in the passage>}}
-2. "relationships": for each pair of extracted entities that are clearly related, {{"source": <entity name>, "target": <entity name>, "predicate": <1-3 word relation label, e.g. "issued", "regulates", "amends">, "description": <how they relate, one concise sentence>, "strength": <integer 1-10>}}
+2. "relationships": for each pair of extracted entities that are clearly related, {{"source": <entity name>, "target": <entity name>, "predicate": <1-3 word relation label, e.g. "issued", "regulates", "amends">, "description": <how they relate, one concise sentence>}}
 
 Rules:
 - Use the entity's surface form from the passage as "name"; keep Arabic text in Arabic.
@@ -75,7 +75,7 @@ def extractChunk(chunk, entityGuide, backend):
 
 
 def loadPartial(docName):
-    p = Path(f'extractions/{docName}_graph.json')
+    p = Path(f'{EXTRACT_DIR}/{docName}_graph.json')
     return json.loads(p.read_text(encoding='utf-8')) if p.exists() else []
 
 
@@ -101,8 +101,10 @@ def extractDoc(docName, backend=GRAPH_EXTRACT_BACKEND):
 
 def dumpElements(results, docName):
     # atomic write so a Ctrl-C mid-flush can never corrupt the resume checkpoint
-    Path('extractions').mkdir(exist_ok=True)
-    path = Path(f'extractions/{docName}_graph.json')
+    Path(EXTRACT_DIR).mkdir(exist_ok=True)
+    path = Path(f'{EXTRACT_DIR}/{docName}_graph.json')
     tmp = path.with_suffix('.json.tmp')
     tmp.write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding='utf-8')
     tmp.replace(path)
+
+

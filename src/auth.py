@@ -10,15 +10,17 @@ from db.repositories.authRepo import createSession, deleteSessionByTokenHash, ge
 from db.session import getDbSession
 
 
-bearer = HTTPBearer(auto_error=False)
 
+
+bearer = HTTPBearer(auto_error=False)
 
 def hashToken(token: str):
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
-
 def verifyPassword(password: str, passwordHash: str):
     return bcrypt.checkpw(password.encode("utf-8"), passwordHash.encode("utf-8"))
+
+
 
 
 async def login(username: str, password: str, session: AsyncSession):
@@ -29,13 +31,9 @@ async def login(username: str, password: str, session: AsyncSession):
     await createSession(session, user.id, hashToken(token))
     await session.commit()
     return token
-
-
 async def logout(token: str, session: AsyncSession):
     await deleteSessionByTokenHash(session, hashToken(token))
     await session.commit()
-
-
 async def userFromToken(token: str, session: AsyncSession):
     user = await getUserByTokenHash(session, hashToken(token))
     if not user:
@@ -47,6 +45,19 @@ async def userFromToken(token: str, session: AsyncSession):
         "role": user.role,
         "clearance": user.clearance,
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 async def getCurrentUser(

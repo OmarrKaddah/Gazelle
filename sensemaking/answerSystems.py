@@ -16,6 +16,13 @@ from config import GRAPH_EXTRACT_BACKEND
 CORPUS = sys.argv[2] if len(sys.argv) > 2 else 'apnews'
 OUT_DIR = Path(sys.argv[3] if len(sys.argv) > 3 else 'sensemaking/eval_results')
 
+# AutoE reads each condition's answers from a DIRECTORY as <set>.json, looping over
+# the named question_sets in pairwise.json. So each system gets its own subdir and we
+# name the file after the question set (the questions filename, sans 'questions_').
+SET = Path(sys.argv[1]).stem
+if SET.startswith('questions_'):
+    SET = SET[len('questions_'):]
+
 
 def loadQuestions(path):
     raw = json.loads(Path(path).read_text(encoding='utf-8'))
@@ -47,13 +54,15 @@ def main():
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     questions = loadQuestions(sys.argv[1])
     print(f'[answerSystems] {len(questions)} questions, corpus={CORPUS}, backend={GRAPH_EXTRACT_BACKEND}')
+    (OUT_DIR / 'global').mkdir(parents=True, exist_ok=True)
+    (OUT_DIR / 'vector').mkdir(parents=True, exist_ok=True)
     print('[answerSystems] global arm...')
     generate(questions, lambda qt: globalSearch(qt, CORPUS, backend=GRAPH_EXTRACT_BACKEND),
-             OUT_DIR / 'global_answers.json')
+             OUT_DIR / 'global' / f'{SET}.json')
     print('[answerSystems] vector baseline...')
     generate(questions, lambda qt: vectorAnswer(qt, CORPUS, backend=GRAPH_EXTRACT_BACKEND),
-             OUT_DIR / 'vector_answers.json')
-    print(f'[answerSystems] wrote global_answers.json + vector_answers.json to {OUT_DIR}')
+             OUT_DIR / 'vector' / f'{SET}.json')
+    print(f'[answerSystems] wrote global/{SET}.json + vector/{SET}.json under {OUT_DIR}')
 
 
 if __name__ == '__main__':

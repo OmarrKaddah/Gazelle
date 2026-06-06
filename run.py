@@ -29,7 +29,6 @@ else:
 from typedOntologyExtract import extractDoc, dumpExtractions
 from typedKgWriter import writeDoc, writeDocEntitiesOnly, clearDb
 from entityEmbedding import embedEntities
-from entityAlign import deduplicate
 
 OCR_EXTENSIONS = {".pdf", ".jpg", ".jpeg", ".png", ".tif", ".tiff"}
 
@@ -140,11 +139,6 @@ def runEntityEmbed():
     embedEntities()
 
 
-def runEntityAlign():
-    print("\n=== Entity Align ===")
-    deduplicate()
-
-
 if __name__ == '__main__':
     runOcr()
     runParser()
@@ -154,4 +148,3 @@ if __name__ == '__main__':
     runLlm()
     runKg()
     runEntityEmbed()
-    runEntityAlign()

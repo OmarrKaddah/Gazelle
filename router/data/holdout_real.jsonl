@@ -1,0 +1,5 @@
+{"_comment": "holdout_real.jsonl — hand-authored real queries for final evaluation. Write ~80-100 genuine bilingual questions (mix ar/en, mix local/global) that you or domain experts actually want the router to answer correctly. Do NOT use templates. source must be 'real'. Schema: {text, label, lang, domain, source, template_id, doc}. template_id=null for all real rows. See README.md for the full schema."}
+{"text": "ما هي متطلبات كفاية رأس المال وفق اتفاقية بازل؟", "label": "local", "lang": "ar", "domain": "cbe", "source": "example", "template_id": null, "doc": "example"}
+{"text": "ما هي الاتجاهات العامة فيما يخص الشمول المالي في المستندات؟", "label": "global", "lang": "ar", "domain": "cbe", "source": "example", "template_id": null, "doc": "example"}
+{"text": "What is the minimum capital adequacy ratio required by CBE?", "label": "local", "lang": "en", "domain": "cbe", "source": "example", "template_id": null, "doc": "example"}
+{"text": "What are the main themes related to financial inclusion across the documents?", "label": "global", "lang": "en", "domain": "cbe", "source": "example", "template_id": null, "doc": "example"}

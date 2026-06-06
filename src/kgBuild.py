@@ -3,7 +3,7 @@ import re
 from collections import defaultdict
 from pathlib import Path
 from neo4j import GraphDatabase
-from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
+from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, EXTRACT_DIR
 
 
 def loadChunks(docName):
@@ -11,7 +11,7 @@ def loadChunks(docName):
 
 
 def loadEntitySpans(docName):
-    return json.loads(Path(f'extractions/{docName}_entities.json').read_text(encoding='utf-8'))
+    return json.loads(Path(f'{EXTRACT_DIR}/{docName}_entities.json').read_text(encoding='utf-8'))
 
 
 # Arabic normalization (Lucene ArabicNormalizer set): fold alef/ya/ta-marbuta variants and drop

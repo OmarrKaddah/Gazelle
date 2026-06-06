@@ -1,20 +1,13 @@
 import json
 from collections import Counter, defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from neo4j import GraphDatabase
 from llmTriples import callLLM
 from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
 
-# Stage 3 of the global arm — turn each (:Community) skeleton (Stage 4) into a
-# structured report grounded in its entities and relationships, following GraphRAG
-# (Edge et al., 2024, Appendix). Leaf communities are summarised from their elements;
-# parent communities roll up their children's reports. Reports are written back onto
-# the Community node so the map-reduce global search (Stage 2) can read them.
-#
-# Provenance: elements are handed to the LLM with short record ids (E0, R3, ...) and
-# the prompt requires every finding to cite them as [Data: Entities (...); Relationships (...)],
-# so answers trace back to graph evidence — the project's hallucination-resistance rule.
 
-MAX_CONTEXT_CHARS = 8000   # ~2k tokens of element/child-report context per community
+
+MAX_CONTEXT_CHARS = 8000  
 
 
 SUMMARY_PROMPT = '''You are writing an analyst report about a community of related entities from a corpus.
@@ -32,7 +25,9 @@ Data:
 {context}'''
 
 
-# ── element selection (one community's evidence) ─────────────────
+
+
+
 
 def communityMembers(session, communityId):
     rows = session.run(
@@ -44,6 +39,7 @@ def communityMembers(session, communityId):
         id=communityId,
     )
     return [dict(r) for r in rows]
+
 
 
 def communityEdges(session, communityId):
@@ -60,6 +56,8 @@ def communityEdges(session, communityId):
     return [dict(r) for r in rows]
 
 
+
+
 def communityElements(session, communityId):
     members = communityMembers(session, communityId)
     edges = communityEdges(session, communityId)
@@ -67,38 +65,64 @@ def communityElements(session, communityId):
     for e in edges:
         degree[e['src']] += 1
         degree[e['dst']] += 1
+
     members.sort(key=lambda m: -degree[m['id']])
+    
     edges.sort(key=lambda e: -(e['weight'] or 0))
     return members, edges
 
 
-# ── prompt formatting (assigns the E#/R# record ids) ─────────────
+
 
 def formatElements(members, edges):
     nameById = {m['id']: m['name'] for m in members}
     lines = ['Entities:']
+
     for i, m in enumerate(members):
         lines.append(f'E{i}: {m["name"]} ({m["type"]}) — {m["description"] or ""}')
+
     lines.append('')
+
     lines.append('Relationships:')
+
     for i, e in enumerate(edges):
         src, dst = nameById.get(e['src'], e['src']), nameById.get(e['dst'], e['dst'])
         pred = f' [{e["predicate"]}]' if e['predicate'] else ''
         lines.append(f'R{i}: {src} -> {dst}{pred} — {e["description"] or ""}')
     return '\n'.join(lines)[:MAX_CONTEXT_CHARS]
 
-
 def reportText(report):
     findings = '\n'.join(f'- {f["summary"]}: {f["explanation"]}' for f in report.get('findings', []))
     return f'# {report["title"]}\n\n{report["summary"]}\n\n{findings}'
 
 
-# ── summarisation (leaf + roll-up) ───────────────────────────────
+
+
+def parseJson(raw):
+    # tolerate ```fences``` / trailing prose: take the outermost brace span.
+    raw = raw.strip()
+    start, end = raw.find('{'), raw.rfind('}')
+    return json.loads(raw[start:end + 1] if start != -1 and end > start else raw)
+
+
+def toFloat(x):
+    try:
+        return float(x)
+    except (TypeError, ValueError):
+        return 0.0
+
 
 def summarize(context, backend):
-    report = json.loads(callLLM(SUMMARY_PROMPT.format(context=context), backend=backend))
-    report['rating'] = float(report.get('rating', 0.0))
-    return report
+ 
+    for _ in range(3):
+        raw = callLLM(SUMMARY_PROMPT.format(context=context), backend=backend)
+        try:
+            report = parseJson(raw)
+        except json.JSONDecodeError:
+            continue
+        report['rating'] = toFloat(report.get('rating'))
+        return report
+    return None
 
 
 def summarizeLeaf(members, edges, backend):
@@ -106,19 +130,23 @@ def summarizeLeaf(members, edges, backend):
 
 
 def summarizeParent(childReports, members, edges, backend):
+
     childContext = '\n\n'.join(reportText(r) for r in childReports)
+
     elements = formatElements(members, edges)
+
     budget = MAX_CONTEXT_CHARS - len(childContext)
+
     context = 'Sub-community reports:\n' + childContext
-    if budget > 500:
+    if budget > 500 :
         context += '\n\nAdditional elements:\n' + elements[:budget]
     return summarize(context, backend)
 
 
-# ── hierarchy walk + persistence ─────────────────────────────────
+
 
 def storedReport(row):
-    # Rebuild the report dict from the fields Stage 3 persists, for resume runs.
+    #store one b one
     if row['summary'] is None:
         return None
     return {'title': row['title'], 'summary': row['summary'],
@@ -126,19 +154,24 @@ def storedReport(row):
 
 
 def loadHierarchy(session, corpus):
+
     rows = session.run(
         '''MATCH (c:Community {corpus: $corpus})
            RETURN c.id AS id, c.level AS level, c.title AS title, c.summary AS summary,
                   c.findings AS findings''',
         corpus=corpus,
     )
+
     nodes = {r['id']: {'level': r['level'], 'report': storedReport(r)} for r in rows}
+
     childrenOf = defaultdict(list)
+
     links = session.run(
         'MATCH (child:Community {corpus: $corpus})-[:PARENT]->(parent:Community) RETURN child.id AS child, parent.id AS parent',
         corpus=corpus,
     )
     for r in links:
+
         childrenOf[r['parent']].append(r['child'])
     return nodes, childrenOf
 
@@ -156,27 +189,61 @@ def writeReport(session, communityId, report):
     )
 
 
-def summarizeHierarchy(corpus, backend='openrouter'):
+def summarizeOne(cid, members, edges, childReports, backend):
+
+    if childReports is not None:
+
+        return cid, summarizeParent(childReports, members, edges, backend)
+    return cid, summarizeLeaf(members, edges, backend)
+
+
+def summarizeHierarchy(corpus, backend='openrouter', workers=8):
+    # Walk levels finest->root so a parent children are summarised first.
+   
     with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
         with driver.session() as session:
             nodes, childrenOf = loadHierarchy(session, corpus)
             reports = {cid: n['report'] for cid, n in nodes.items()}   # prior runs already filled
-            # finest (highest level) first, so a parent's children are ready before it.
-            order = sorted(nodes, key=lambda cid: -nodes[cid]['level'])
+            byLevel = defaultdict(list)
+
+            for cid, n in nodes.items():
+
+                byLevel[n['level']].append(cid)
             done = 0
-            for cid in order:
-                if reports[cid]:                              # resume-safe: already summarised
-                    continue
-                members, edges = communityElements(session, cid)
-                children = childrenOf.get(cid, [])
-                if children:
-                    childReports = [reports[ch] for ch in children if reports.get(ch)]
-                    report = summarizeParent(childReports, members, edges, backend)
-                else:
-                    report = summarizeLeaf(members, edges, backend)
-                reports[cid] = report
-                writeReport(session, cid, report)
-                done += 1
-                if done % 10 == 0:
-                    print(f'[communitySummary] {corpus}: {done} summarised', flush=True)
+            for level in sorted(byLevel, reverse=True):    # highest level = finest = leaves
+                todo = [cid for cid in byLevel[level] if not reports[cid]]
+
+                elems = {cid: communityElements(session, cid) for cid in todo}  
+
+                jobs = []
+                for cid in todo:
+                    children = childrenOf.get(cid, [])
+
+                    childReports = [reports[c] for c in children if reports.get(c)] if children else None
+
+                    jobs.append((cid, *elems[cid], childReports, backend))
+
+                total = len(byLevel[level])
+
+                with ThreadPoolExecutor(max_workers=workers) as pool:
+
+                    futures = [pool.submit(summarizeOne, *job) for job in jobs]
+
+                    for fut in as_completed(futures):       # write 
+                        cid, report = fut.result()
+
+                        if report is None:
+                            print(f'  [warn] {cid}: summary unparseable, skipping (retried on resume)', flush=True)
+
+                            continue
+                        reports[cid] = report
+                        writeReport(session, cid, report)
+
+                        done += 1
+
+                        if done % 20 == 0:
+                            print(f'[communitySummary] {corpus}: {done} summarised', flush=True)
+
+                print(f'[communitySummary] {corpus}: level {level} complete ({len(todo)}/{total} communities, {done} total)', flush=True)
+
     print(f'[communitySummary] {corpus}: {done} communities summarised ({len(nodes)} total)')

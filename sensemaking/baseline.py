@@ -3,6 +3,7 @@ import json
 from neo4j import GraphDatabase
 from embedding import embedQuery
 from llmTriples import callLLM
+from globalSearch import asText
 from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
 
 # Naive vector RAG — the baseline the global arm is judged against (the paper's
@@ -38,4 +39,4 @@ def vectorAnswer(query, corpus='apnews', topK=10, backend='openrouter'):
     chunks = vectorChunks(query, corpus, topK)
     context = '\n\n'.join(f'[{i + 1}] {t}' for i, t in enumerate(chunks))
     raw = json.loads(callLLM(ANSWER_PROMPT.format(query=query, context=context), backend=backend))
-    return raw.get('answer', '')
+    return asText(raw.get('answer', ''))

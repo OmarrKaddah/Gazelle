@@ -12,8 +12,7 @@ ENTITIES = {
     'Document':              'Circulars, decrees, policy notes, reference documents.',
     'FinancialInstrument':   'Accounts, deposits, contracts, financial products.',
     'RegulatoryRequirement': 'Capital ratios, reserve requirements, thresholds.',
-    'MonetaryAmount':        'Amounts with currency.',
-    'Date':                  'Absolute dates and date ranges.',
+    'Crime':                 'Offenses defined or penalized by law (e.g., جريمة إرهابية, money laundering, الترويج, التمويل).',
 }
 
 # General-knowledge ontology for English-language corpora (e.g., MuSiQue / Wikipedia).
@@ -33,7 +32,7 @@ ENTITIES_EN = {
 ENTITIES_BY_LANG = {'ar': ENTITIES, 'en': ENTITIES_EN}
 
 # Open-domain English benchmark corpora extract against ENTITIES_EN, not the finance ontology.
-EN_CORPORA = {'musique', '2wiki', '2wikimultihopqa'}
+EN_CORPORA = {'musique', '2wiki', '2wikimultihopqa', 'apnews'}
 
 
 def ontologyFor(docName):

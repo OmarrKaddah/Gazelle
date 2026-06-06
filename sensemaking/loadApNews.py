@@ -16,7 +16,7 @@ from config import CHUNK_TARGET_TOKENS
 #   benchmark-qed data download AP_news sensemaking/data/ap_news
 # which unzips the per-article JSONs under <dir>/raw_data/.
 
-LIMIT = 50  # number of articles; set to None for the full 1,397
+LIMIT = 200  # number of articles; set to None for the full 1,397
 RAW = Path(__file__).resolve().parent / 'data' / 'ap_news'
 OUT = Path(__file__).resolve().parent.parent / 'chunks' / 'apnews.json'
 
@@ -54,7 +54,7 @@ def packParagraphs(paras, target):
 def buildChunks(files):
     rows = []
     for f in files:
-        art = json.loads(f.read_text(encoding='utf-8'))
+        art = json.loads(f.read_text(encoding='utf-8-sig'))
         itemid = art['altids']['itemid']
         headline = art.get('headline') or art.get('title') or ''
         paras = packParagraphs(paragraphs(art.get('body_nitf', '')), CHUNK_TARGET_TOKENS)

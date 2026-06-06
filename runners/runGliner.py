@@ -3,6 +3,7 @@ import sys
 import traceback
 from pathlib import Path
 from glinerExtract import extractEntities, dumpEntities
+from config import EXTRACT_DIR
 
 lang = sys.argv[1] if len(sys.argv) > 1 else 'ar'
 onlyDoc = sys.argv[2] if len(sys.argv) > 2 else None
@@ -25,7 +26,7 @@ for chunk in allChunks:
     docName = chunk.stem
     if onlyDoc and docName != onlyDoc:
         continue
-    out = Path(f"extractions/{docName}_entities.json")
+    out = Path(f"{EXTRACT_DIR}/{docName}_entities.json")
     if out.exists():
         print(f"[skip] {docName} (already at {out})", flush=True)
         continue

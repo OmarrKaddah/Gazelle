@@ -14,7 +14,7 @@ OUT_DIR = Path("Doc_Out")
 
 def collectSources(args):
     if not args:
-        return sorted(p for p in Path("Documents").rglob("*") if p.suffix.lower() in EXTENSIONS)
+        return sorted(p for p in Path("scraped/cbe").rglob("*") if p.suffix.lower() in EXTENSIONS)
     sources = []
     for a in args:
         p = Path(a)

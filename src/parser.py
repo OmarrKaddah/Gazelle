@@ -2,8 +2,10 @@ import json
 import re
 from dataclasses import dataclass, asdict
 from pathlib import Path
-from docling.document_converter import DocumentConverter
-from docling_core.types.doc import TableItem, TextItem, SectionHeaderItem, ListItem
+
+# docling is imported lazily inside parseDocx — it pulls heavy, env-fragile deps
+# (transformers vision models) that the JSON IO helpers (loadParsed/dumpParsed)
+# and the markdown path must not require.
 
 
 @dataclass
@@ -76,6 +78,8 @@ def parseMarkdown(docName):
 
 
 def parseDocx(path):
+    from docling.document_converter import DocumentConverter
+    from docling_core.types.doc import TableItem, TextItem, SectionHeaderItem, ListItem
     docName = Path(path).stem
     doc = DocumentConverter().convert(path).document
     elements = []

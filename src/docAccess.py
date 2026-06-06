@@ -24,25 +24,33 @@ DOC_ACCESS = {
 }
 
 
+
+
 def levelRank(level):
     return LEVELS.index(level)
+
 
 
 def docLevel(docName):
     return DOC_ACCESS.get(docName, DEFAULT_LEVEL)
 
 
+
+
 def allDocNames():
-    # The universe of ingested docs is whatever exists in Neo4j, not just the DOC_ACCESS dict —
-    # so the scraped corpus (unlisted -> DEFAULT_LEVEL) is included, not silently filtered out.
+    
     with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD)) as driver:
         with driver.session() as session:
             return [r['doc'] for r in session.run('MATCH (d:Document) RETURN d.docName AS doc')]
 
 
+
+
 def allowedDocs(userClearance):
     threshold = levelRank(userClearance)
     return [doc for doc in allDocNames() if levelRank(docLevel(doc)) <= threshold]
+
+
 
 
 def canSeeDoc(docName, userClearance):

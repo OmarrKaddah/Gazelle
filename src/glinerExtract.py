@@ -4,9 +4,11 @@ from pathlib import Path
 from tqdm import tqdm
 from gliner import GLiNER
 from ontology import ENTITIES
-from config import GLINER_MODEL, GLINER_MODEL_EN, GLINER_THRESHOLD
+from config import GLINER_MODEL, GLINER_MODEL_EN, GLINER_THRESHOLD, EXTRACT_DIR
 
 _models = {}
+
+
 
 
 def getModel(lang):
@@ -17,13 +19,15 @@ def getModel(lang):
     return _models[name]
 
 
+
+
 def getLabels(lang):
     return list(ENTITIES.keys())
 
 
+
 def loadChunks(docName):
     return json.loads(Path(f'chunks/{docName}.json').read_text(encoding='utf-8'))
-
 
 def extractFromChunk(chunk, lang):
     model = getModel(lang)
@@ -41,8 +45,6 @@ def extractFromChunk(chunk, lang):
         }
         for s in spans
     ]
-
-
 def extractEntities(docName, lang='ar'):
     chunks = loadChunks(docName)
     print(f"[gliner] {docName}: {len(chunks)} chunks", flush=True)
@@ -55,9 +57,10 @@ def extractEntities(docName, lang='ar'):
     return entities
 
 
+
 def dumpEntities(entities, docName):
-    Path('extractions').mkdir(exist_ok=True)
-    Path(f'extractions/{docName}_entities.json').write_text(
+    Path(EXTRACT_DIR).mkdir(exist_ok=True)
+    Path(f'{EXTRACT_DIR}/{docName}_entities.json').write_text(
         json.dumps(entities, ensure_ascii=False, indent=2),
         encoding='utf-8',
     )

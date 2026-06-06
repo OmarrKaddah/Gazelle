@@ -15,6 +15,7 @@ def setupEntityIndex(tx):
 
 
 def loadPending(tx):
+
     res = tx.run("""
         MATCH (e:Entity)
         WHERE e.embedding IS NULL
@@ -24,6 +25,7 @@ def loadPending(tx):
 
 
 def writeEmbedding(tx, canonicalId, embedding):
+
     tx.run(
         "MATCH (e:Entity {canonicalId: $id}) SET e.embedding = $emb",
         id=canonicalId,
@@ -31,11 +33,16 @@ def writeEmbedding(tx, canonicalId, embedding):
     )
 
 
-# Concatenate canonical name + aliases so semantically equivalent surface forms
-# pull the entity's vector toward all of them, not just the first-seen variant.
+
+
+
+
 def buildEmbedText(entity):
     parts = [entity['name']] + (entity['aliases'] or [])
     return ' / '.join(dict.fromkeys(p for p in parts if p))
+
+
+
 
 
 def embedWithSkip(texts):
@@ -47,6 +54,9 @@ def embedWithSkip(texts):
             return [None]
         mid = len(texts) // 2
         return embedWithSkip(texts[:mid]) + embedWithSkip(texts[mid:])
+
+
+
 
 
 def embedEntities():

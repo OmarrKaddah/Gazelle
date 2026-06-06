@@ -19,15 +19,22 @@ class Chunk:
     accessLevel: str
 
 
+
+
 def countTokens(text):
+
+
     return len(tokenizer.encode(text, add_special_tokens=False))
 
 
 def collectPages(elems):
     seen = []
     for e in elems:
+
         if e.page is not None and e.page not in seen:
+
             seen.append(e.page)
+
     return seen
 
 
@@ -35,7 +42,9 @@ def groupBySection(elements):
     groups = []
     current = []
     currentPath = None
+
     for e in elements:
+
         if e.elementType == 'heading':
             continue
         if e.sectionPath != currentPath:
@@ -43,16 +52,22 @@ def groupBySection(elements):
                 groups.append((currentPath, current))
             current = []
             currentPath = e.sectionPath
+
         current.append(e)
     if current:
+
+
         groups.append((currentPath, current))
     return groups
 
 
 def packElements(elems, target):
+
     chunks = []
+
     current = []
     currentTokens = 0
+
     for e in elems:
         if e.elementType == 'table':
             if current:
@@ -61,13 +76,23 @@ def packElements(elems, target):
                 currentTokens = 0
             chunks.append([e])
             continue
+
         eTokens = countTokens(e.text)
+
         if current and currentTokens + eTokens > target:
+
             chunks.append(current)
+
             current = [current[-1], e]
+
+
+
             currentTokens = countTokens(current[0].text) + eTokens
         else:
+
             current.append(e)
+
+
             currentTokens += eTokens
     if current:
         chunks.append(current)
@@ -75,8 +100,11 @@ def packElements(elems, target):
 
 
 def buildChunk(elems, sectionPath, docName, counter):
+
     prefix = (sectionPath[-1] + ': ') if sectionPath else ''
+
     body = '\n\n'.join(e.text for e in elems)
+
     return Chunk(
         chunkId=f'{docName}-c{counter:04d}',
         docName=docName,
@@ -89,6 +117,7 @@ def buildChunk(elems, sectionPath, docName, counter):
 
 
 def chunkDoc(elements, target=CHUNK_TARGET_TOKENS):
+    
     chunks = []
     counter = 0
     docName = elements[0].docName

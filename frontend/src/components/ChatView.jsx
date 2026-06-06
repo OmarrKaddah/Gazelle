@@ -12,6 +12,7 @@ const MODES = [
   { id: 'vector', label: 'Vector', desc: 'Pure semantic similarity' },
   { id: 'fusion', label: 'Fusion', desc: 'Vector + keyword (RRF)' },
   { id: 'graph', label: 'Graph', desc: 'PPR over the knowledge graph' },
+  { id: 'hybrid', label: 'Hybrid', desc: 'Fusion + Graph merged via RRF' },
 ];
 
 const SUGGESTIONS = [
@@ -272,18 +273,33 @@ function Message({ message }) {
       </div>
     );
   }
-  const citationMap = new Map((message.citations || []).map((c, i) => [c.chunkId, i + 1]));
+  const citedIds = new Set();
+  {
+    const pat = /\[([\w؀-ۿ.\-:]+)\]/g;
+    let m;
+    while ((m = pat.exec(message.text)) !== null) citedIds.add(m[1]);
+  }
+  const allCitations = message.citations || [];
+  const visibleCitations = allCitations.filter((c) => citedIds.has(c.chunkId));
+  const citationMap = new Map(visibleCitations.map((c, i) => [c.chunkId, i + 1]));
+  const showGraphArea = message.mode === 'graph' || message.mode === 'hybrid';
   return (
     <div className="space-y-4">
       <div className="text-ink leading-[1.7] text-[15.5px] prose-message" dir="auto">
         <RenderedText text={message.text} citationMap={citationMap} />
         {message.streaming && <span className="caret" />}
       </div>
-      {message.citations && message.citations.length > 0 && (
-        <Citations citations={message.citations} mode={message.mode} />
+      {visibleCitations.length > 0 && (
+        <Citations citations={visibleCitations} mode={message.mode} />
       )}
-      {message.mode === 'graph' && message.graph && message.graph.seeds.length > 0 && (
-        <GraphPath graph={message.graph} citations={message.citations || []} />
+      {showGraphArea && (
+        <div className="min-h-0">
+          {message.graph && message.graph.seeds.length > 0 ? (
+            <GraphPath graph={message.graph} citations={allCitations} />
+          ) : message.streaming ? (
+            <div className="text-[11px] text-ink-faint animate-pulse py-1">Loading graph…</div>
+          ) : null}
+        </div>
       )}
     </div>
   );
@@ -373,6 +389,7 @@ function Citation({ citation, index }) {
       vector: 'bg-brand text-adib-glow',
       fusion: 'bg-adib text-white',
       graph: 'bg-gold text-brand',
+      hybrid: 'bg-adib-deep text-white',
       seed: 'bg-brand text-adib-glow',
       neighbor: 'bg-gold text-brand',
     }[citation.source] || 'bg-cream-deeper text-ink-muted';
@@ -557,7 +574,7 @@ function SettingsPopover({ settings, setSettings, providers, onClose }) {
           <input
             type="range"
             min="1"
-            max="15"
+            max="50"
             value={settings.k}
             onChange={(e) => setSettings({ ...settings, k: Number(e.target.value) })}
             className="w-full accent-gold"

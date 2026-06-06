@@ -1,7 +1,9 @@
 import _bootstrap  # noqa: F401
 import sys
 from synonyms import writeSynonymEdges
+from config import SYNONYM_THRESHOLD
 
-docName = sys.argv[1]
-threshold = float(sys.argv[2]) if len(sys.argv) > 2 else 0.85
-writeSynonymEdges(docName, threshold)
+# Corpus-wide SYNONYM edges over every embedded entity in the DB.
+# threshold defaults to SYNONYM_THRESHOLD from config.
+threshold = float(sys.argv[1]) if len(sys.argv) > 1 else SYNONYM_THRESHOLD
+writeSynonymEdges(threshold)

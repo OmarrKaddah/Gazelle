@@ -64,6 +64,30 @@ def fusionSearch(query, k, allowed):
     return rrfFuse([v, f], topK=k)
 
 
+def hybridRetrieve(query, k, clearance):
+    allowed = allowedDocs(clearance)
+    if not allowed:
+        return {'seeds': [], 'chunks': [], 'pathEdges': []}
+    fusionChunks = fusionSearch(query, k, allowed)
+    graphResult = getLocalIndex().retrieve(query, k=k, allowedDocs=allowed)
+    for c in graphResult['chunks']:
+        c['source'] = 'graph'
+    scores = {}
+    items = {}
+    for rank, c in enumerate(fusionChunks):
+        cid = c['chunkId']
+        scores[cid] = scores.get(cid, 0) + 1.0 / (RRF_K + rank + 1)
+        items[cid] = c
+    for rank, c in enumerate(graphResult['chunks']):
+        cid = c['chunkId']
+        scores[cid] = scores.get(cid, 0) + 1.0 / (RRF_K + rank + 1)
+        if cid not in items:
+            items[cid] = c
+    ranked = sorted(scores.items(), key=lambda x: -x[1])
+    chunks = [{**items[cid], 'score': s, 'source': 'hybrid'} for cid, s in ranked]
+    return {'chunks': chunks, 'seeds': graphResult['seeds'], 'pathEdges': graphResult['pathEdges']}
+
+
 def graphRetrieve(query, k, clearance):
     # Local arm: PPR over the RELATED + SYNONYM entity graph (warm LocalIndex singleton).
     # Returns chunks (clearance-filtered) plus provenance (seeds + path edges) for the UI.
@@ -86,4 +110,6 @@ def retrieve(query, mode='vector', k=5, clearance='public'):
         return fusionSearch(query, k, allowed)
     if mode == 'graph':
         return graphRetrieve(query, k, clearance)['chunks']
+    if mode == 'hybrid':
+        return hybridRetrieve(query, k, clearance)['chunks']
     return []

@@ -4,21 +4,30 @@ from pathlib import Path
 
 from neo4j import GraphDatabase
 
-from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
+from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, EXTRACT_DIR
 from kgBuild import canonicalId, canonicalKey, loadChunks, setupConstraints, writeChunks, writeDocument
 
 
 def loadElements(docName):
-    return json.loads(Path(f'extractions/{docName}_graph.json').read_text(encoding='utf-8'))
+    return json.loads(Path(f'{EXTRACT_DIR}/{docName}_graph.json').read_text(encoding='utf-8'))
 
 
 def mergeEntities(docName, instances):
+
     grouped = {}
+
     for inst in instances:
+
         for name, type, desc in inst['entities']:
+
             key = (canonicalKey(name), type)
+
+
             if key not in grouped:
+
+
                 grouped[key] = {
+
                     'canonicalId': canonicalId(docName, key[0], type),
                     'canonicalName': name.strip(),
                     'type': type,
@@ -28,24 +37,37 @@ def mergeEntities(docName, instances):
                     'chunkIds': set(),
                 }
             rec = grouped[key]
+
+
             if desc:
                 rec['descriptions'].append(desc)
             surface = name.strip()
             if surface != rec['canonicalName']:
                 rec['aliases'].add(surface)
             rec['chunkIds'].add(inst['chunkId'])
+
+
     for rec in grouped.values():
+
         rec['description'] = ' '.join(dict.fromkeys(rec.pop('descriptions')))
+
         rec['aliases'] = sorted(rec['aliases'])
+
         rec['chunkIds'] = sorted(rec['chunkIds'])
+
+
     return list(grouped.values())
 
 
 def buildNameLookup(entities):
+
     lookup = {}
     for e in entities:
+
         for surface in [e['canonicalName']] + e['aliases']:
+
             lookup.setdefault(canonicalKey(surface), e['canonicalId'])
+            
     return lookup
 
 

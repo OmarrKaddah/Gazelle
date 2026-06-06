@@ -87,6 +87,20 @@ Doc_Out/
 output/
 parsed/
 
+# CBE-specific extractions (regenerable from the pipeline)
+extractions_cbe/
+
+# Gazetteer (regenerable)
+gazetteer/
+
+# Trained model artifacts and classical NER subsystem (regenerable)
+src/models/
+src/classical_NER/
+router/data/*.pkl
+
+# NER annotation datasets
+annotations/
+
 # chunks/ and extractions/ — ignore contents by default, allowlist
 # the thesis-critical MuSiQue artifacts so they're in the repo record.
 chunks/*
@@ -109,6 +123,12 @@ WhatsApp Image *.jpeg
 WhatsApp Image *.jpg
 WhatsApp Image *.png
 
+# Root-level corpus/graph dumps (regenerable — all JSON at root is data, nothing tracked there)
+/*.json
+
+# Root-level scratch sample files
+/_*.txt
+
 # Throwaway probe scripts at project root (not in src/ or runners/)
 /test.py
 /scratch.py
@@ -118,9 +138,17 @@ WhatsApp Image *.png
 
 # Local Claude config
 .claude/
+CLAUDE.md
 
 # graphTraversal validation fixtures + generated figures (regenerable/downloadable)
 graphTraversal/datasets/
 graphTraversal/figures/
+
+# Global-arm benchmark (sensemaking): downloaded corpora, question sets, eval results, vizualizations
+sensemaking/data/
+sensemaking/eval_results/
+sensemaking/questions_*.json
+sensemaking/config/
+viz/
 
 .venv*

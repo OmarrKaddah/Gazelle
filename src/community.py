@@ -3,15 +3,9 @@ from collections import Counter, defaultdict
 from neo4j import GraphDatabase
 from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
 
-# Stage 4 — persist a Leiden community hierarchy to Neo4j as the skeleton the
-# global arm summarises later. leidenHierarchy returns partitions finest->root;
-# we store them with level 0 = root (coarsest), matching GraphRAG's C0 convention
-# (the level the global arm answers at). PARENT links are assigned by plurality
-# vote, not containment: consecutive Leiden levels do not always strictly nest, so
-# a finer community's entities can split across two coarser communities.
 
 
-# ── pure builders ────────────────────────────────────────────────
+
 
 def communityId(corpus, level, label):
     return f'{corpus}-L{level}-c{label}'
@@ -33,7 +27,9 @@ def communityNodes(levels, corpus):
 def memberships(levels, idxToId, corpus):
     rows = []
     for level, labels in enumerate(levels):
+
         for idx, label in enumerate(labels):
+            
             rows.append({
                 'entityId': idxToId[idx],
                 'communityId': communityId(corpus, level, int(label)),
@@ -59,7 +55,7 @@ def parentLinks(levels, corpus):
     return links
 
 
-# ── Neo4j writers ────────────────────────────────────────────────
+#  Neo4j writers 
 
 def setupConstraints(tx):
     tx.run('CREATE CONSTRAINT IF NOT EXISTS FOR (c:Community) REQUIRE c.id IS UNIQUE')
@@ -105,7 +101,7 @@ def writeParents(tx, links):
     )
 
 
-# ── orchestrator ─────────────────────────────────────────────────
+
 
 def writeCommunities(hierarchy, idxToId, corpus):
     levels = orientLevels(hierarchy)

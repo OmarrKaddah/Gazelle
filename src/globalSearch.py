@@ -3,36 +3,71 @@ from neo4j import GraphDatabase
 from llmTriples import callLLM
 from config import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
 
-# Stage 2 of the global arm — GraphRAG map-reduce over community reports. Each
-# community report independently produces a partial answer + a helpfulness score
-# (map); the top-scored partials are combined into the final answer (reduce). This
-# is what makes the answer *global*: the whole corpus is considered through its
-# community summaries, nothing is retrieved away. Default level 0 = root (C0), the
-# level the paper shows is ~as good as deeper ones at a fraction of the tokens.
 
-MAP_PROMPT = '''Answer the question using ONLY the community report below. If the report is not
-relevant to the question, say so and score 0.
 
-Give a partial answer and a helpfulness score from 0-100 (how useful this report is for answering
-the question). Preserve any [Data: ...] references from the report in your partial answer.
+MAP_BATCH_CHARS = 10000   
+REDUCE_TOP_POINTS = 40    # cap the points fed to reduce, highest score first
 
-Return JSON only: {{"answer": "...", "score": 0}}
+
+REFUSAL = 'The provided context does not contain enough information to answer this question.'
+
+MAP_PROMPT = '''You are answering a question using several community reports drawn from a corpus.
+
+From the reports below, extract the key points relevant to answering the question. Each point is a
+single self-contained claim with a helpfulness score 0-100 (how useful it is for the question).
+Preserve any [Data: ...] references. Ignore reports that are not relevant.
+
+Return JSON only: {{"points": [{{"description": "...", "score": 0}}]}}
 
 Question: {query}
 
-Community report:
-{report}'''
+Community reports:
+{reports}'''
 
-REDUCE_PROMPT = '''Combine the partial answers below into a single comprehensive answer to the question.
-The partials come from independent analyses of different parts of the corpus; merge them, remove
-redundancy, and preserve their [Data: ...] references. Do not add information not present in the partials.
+REDUCE_PROMPT = '''Synthesise the key points below into a single comprehensive answer to the question.
+The points were extracted independently from different parts of the corpus.
+
+Write flowing PROSE, not a bare list: group related points into a few short paragraphs, briefly explain
+each, merge duplicates, and preserve the [Data: ...] references. Do not add information not present in the
+points. The "answer" value must be a single prose string.
 
 Return JSON only: {{"answer": "..."}}
 
 Question: {query}
 
-Partial answers (each from one community, most helpful first):
-{partials}'''
+Key points (most helpful first):
+{points}'''
+
+
+
+def asText(x):
+    
+
+    if isinstance(x, str):
+        return x
+    if isinstance(x, list):
+        return ' '.join(asText(i) for i in x)
+    return json.dumps(x, ensure_ascii=False)
+
+
+
+def toScore(x):
+    try:
+        return int(float(x))
+    except (TypeError, ValueError):
+        return 0
+
+
+
+
+def parseJson(raw):
+    
+    raw = raw.strip()
+    start, end = raw.find('{'), raw.rfind('}')
+    return json.loads(raw[start:end + 1] if start != -1 and end > start else raw)
+
+
+
 
 
 def loadCommunityReports(corpus, level=0):
@@ -46,22 +81,70 @@ def loadCommunityReports(corpus, level=0):
             return [(r['id'], r['report']) for r in session.run(cypher, corpus=corpus, level=level)]
 
 
-def mapCommunity(query, report, backend):
-    raw = json.loads(callLLM(MAP_PROMPT.format(query=query, report=report), backend=backend))
-    return raw.get('answer', ''), int(raw.get('score', 0))
 
 
-def reduceAnswers(query, partials, backend):
-    ranked = sorted(partials, key=lambda p: -p[1])
-    block = '\n\n'.join(f'[helpfulness {score}] {answer}' for answer, score in ranked)
-    raw = json.loads(callLLM(REDUCE_PROMPT.format(query=query, partials=block), backend=backend))
-    return raw.get('answer', '')
+def batchReports(reports, budget=MAP_BATCH_CHARS):
+    # greedily pack report texts into batches that fit the char budget.
+    batches, current, size = [], [], 0
+    for rep in reports:
+        if current and size + len(rep) > budget:
+            batches.append(current)
+            current, size = [], 0
+        current.append(rep)
+        size += len(rep)
+    if current:
+        batches.append(current)
+    return batches
+
+
+
+
+def mapBatch(query, reports, backend):
+    
+    
+    block = '\n\n---\n\n'.join(reports)
+    for _ in range(3):
+        raw = callLLM(MAP_PROMPT.format(query=query, reports=block), backend=backend)
+        try:
+            data = parseJson(raw)
+        except json.JSONDecodeError:
+            continue
+        return [(asText(p.get('description', '')), toScore(p.get('score'))) for p in data.get('points', [])]
+    
+
+    print(f'  batch broke ({len(reports)} reports), ', flush=True)
+    return []
+
+
+
+
+def reduceAnswers(query, points, backend):
+
+
+    ranked = sorted(points, key=lambda p: -p[1])[:REDUCE_TOP_POINTS]
+
+
+    block = '\n'.join(f'- ({score}) {desc}' for desc, score in ranked)
+
+
+    raw = parseJson(callLLM(REDUCE_PROMPT.format(query=query, points=block), backend=backend))
+    return asText(raw.get('answer', ''))
+
+
+
 
 
 def globalSearch(query, corpus, level=0, backend='openrouter'):
-    reports = loadCommunityReports(corpus, level)
-    partials = [mapCommunity(query, report, backend) for _, report in reports]
-    partials = [(answer, score) for answer, score in partials if score > 0]
-    if not partials:
-        return 'The corpus does not contain information relevant to this question.'
-    return reduceAnswers(query, partials, backend)
+    reports = [rep for _, rep in loadCommunityReports(corpus, level)]
+    points = []
+
+
+    for batch in batchReports(reports):
+
+        points += mapBatch(query, batch, backend)
+    points = [(desc, score) for desc, score in points if score > 0]
+
+
+    if not points:
+        return REFUSAL
+    return reduceAnswers(query, points, backend)

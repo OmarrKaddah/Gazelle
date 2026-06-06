@@ -13,7 +13,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from neo4j import GraphDatabase
-from retriever import retrieve, graphRetrieve
+from retriever import retrieve, graphRetrieve, hybridRetrieve
 from localRetrieve import reloadLocalIndex
 from auth import bearer, getCurrentUser, login, logout, userFromToken
 from docAccess import LEVELS
@@ -42,12 +42,18 @@ PROVIDERS = {
 }
 
 
+
+
 app = FastAPI(title="Gazelle API")
+
+
 
 
 @app.on_event("startup")
 async def onStartup():
     await initDb()
+
+
 
 
 app.add_middleware(
@@ -57,8 +63,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
 class ChatRequest(BaseModel):
     query: str
     chatId: str | None = None
@@ -68,12 +72,24 @@ class ChatRequest(BaseModel):
     provider: str = "ollama"
 
 
+
+
+
+
 class CreateChatRequest(BaseModel):
     title: str | None = None
 
 
+
+
+
 class UpdateChatRequest(BaseModel):
     title: str
+
+
+
+
+
 
 
 class UpsertChatMemoryRequest(BaseModel):
@@ -88,6 +104,10 @@ class UpsertUserMemoryRequest(BaseModel):
     metadata: dict | None = None
 
 
+
+
+
+
 def buildContext(chunks):
     return "\n\n---\n\n".join(
         f"[{c['chunkId']} | section: {' > '.join(c.get('sectionPath') or [])} | pages: {c.get('pages')}]\n{c['text']}"
@@ -95,40 +115,76 @@ def buildContext(chunks):
     )
 
 
-COMPLIANCE_PROMPT = """You are Gazelle, a compliance assistant for Abu Dhabi Islamic Bank (ADIB).
 
-STRICT GROUNDING RULES — these override every other instinct:
-1. Answer using ONLY the provided CONTEXT chunks. Do NOT use general knowledge, training data, common-sense inferences, or any external information.
-2. Every factual claim in your answer MUST be tied to a specific source by including the chunkId in square brackets, e.g. [chapter_3-c0017]. A claim without a citation is forbidden.
-3. If the CONTEXT does not contain enough information to answer the question, respond with exactly:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+COMPLIANCE_PROMPT = """You are Gazelle, an expert compliance and technical support assistant for Abu Dhabi Islamic Bank (ADIB). Your job is to provide complete, highly detailed, and exhaustive answers based strictly on the provided CONTEXT.
+
+GROUNDING RULES:
+1. Answer ONLY using the provided CONTEXT chunks — do not introduce outside facts, assumptions, or external information. You MAY read closely, combine, and reason over facts that ARE stated in the CONTEXT to reach the answer.
+2. Exhaustive Synthesis: Do not summarize or provide short answers. You must extract and explain EVERY relevant condition, troubleshooting step, parameter, and nuance found in the CONTEXT. If multiple steps or rules exist, you are required to list all of them.
+3. Language & Formatting: Present your detailed explanation in clear, professional Arabic. Organize complex workflows, multiple rules, or troubleshooting steps into structured bulleted lists or numbered steps. Keep all technical English system terms (e.g., "Flags", "Service button", "Spam", "mobile cm") exactly as they appear in the context.
+4. Citations: Every single factual claim, step, or rule in your response MUST conclude with its exact source chunk ID in square brackets, formatted precisely like this: [chapter_3-c0017].
+5. Refusals: If the CONTEXT does not contain the answer, do not attempt to guess. Respond exactly with:
    - In Arabic: "لا توجد معلومات كافية في السياق المتاح للإجابة على هذا السؤال."
    - In English: "The provided context does not contain enough information to answer this question."
-   Match the language of the question. Do NOT guess. Do NOT fall back on what you think the answer might be.
-4. Do NOT add background, examples, definitions, or related facts that are not explicitly stated in the CONTEXT.
-5. Prefer short direct quotes from the CONTEXT over paraphrase. Be concise: 2–4 sentences unless the question genuinely requires a structured list.
-6. If a question is partially covered, answer only the part the context supports and explicitly note what is missing.
+   Match the language of the question.
 
-When in doubt, refuse to answer rather than fabricate."""
+EXAMPLE OF CORRECT FORMATTING AND SYNTHESIS:
+User: مش بتسلم رسائل على بطاقة الكاش باك
+Context:
+[Troubleshooting Guide (1)-c0054]: التأكد من ارقام الموبيل علي السيستم صحيحه ومحفوظه بالشكل السليم (علي 2 عنوان علي برايم) Flags is done on service button للعمليات (سحب / معامله) وليس للإيداع لا يكون عدي علي المعامله التي يشتكي منها العميل 10 أيام التأكد ان ADIB on mobile cm is not spam - مش بتسلم رسائل على بطاقة الكاش باك التأكد من عدم وجود كارت إضافي على السيستم التأكد ان العميل لديه كارت واحد فقط بحساب مالي واحد فقط العميل يعترض على المصروفات السنوية بشكل عام (ليست شكوى) التأكد من عدم ردها له قبل خصمها وكذا في حالة الاستبدال free replacement offer انا متحاسب على مصاريف السنوية للكارت مرتين
+
+Gazelle: 
+لحل مشكلة عدم استلام الرسائل على بطاقة الكاش باك بشكل كامل وتفصيلي، يرجى مراجعة وتطبيق كافة الشروط والخطوات التالية الواردة في الدليل الشامل:
+* التأكد التام من أن أرقام الهاتف المحمول المسجلة على النظام صحيحة ومحفوظة بالشكل السليم، وتحديداً على عنوانين على نظام "برايم" [Troubleshooting Guide (1)-c0054].
+* التحقق من تفعيل خيار "Flags" للعمليات الخاصة بـ (السحب / المعاملة) عبر "service button"، مع الملاحظة أن هذا الإجراء ليس مخصصاً لعمليات الإيداع [Troubleshooting Guide (1)-c0054].
+* التأكد من أن المعاملة التي يشتكي منها العميل لم يمر عليها أكثر من 10 أيام [Troubleshooting Guide (1)-c0054].
+* التحقق من إعدادات هاتف العميل والتأكد من أن نظام "ADIB on mobile cm" غير مصنف كرسائل مزعجة (is not spam) [Troubleshooting Guide (1)-c0054].
+* الفحص والتحقق من عدم وجود أي كارت إضافي مسجل للعميل على السيستم [Troubleshooting Guide (1)-c0054].
+* التأكد من أن العميل يمتلك كارت واحد فقط مرتبط بحساب مالي واحد فقط لا غير [Troubleshooting Guide (1)-c0054]."""
 
 
-# Open-domain framing for benchmark corpora (MuSiQue / 2Wiki Wikipedia passages). Same grounding
-# discipline, no banking identity — so the UI vibe-check reflects the data actually loaded.
+
+
+
+
+# Open-domain lel benchamrks
 GENERAL_PROMPT = """You are a question-answering assistant grounded in a retrieved set of passages.
 
-STRICT GROUNDING RULES — these override every other instinct:
-1. Answer using ONLY the provided CONTEXT chunks. Do NOT use general knowledge, training data, common-sense inferences, or any external information.
+GROUNDING RULES:
+1. Answer using only the information in the CONTEXT chunks — do not introduce outside facts, training data, or external information. You MAY read closely, combine, and reason over facts that ARE stated in the CONTEXT (including across several chunks) to reach the answer.
 2. Every factual claim in your answer MUST be tied to a specific source by including the chunkId in square brackets, e.g. [musique-0017]. A claim without a citation is forbidden.
-3. If the CONTEXT does not contain enough information to answer the question, respond with exactly:
+3. Refuse ONLY if, after carefully checking every chunk, the needed information is genuinely absent. If the CONTEXT supports an answer — even partially, or by connecting facts stated across chunks — give it. When the information is truly not present, respond with exactly:
    "The provided context does not contain enough information to answer this question."
-   Do NOT guess. Do NOT fall back on what you think the answer might be.
-4. Do NOT add background, examples, definitions, or related facts that are not explicitly stated in the CONTEXT.
+   Do NOT invent an answer the context does not support.
+4. Do NOT add background, examples, definitions, or unrelated facts that are not in the CONTEXT.
 5. Prefer short direct quotes from the CONTEXT over paraphrase. Be concise.
-6. If a question is partially covered, answer only the part the context supports and explicitly note what is missing.
+6. If a question is partially covered, answer only the part the CONTEXT supports and explicitly note what is missing.
 
-When in doubt, refuse to answer rather than fabricate."""
+Do not fabricate facts that aren't in the CONTEXT — but do not refuse when the CONTEXT does support an answer."""
 
 
 SYSTEM_PROMPT = GENERAL_PROMPT if CHAT_DOMAIN == 'general' else COMPLIANCE_PROMPT
+
+
+
+
 
 
 def buildPrompt(query, chunks):
@@ -141,6 +197,12 @@ def buildPrompt(query, chunks):
     )
 
 
+
+
+
+
+
+
 async def streamTokens(query, chunks, userMemRows, chatSummary, recentTurns, provider='ollama'):
     if not chunks:
         print(
@@ -150,7 +212,9 @@ async def streamTokens(query, chunks, userMemRows, chatSummary, recentTurns, pro
         yield "data: " + json.dumps({"type": "token", "text": "No relevant context was retrieved for this query."}) + "\n\n"
         return
     cfg = PROVIDERS.get(provider) or PROVIDERS['ollama']
+
     headers = {"Authorization": f"Bearer {cfg['apiKey']}"} if cfg['apiKey'] else {}
+
     messages = assembleMessages(
         systemPrompt=SYSTEM_PROMPT,
         userMemRows=userMemRows,
@@ -165,6 +229,7 @@ async def streamTokens(query, chunks, userMemRows, chatSummary, recentTurns, pro
         flush=True,
     )
     async with httpx.AsyncClient(timeout=300) as client:
+
         async with client.stream(
             "POST",
             cfg['url'],
@@ -176,16 +241,21 @@ async def streamTokens(query, chunks, userMemRows, chatSummary, recentTurns, pro
                 "stream": True,
             },
         ) as response:
+            
             response.raise_for_status()
             async for raw in response.aiter_lines():
+
                 if not raw or not raw.startswith("data: "):
                     continue
                 payload = raw[6:]
+
                 if payload == "[DONE]":
+
                     break
                 chunk = json.loads(payload)
                 delta = chunk["choices"][0].get("delta", {}).get("content", "")
                 if delta:
+
                     yield "data: " + json.dumps({"type": "token", "text": delta}) + "\n\n"
 
 
@@ -199,6 +269,9 @@ def serializeChat(chat):
     }
 
 
+
+
+
 def serializeMessage(message):
     return {
         "id": str(message.id),
@@ -208,8 +281,6 @@ def serializeMessage(message):
         "tokenCount": message.tokenCount,
         "createdAt": message.createdAt.isoformat(),
     }
-
-
 def serializeUserMemory(row):
     return {
         "id": str(row.id),
@@ -219,8 +290,6 @@ def serializeUserMemory(row):
         "metadata": row.metadataJson,
         "updatedAt": row.updatedAt.isoformat(),
     }
-
-
 def serializeChatMemory(row):
     if not row:
         return None
@@ -232,17 +301,16 @@ def serializeChatMemory(row):
         "metadata": row.metadataJson,
         "updatedAt": row.updatedAt.isoformat(),
     }
-
-
 def countTokens(text: str):
     return len(text.split())
 
-
 def buildChatSummary(userQuery: str, assistantAnswer: str):
-    userPart = userQuery.strip()[:500]
-    assistantPart = assistantAnswer.strip()[:1200]
-    return f"User: {userPart}\nAssistant: {assistantPart}"
 
+    userPart = userQuery.strip()[:500]
+
+    assistantPart = assistantAnswer.strip()[:1200]
+
+    return f"User: {userPart}\nAssistant: {assistantPart}"
 
 @app.get("/api/info")
 def infoEndpoint():
@@ -253,22 +321,18 @@ def infoEndpoint():
         },
         "levels": LEVELS,
     }
-
-
 class LoginRequest(BaseModel):
     username: str
     password: str
 
-
 @app.post("/api/login")
+
 async def loginEndpoint(req: LoginRequest, session: AsyncSession = Depends(getDbSession)):
     token = await login(req.username, req.password, session)
     if not token:
         return {"ok": False, "error": "Invalid credentials"}
     user = await userFromToken(token, session)
     return {"ok": True, "token": token, "user": user}
-
-
 @app.post("/api/logout")
 async def logoutEndpoint(
     creds=Depends(bearer),
@@ -279,14 +343,24 @@ async def logoutEndpoint(
     return {"ok": True}
 
 
+
+
 @app.get("/api/me")
 async def meEndpoint(user=Depends(getCurrentUser)):
     return {"user": user}
 
-
 @app.post("/api/retrieve")
 def retrieveEndpoint(req: ChatRequest, user=Depends(getCurrentUser)):
     return {"chunks": retrieve(req.query, mode=req.mode, k=req.k, clearance=user['clearance'])}
+
+
+
+
+
+
+
+
+
 
 
 def queryGraph(tx, search, entityType, limit):
@@ -325,6 +399,13 @@ def queryGraph(tx, search, entityType, limit):
     return nodes, edges
 
 
+
+
+
+
+
+
+
 def querySeedGraph(tx, seed, hops, limit):
     nodesRes = tx.run(
         f"""
@@ -354,6 +435,19 @@ def querySeedGraph(tx, seed, hops, limit):
     )
     edges = [dict(r) for r in edgesRes]
     return nodes, edges
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @app.get("/api/graph")
@@ -398,6 +492,15 @@ async def graphEndpoint(
     }
 
 
+
+
+
+
+
+
+
+
+
 async def chatEventGen(query, chunks, userMemRows, chatSummary, recentTurns, chatId, userId, req, provenance=None):
     yield "data: " + json.dumps({"type": "citations", "citations": chunks}) + "\n\n"
     if provenance:
@@ -429,8 +532,9 @@ async def chatEventGen(query, chunks, userMemRows, chatSummary, recentTurns, cha
 
 @app.post("/api/chat")
 async def chatStream(req: ChatRequest, user=Depends(getCurrentUser)):
-    if req.mode == 'graph':
-        result = await asyncio.to_thread(graphRetrieve, req.query, req.k, user['clearance'])
+    if req.mode in ('graph', 'hybrid'):
+        fn = graphRetrieve if req.mode == 'graph' else hybridRetrieve
+        result = await asyncio.to_thread(fn, req.query, req.k, user['clearance'])
         chunks = result['chunks']
         provenance = {'seeds': result['seeds'], 'pathEdges': result['pathEdges']}
     else:
@@ -456,7 +560,6 @@ async def chatStream(req: ChatRequest, user=Depends(getCurrentUser)):
         media_type="text/event-stream; charset=utf-8",
     )
 
-
 @app.get("/api/chats")
 async def listChatsEndpoint(
     limit: int = 30,
@@ -466,7 +569,6 @@ async def listChatsEndpoint(
 ):
     rows = await listChats(session, uuid.UUID(user["id"]), limit, offset)
     return {"chats": [serializeChat(row) for row in rows]}
-
 
 @app.post("/api/chats")
 async def createChatEndpoint(
@@ -481,7 +583,6 @@ async def createChatEndpoint(
     messages = await listMessages(session, row.id, 200, 0)
     return {"chat": {**serializeChat(row), "messages": [serializeMessage(msg) for msg in messages]}}
 
-
 @app.get("/api/chats/{chatId}")
 async def getChatEndpoint(
     chatId: str,
@@ -495,6 +596,8 @@ async def getChatEndpoint(
         raise HTTPException(status_code=404, detail="Chat not found")
     messages = await listMessages(session, row.id, limit, offset)
     return {"chat": {**serializeChat(row), "messages": [serializeMessage(msg) for msg in messages]}}
+
+
 
 
 @app.patch("/api/chats/{chatId}")
@@ -514,6 +617,8 @@ async def updateChatEndpoint(
     return {"chat": serializeChat(row)}
 
 
+
+
 @app.delete("/api/chats/{chatId}")
 async def deleteChatEndpoint(
     chatId: str,
@@ -526,20 +631,26 @@ async def deleteChatEndpoint(
     return {"ok": True}
 
 
+
 @app.get("/api/chats/{chatId}/memory")
 async def getChatMemoryEndpoint(
     chatId: str,
     user=Depends(getCurrentUser),
     session: AsyncSession = Depends(getDbSession),
 ):
+    
+
     row = await getChatById(session, uuid.UUID(user["id"]), uuid.UUID(chatId))
     if not row:
+
         raise HTTPException(status_code=404, detail="Chat not found")
     memory = await getChatMemory(session, row.id)
     return {"memory": serializeChatMemory(memory)}
 
 
 @app.put("/api/chats/{chatId}/memory")
+
+
 async def putChatMemoryEndpoint(
     chatId: str,
     req: UpsertChatMemoryRequest,
@@ -557,6 +668,7 @@ async def putChatMemoryEndpoint(
 
 
 @app.get("/api/memory/user")
+
 async def getUserMemoryEndpoint(
     user=Depends(getCurrentUser),
     session: AsyncSession = Depends(getDbSession),
@@ -565,7 +677,15 @@ async def getUserMemoryEndpoint(
     return {"memory": [serializeUserMemory(row) for row in rows]}
 
 
+
+
+
+
+
+
 @app.put("/api/memory/user/{memoryKey}")
+
+
 async def putUserMemoryEndpoint(
     memoryKey: str,
     req: UpsertUserMemoryRequest,
@@ -584,6 +704,8 @@ async def putUserMemoryEndpoint(
     await session.commit()
     await session.refresh(row)
     return {"memory": serializeUserMemory(row)}
+
+
 
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -612,6 +734,8 @@ PIPELINE_OUTPUTS = {
 }
 
 
+
+
 class PipelineRunRequest(BaseModel):
     stage: str
     route: str = "2"
@@ -619,6 +743,8 @@ class PipelineRunRequest(BaseModel):
     chunker: str = "semantic"
     backend: str = "openrouter"
     workers: int = 12
+
+
 
 
 def pipelineEnv(req: PipelineRunRequest):
@@ -633,6 +759,8 @@ def pipelineEnv(req: PipelineRunRequest):
         "PYTHONUTF8": "1",
     })
     return env
+
+
 
 
 @app.get("/api/pipeline/status")
@@ -651,6 +779,8 @@ async def pipelineStatus(user=Depends(getCurrentUser)):
             "workers": int(os.environ.get("GRAPH_EXTRACT_WORKERS", "12")),
         },
     }
+
+
 
 
 @app.post("/api/pipeline/run")
@@ -678,6 +808,8 @@ def pipelineRun(req: PipelineRunRequest, user=Depends(getCurrentUser)):
         yield "data: " + json.dumps({"done": True, "code": proc.returncode}) + "\n\n"
 
     return StreamingResponse(gen(), media_type="text/event-stream; charset=utf-8")
+
+
 
 
 @app.post("/api/pipeline/reloadIndex")

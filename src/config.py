@@ -3,6 +3,26 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# ============================================================================
+# PROJECT SETUP — the one knob to set when running the project from scratch.
+# Pick the graph-construction route; everything downstream derives from it.
+#   '1' = Route 1: GLiNER NER + co-mention COOCCURS_WITH  (classical baseline,
+#         deterministic, local-retrieval only, no descriptions)
+#   '2' = Route 2: full-LLM entities + RELATED{predicate,description} edges
+#         (deployed; required for the global/community arm)
+# Override per-run with the GRAPH_ROUTE env var.
+# ============================================================================
+GRAPH_ROUTE = os.environ.get('GRAPH_ROUTE', '2')
+
+# Clean-output knobs for a from-scratch run. ocr/parse/chunk keep their fixed
+# folders (Doc_Out/, parsed/, chunks/) so they SKIP and don't re-run.
+# EXTRACT_DIR is the only post-chunk *file* output; the rest of the pipeline
+# writes to Neo4j, namespaced by CORPUS_NAME (the :Community {corpus} tag).
+EXTRACT_DIR = os.environ.get('EXTRACT_DIR', 'extractions_cbe') # per-doc extraction JSON; shared by graphExtract write + graphBuild read (Route 2) and glinerExtract + kgBuild (Route 1)
+CORPUS_NAME = os.environ.get('CORPUS_NAME', 'cbe')         # tags (:Community {corpus}); the scope key for community summaries
+SYNONYM_THRESHOLD = float(os.environ.get('SYNONYM_THRESHOLD', '0.85'))  # cosine cutoff for SYNONYM identity-bridging edges
+COMMUNITY_RESOLUTION = float(os.environ.get('COMMUNITY_RESOLUTION', '1.0'))  # Leiden resolution
+
 # Neo4j
 NEO4J_URI = os.environ['NEO4J_URI']
 NEO4J_USER = os.environ['NEO4J_USER']
@@ -26,7 +46,7 @@ HANDWRITING_PATCHES_PER_IMAGE = int(os.environ.get('HANDWRITING_PATCHES_PER_IMAG
 HANDWRITING_THRESHOLD = float(os.environ.get('HANDWRITING_THRESHOLD', '0.7'))
 
 # Relation extraction
-OLLAMA_EXTRACT_MODEL = os.environ.get('OLLAMA_EXTRACT_MODEL', 'granite4.1:8b')
+OLLAMA_EXTRACT_MODEL = os.environ.get('OLLAMA_EXTRACT_MODEL', 'llama3.1:8b')
 PARALLEL_CHUNKS = int(os.environ.get('PARALLEL_CHUNKS', '4'))
 
 # Chunking
@@ -35,14 +55,13 @@ CHUNKER_TYPE = os.environ.get('CHUNKER_TYPE', 'semantic').lower() # valid values
 # Entity extraction (NER)
 NER_STRATEGY = os.environ.get('NER_STRATEGY', 'gliner').lower() # valid values: "gliner" (src/glinerExtract.py) or "llm" (src/llmNER.py)
 
-# Graph construction route
-GRAPH_ROUTE = os.environ.get('GRAPH_ROUTE', '1') # "1" = GLiNER + co-mention (classical baseline, kgBuild), "2" = full-LLM entities+rels+descriptions (graphExtract+graphBuild)
+# Graph construction route — GRAPH_ROUTE is set in the PROJECT SETUP block at the top of this file.
 GRAPH_EXTRACT_BACKEND = os.environ.get('GRAPH_EXTRACT_BACKEND', 'openrouter') # callLLM backend for Route 2 (ollama|groq|openrouter|gemini)
 GRAPH_EXTRACT_WORKERS = int(os.environ.get('GRAPH_EXTRACT_WORKERS', '12')) # parallel chunk extraction requests in Route 2
 
 # Chat API
 CHAT_DOMAIN = os.environ.get('CHAT_DOMAIN', 'compliance') # system-prompt framing: "compliance" (CBE/ADIB) | "general" (open-domain benchmark data)
-OLLAMA_CHAT_MODEL = os.environ.get('OLLAMA_CHAT_MODEL', 'granite4.1:8b')
+OLLAMA_CHAT_MODEL = os.environ.get('OLLAMA_CHAT_MODEL', 'llama3.1:8b')
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 GROQ_MODEL = os.environ.get('GROQ_MODEL', 'llama-3.3-70b-versatile')
 GROQ_API_KEY = os.environ.get('GROQ_API_KEY')
